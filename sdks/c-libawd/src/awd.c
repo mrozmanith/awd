@@ -22,9 +22,11 @@ awd_create(AWD_compression compression, awd_uint16 flags)
 
     awd = malloc(sizeof(AWD));
     awd->header = header;
+    awd->namespaces = malloc(256 * sizeof(AWD_namespace *));
+    
     awd->_last_block_id = 0;
+    awd->_last_ns_id = 0;
     awd->_header_written = AWD_FALSE;
-
 
     // No block lists initially
     awd->mesh_instances = NULL;

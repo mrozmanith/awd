@@ -4,6 +4,7 @@
 
 #include "util.h"
 #include "AWDMeshData.h"
+#include "AWDSubMesh.h"
 
 #include <awd/libawd.h>
 
@@ -28,8 +29,6 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     pyawd_AWDMeshData *self;
 
     self = (pyawd_AWDMeshData *)type->tp_alloc(type, 0);
-    if (self != NULL) {
-    }
 
     return (PyObject *)self;
 }
@@ -54,58 +53,14 @@ pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject
     int verts_len;
     awd_bool wide;
 
-    PyObject *verts;
-    PyObject *inds;
-    PyObject *uvs;
+    PyObject *sub_arg;
+    pyawd_AWDSubMesh *sub;
 
-    unsigned int len;
-
-
-    // TODO: Add material
-    static char *kwlist[] = { "vertices", "triangles", "uvs", NULL };
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!|O!i", kwlist, 
-        &PyList_Type, &verts, &PyList_Type, &inds, &PyList_Type, &uvs))
+    if (!PyArg_ParseTuple(args, "O!", &pyawd_AWDSubMeshType, &sub_arg))
         return NULL;
     
-    tris_len = PyList_Size(inds);
-    verts_len = PyList_Size(verts);
-
-    //wide = awdutil_check_flag(self->ob_awd, AWD_OPTIMIZE_FOR_ACCURACY);
-    // TODO: Refactor to delay this until added to AWD
-    wide = AWD_FALSE;
-    if (wide) {
-        awd_float64 *verts_arr;
-        awd_uint32 *inds_arr;
-        awd_float64 *uvs_arr;
-    }
-    else {
-        awd_float32 *verts_arr;
-        awd_uint16 *inds_arr;
-        awd_float32 *uvs_arr;
-
-        verts_arr = malloc(verts_len * sizeof(awd_float32));
-        if (!pyawdutil_pylist_to_float32(verts, verts_arr, verts_len))
-            return NULL;
-
-        inds_arr = malloc(tris_len * sizeof(awd_uint16));
-        if (!pyawdutil_pylist_to_uint16(inds, inds_arr, tris_len))
-            return NULL;
-        
-        // TODO: Postpone until add to AWD
-        /*
-        awd_mesh_add_sub_vtu(
-            self->ob_data, 
-            verts_len/3, 
-            tris_len/3,
-            verts_arr,
-            inds_arr,
-            NULL, // TODO: Deal with uvs
-            NULL, // Material
-            AWD_FALSE // wide?
-        );
-        */
-    }
+    sub = (pyawd_AWDSubMesh *)sub_arg;
+    awd_mesh_add_sub(self->ob_data, sub->ob_sub);
 
     Py_RETURN_NONE;
 }

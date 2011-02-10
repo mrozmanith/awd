@@ -5,6 +5,9 @@
 
 #include <awd/libawd.h>
 
+#define PYAWD_MAJOR_VERSION 1
+#define PYAWD_MINOR_VERSION 0
+
 
 extern PyTypeObject pyawd_AWDType;
 

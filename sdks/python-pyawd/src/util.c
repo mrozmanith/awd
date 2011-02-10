@@ -16,12 +16,8 @@ pyawdutil_pylist_to_float64(PyObject *list, awd_float64 *buf, unsigned int num_i
 
             item = PyList_GetItem(list, i);
 
-            // Check if float or long int, or bail out
-            // if none of these.
-            if (PyObject_TypeCheck(item, &PyFloat_Type) 
-                || PyObject_TypeCheck(item, &PyLong_Type)) {
-
-                buf[i] = (awd_float64)PyLong_AsDouble(item);
+            if (PyNumber_Check(item)) {
+                buf[i] = (awd_float64)PyFloat_AsDouble(PyNumber_Float(item));
             }
             else return NULL;
         }
@@ -48,10 +44,8 @@ pyawdutil_pylist_to_float32(PyObject *list, awd_float32 *buf, unsigned int num_i
 
             // Check if float or long int, or bail out
             // if none of these.
-            if (PyObject_TypeCheck(item, &PyFloat_Type) 
-                || PyObject_TypeCheck(item, &PyLong_Type)) {
-
-                buf[i] = (awd_float32)PyLong_AsDouble(item);
+            if (PyNumber_Check(item)) {
+                buf[i] = (awd_float32)PyFloat_AsDouble(PyNumber_Float(item));
             }
             else return NULL;
         }
@@ -78,7 +72,7 @@ pyawdutil_pylist_to_uint32(PyObject *list, awd_uint32 *buf, unsigned int num_ite
             item = PyList_GetItem(list, i);
 
             // Check if long int, or bail out
-            if (PyObject_TypeCheck(item, &PyLong_Type)) {
+            if (PyNumber_Check(item)) {
                 buf[i] = (awd_uint32)PyLong_AsLong(item);
             }
             else return NULL;
@@ -106,7 +100,7 @@ pyawdutil_pylist_to_uint16(PyObject *list, awd_uint16 *buf, unsigned int num_ite
             item = PyList_GetItem(list, i);
 
             // Check if long int, or bail out
-            if (PyObject_TypeCheck(item, &PyLong_Type)) {
+            if (PyNumber_Check(item)) {
                 buf[i] = (awd_uint16)PyLong_AsLong(item);
             }
             else return NULL;

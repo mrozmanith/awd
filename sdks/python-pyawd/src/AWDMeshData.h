@@ -28,8 +28,5 @@ int pyawd_AWDMeshData_init(pyawd_AWDMeshData *, PyObject *, PyObject *);
 PyObject *pyawd_AWDMeshData_add_sub(pyawd_AWDMeshData *, PyObject *, PyObject *);
 
 
-
-
-
 #endif
 

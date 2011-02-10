@@ -38,7 +38,7 @@ _awd_has_block(AWD_block_list *list, AWD_block *block)
     return AWD_FALSE;
 }
 
-awd_uint16 
+awd_baddr
 _awd_get_block_id_by_data(AWD_block_list *list, void *data)
 {
     AWD_block *block;
@@ -76,6 +76,7 @@ _awd_create_block(AWD_block_type type, void *data)
     block->type = type;
     block->data = data;
     block->next = NULL;
+    block->ns = NULL;
 
     return block;
 }

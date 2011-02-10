@@ -94,6 +94,7 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
     PyObject *mtx_arg;
     awd_float64 *mtx;
 
+
     char *kwlist[] = { "data", "transform", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!", kwlist, 
@@ -123,21 +124,22 @@ PyObject *
 pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
 {
     PyObject *fobj;
-    FILE *fp;
     int fd;
 
+#if PYTHON_VERSION == 3
     extern PyTypeObject PyIOBase_Type;
-
-
     if (!PyArg_ParseTuple(args, "O!", &PyIOBase_Type, &fobj))
         return NULL;
+#else
+    extern PyTypeObject PyFile_Type;
+    if (!PyArg_ParseTuple(args, "O!", &PyFile_Type, &fobj))
+        return NULL;
+#endif
 
     fd = PyObject_AsFileDescriptor(fobj);
 
     if (fd >= 0) {
         awd_flush(self->ob_awd, fd);
-        close(fd);
-
         Py_RETURN_NONE;
     }
     else {

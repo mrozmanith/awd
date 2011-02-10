@@ -1,9 +1,8 @@
 CC=gcc
 LD=ld
 SRC=$(wildcard src/*.c lib/lzma/*.c)
-#OBJ=src/awd.o src/util.o src/writing.o src/attr.o
 OBJ=$(SRC:.c=.o)
-CFLAGS=-Wall -L. -arch i386 -arch ppc -arch x86_64
+CFLAGS=-Wall -g -L. -arch i386 -arch ppc -arch x86_64
 INCLUDE=-Iinclude -Ilib/lzma/
 DEFINES=-D_7ZIP_ST
 LIBVER=1.0
@@ -14,15 +13,18 @@ LIBDIR=$(PREFIX)/lib
 INCDIR=$(PREFIX)/include
 BUILDDIR=build
 
-all: dynamic awdtest
+all: dynamic
+
+test: 
+	$(CC) -dynamic -lawd -o test test.c
+    
+    
 
 install: dynamic 
 	cp $(BUILDDIR)/$(DYLIB) $(LIBDIR)/$(DYLIB)
-	cp -R $(BUILDDIR)/awd $(INCDIR)/awd
+	rm -rf $(INCDIR)/awd
+	cp -Rf $(BUILDDIR)/awd $(INCDIR)/
     
-
-awdtest: dynamic 
-	$(CC) -lawd $(INCLUDE) $(CFLAGS) test.c -o awdtest
 
 dynamic: $(OBJ) 
 	gcc -dynamiclib -install_name $(LIBDIR)/$(DYLIB) -current_version $(LIBVER) $(CFLAGS) $(OBJ) -o $(BUILDDIR)/$(DYLIB)
@@ -36,9 +38,7 @@ static: $(OBJ)
 	$(CC) -c $(INCLUDE) $(CFLAGS) $(DEFINES) $< -o $@
 	
 clean: clean-objects
-	rm -f awdtest
+	rm -rf $(BUILDDIR)/*
 
 clean-objects:
-	rm -f *.o
-	rm -rf $(BUILDDIR)/*
 	rm -f $(OBJ)

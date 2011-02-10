@@ -20,13 +20,9 @@ typedef enum {
  * Data stream pointer
 */
 typedef union {
-    void *v;
-    awd_uint16 *ui16;
     awd_uint32 *ui32;
-    awd_float32 *f32;
     awd_float64 *f64;
-} AWD_mesh_data_stream_ptr;
-
+} AWD_data_str_ptr;
 
 
 
@@ -37,7 +33,7 @@ typedef union {
 typedef struct _AWD_mesh_data_stream {
     AWD_stream_type                 type;
     awd_uint32                      num_elements;
-    AWD_mesh_data_stream_ptr        data;
+    AWD_data_str_ptr                data;
 
     struct _AWD_mesh_data_stream *  next;
 } AWD_mesh_data_stream;
@@ -77,9 +73,9 @@ AWD_mesh_data *     awd_create_mesh_data(void);
 AWD_sub_mesh *      awd_create_sub_mesh(void);
 
 awd_bool            awd_mesh_add_sub(AWD_mesh_data *, AWD_sub_mesh *);
-awd_bool            awd_mesh_add_sub_vtu(AWD_mesh_data *, awd_uint32, awd_uint32, void *, void *, void *, AWD_material *);
+awd_bool            awd_mesh_add_sub_vtu(AWD_mesh_data *, awd_uint32, awd_uint32, awd_float64 *, awd_uint32 *, awd_float64 *, AWD_material *);
 
-awd_bool            awd_sub_mesh_add_stream(AWD_sub_mesh *, AWD_stream_type, unsigned int, void *);
+awd_bool            awd_sub_mesh_add_stream(AWD_sub_mesh *, AWD_stream_type, awd_uint32, AWD_data_str_ptr);
 
 
 #endif

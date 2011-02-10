@@ -23,6 +23,7 @@ awd_create_sub_mesh()
     sub = malloc(sizeof(AWD_sub_mesh));
     sub->material = NULL;
     sub->next = NULL;
+    sub->first_stream = NULL;
 
     return sub;
 }
@@ -51,17 +52,14 @@ awd_mesh_add_sub(AWD_mesh_data *mesh, AWD_sub_mesh *sub)
 
 
 awd_bool
-awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_stream_type type, unsigned int num_elements, void *data)
+awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_stream_type type, awd_uint32 num_elems, AWD_data_str_ptr data)
 {
-    AWD_mesh_data_stream_ptr ptr;
     AWD_mesh_data_stream *stream;
-
-    ptr.v = data;
 
     stream = malloc(sizeof(AWD_mesh_data_stream));
     stream->type = type;
-    stream->num_elements = num_elements;
-    stream->data = ptr;
+    stream->num_elements = num_elems;
+    stream->data = data;
     stream->next = NULL;
 
     if (!sub->first_stream) {
@@ -94,18 +92,28 @@ awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_stream_type type, unsigned int nu
 */
 awd_bool 
 awd_mesh_add_sub_vtu(AWD_mesh_data *mesh, awd_uint32 num_verts, awd_uint32 num_tris, 
-                                void *verts, void *tris, void *uvs, AWD_material *mat)
+                                awd_float64 *verts, awd_uint32 *tris, awd_float64 *uvs, 
+                                AWD_material *mat)
 {
     AWD_sub_mesh *sub;
 
     sub = awd_create_sub_mesh();
 
-    if (verts != NULL)
-        awd_sub_mesh_add_stream(sub, VERTICES, num_verts * 3, verts);
-    if (tris != NULL) 
-        awd_sub_mesh_add_stream(sub, TRIANGLES, num_tris * 3, tris);
-    if (uvs != NULL)
-        awd_sub_mesh_add_stream(sub, UVS, num_verts * 2, uvs);
+    if (verts != NULL) {
+        AWD_data_str_ptr vptr;
+        vptr.f64 = verts;
+        awd_sub_mesh_add_stream(sub, VERTICES, num_verts * 3, vptr);
+    }
+    if (tris != NULL) {
+        AWD_data_str_ptr tptr;
+        tptr.ui32 = tris;
+        awd_sub_mesh_add_stream(sub, TRIANGLES, num_tris * 3, tptr);
+    }
+    if (uvs != NULL) {
+        AWD_data_str_ptr uptr;
+        uptr.f64 = uvs;
+        awd_sub_mesh_add_stream(sub, UVS, num_verts * 2, uptr);
+    }
 
     return awd_mesh_add_sub(mesh, sub);
 }
