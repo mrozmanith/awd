@@ -75,6 +75,10 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
     while (sub) {
         AWD_mesh_data_stream *str;
         
+        // add size of mat ID and sub-mesh
+        // length (both awd_uint32)
+        mesh_len += 8;
+
         str = sub->first_stream;
         while (str) {
             mesh_len += (awdutil_stream_len(str, wide) + 5);
@@ -192,7 +196,7 @@ _awd_write_mesh_inst(AWD *awd, AWD_block *block, int fd)
     parent_id = UI32(_awd_get_block_id_by_data(awd->mesh_instances, inst->parent));
     data_id = UI32(_awd_get_block_id_by_data(awd->meshes, inst->data));
 
-    _awd_write_block_header(block, 132, fd);
+    _awd_write_block_header(block, 136, fd);
     write(fd, &parent_id, sizeof(awd_uint32));
     for (i=0; i<16; i++) {
         n = F64(inst->transform_mtx[i]);
