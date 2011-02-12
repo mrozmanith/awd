@@ -73,7 +73,7 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
     mesh_len = 0;
     sub = data->first_sub_mesh;
     while (sub) {
-        AWD_mesh_data_stream *str;
+        AWD_mesh_data_str *str;
         
         // add size of mat ID and sub-mesh
         // length (both awd_uint32)
@@ -95,7 +95,7 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
     // Write all sub-meshes
     sub = data->first_sub_mesh;
     while (sub) {
-        AWD_mesh_data_stream *str;
+        AWD_mesh_data_str *str;
         awd_baddr mat_id;
         awd_uint32 sub_len;
 
@@ -132,7 +132,7 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
 
 
 void 
-_awd_write_mesh_data_stream(AWD_mesh_data_stream *str, awd_bool wide, int fd)
+_awd_write_mesh_data_stream(AWD_mesh_data_str *str, awd_bool wide, int fd)
 {
     int e;
     awd_uint32 num;

@@ -50,7 +50,7 @@ pyawd_AWDSubMesh_init(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kwds)
 PyObject *
 pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kwds)
 {
-    AWD_stream_type str_type;
+    AWD_mesh_str_type str_type;
     AWD_data_str_ptr data;
     PyObject *data_list;
     size_t data_len;

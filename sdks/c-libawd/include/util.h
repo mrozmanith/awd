@@ -10,9 +10,9 @@
 awd_float64     *awdutil_id_mtx4(awd_float64 *);
 
 awd_bool        awdutil_check_flag(AWD *, awd_uint16);
-awd_uint32      awdutil_stream_len(AWD_mesh_data_stream *, awd_bool);
+awd_uint32      awdutil_stream_len(AWD_mesh_data_str *, awd_bool);
 
-size_t          awdutil_stream_elem_size(AWD_mesh_data_stream *, awd_bool);
+size_t          awdutil_stream_elem_size(AWD_mesh_data_str *, awd_bool);
 
 int             awdutil_mktmp();
 

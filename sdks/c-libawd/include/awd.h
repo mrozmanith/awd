@@ -8,8 +8,8 @@
 #include "mesh.h"
 
 
-#define AWD_MAJOR_VERSION 1
-#define AWD_MINOR_VERSION 0
+#define AWD_MAJOR_VERSION 0
+#define AWD_MINOR_VERSION 1
 
 #define AWD_TRUE 1
 #define AWD_FALSE 0

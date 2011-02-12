@@ -54,6 +54,9 @@ PyObject *_init_pyawd(PyObject *m)
     PyModule_AddIntConstant(m, "VERTEX_STREAM", VERTICES);
     PyModule_AddIntConstant(m, "TRIANGLE_STREAM", TRIANGLES);
     PyModule_AddIntConstant(m, "UV_STREAM", UVS);
+    PyModule_AddIntConstant(m, "VNORMAL_STREAM", VERTEX_NORMALS);
+    PyModule_AddIntConstant(m, "VTANGENT_STREAM", VERTEX_TANGENTS);
+    PyModule_AddIntConstant(m, "FNORMAL_STREAM", FACE_NORMALS);
 
 
     // Prepare class data types

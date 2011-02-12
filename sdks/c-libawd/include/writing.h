@@ -10,6 +10,6 @@ void            _awd_write_blocks(AWD *, AWD_block_list *, int, void (*)(AWD *, 
 void            _awd_write_mesh_data(AWD *, AWD_block *, int);
 void            _awd_write_mesh_inst(AWD *, AWD_block *, int);
 
-void            _awd_write_mesh_data_stream(AWD_mesh_data_stream *, awd_bool, int);
+void            _awd_write_mesh_data_stream(AWD_mesh_data_str *, awd_bool, int);
 
 #endif

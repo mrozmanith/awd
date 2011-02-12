@@ -20,13 +20,13 @@ awdutil_id_mtx4(awd_float64 *mtx)
 
 
 inline awd_uint32
-awdutil_stream_len(AWD_mesh_data_stream *str, awd_bool opt_for_acc)
+awdutil_stream_len(AWD_mesh_data_str *str, awd_bool opt_for_acc)
 {
     return (str->num_elements * awdutil_stream_elem_size(str, opt_for_acc));
 }
 
 size_t
-awdutil_stream_elem_size(AWD_mesh_data_stream *str, awd_bool opt_for_acc)
+awdutil_stream_elem_size(AWD_mesh_data_str *str, awd_bool opt_for_acc)
 {
     size_t elem_size;
 
@@ -39,6 +39,12 @@ awdutil_stream_elem_size(AWD_mesh_data_stream *str, awd_bool opt_for_acc)
             break;
         case UVS:
             elem_size = sizeof(awd_float32);
+            break;
+        case VERTEX_NORMALS:
+            break;
+        case VERTEX_TANGENTS:
+            break;
+        case FACE_NORMALS:
             break;
     }
 

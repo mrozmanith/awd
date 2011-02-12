@@ -52,11 +52,11 @@ awd_mesh_add_sub(AWD_mesh_data *mesh, AWD_sub_mesh *sub)
 
 
 awd_bool
-awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_stream_type type, awd_uint32 num_elems, AWD_data_str_ptr data)
+awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_mesh_str_type type, awd_uint32 num_elems, AWD_data_str_ptr data)
 {
-    AWD_mesh_data_stream *stream;
+    AWD_mesh_data_str *stream;
 
-    stream = malloc(sizeof(AWD_mesh_data_stream));
+    stream = malloc(sizeof(AWD_mesh_data_str));
     stream->type = type;
     stream->num_elements = num_elems;
     stream->data = data;
@@ -66,7 +66,7 @@ awd_sub_mesh_add_stream(AWD_sub_mesh *sub, AWD_stream_type type, awd_uint32 num_
         sub->first_stream = stream;
     }
     else {
-        AWD_mesh_data_stream *next = sub->first_stream;
+        AWD_mesh_data_str *next = sub->first_stream;
         while (1) {
             if (!next->next) {
                 next->next = stream;
