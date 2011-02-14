@@ -4,16 +4,16 @@
 #include "awd_types.h"
 
 typedef enum {
-    INT32=1,
-    UINT32,
-    FLOAT64,
-    BOOLEAN,
-    STRING,
-    VECTOR2x1=20,
-    VECTOR3x1,
-    VECTOR4x1,
-    MATRIX3x3,
-    MATRIX4x4
+    AWD_ATTR_INT32=1,
+    AWD_ATTR_UINT32,
+    AWD_ATTR_FLOAT64,
+    AWD_ATTR_BOOLEAN,
+    AWD_ATTR_STRING,
+    AWD_ATTR_VECTOR2x1=20,
+    AWD_ATTR_VECTOR3x1,
+    AWD_ATTR_VECTOR4x1,
+    AWD_ATTR_MATRIX3x3,
+    AWD_ATTR_MATRIX4x4
 } AWD_attr_type;
 
 

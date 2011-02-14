@@ -18,7 +18,7 @@ awd_create_attr_list()
 void 
 awd_set_attr_int32(AWD_attr_list *list, const char *key, awd_int32 val)
 {
-    AWD_attr *attr = _awd_create_attr(key, INT32, &val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_INT32, &val);
     _awd_append_attr(list, attr);
 }
 
@@ -26,7 +26,7 @@ awd_set_attr_int32(AWD_attr_list *list, const char *key, awd_int32 val)
 void 
 awd_set_attr_uint32(AWD_attr_list *list, const char *key, awd_uint32 val)
 {
-    AWD_attr *attr = _awd_create_attr(key, UINT32, &val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_UINT32, &val);
     _awd_append_attr(list, attr);
 }
 
@@ -34,7 +34,7 @@ awd_set_attr_uint32(AWD_attr_list *list, const char *key, awd_uint32 val)
 void 
 awd_set_attr_float64(AWD_attr_list *list, const char *key, awd_float64 val)
 {
-    AWD_attr *attr = _awd_create_attr(key, FLOAT64, &val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_FLOAT64, &val);
     _awd_append_attr(list, attr);
 }
 
@@ -42,7 +42,7 @@ awd_set_attr_float64(AWD_attr_list *list, const char *key, awd_float64 val)
 void 
 awd_set_attr_bool(AWD_attr_list *list, const char *key, awd_bool val)
 {
-    AWD_attr *attr = _awd_create_attr(key, BOOLEAN, &val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_BOOLEAN, &val);
     _awd_append_attr(list, attr);
 }
 
@@ -50,7 +50,7 @@ awd_set_attr_bool(AWD_attr_list *list, const char *key, awd_bool val)
 void 
 awd_set_attr_str(AWD_attr_list *list, const char *key, char *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, STRING, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_STRING, val);
     _awd_append_attr(list, attr);
 }
 
@@ -58,7 +58,7 @@ awd_set_attr_str(AWD_attr_list *list, const char *key, char *val)
 void 
 awd_set_attr_vec2x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, VECTOR2x1, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_VECTOR2x1, val);
     _awd_append_attr(list, attr);
 }
 
@@ -66,7 +66,7 @@ awd_set_attr_vec2x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 void 
 awd_set_attr_vec3x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, VECTOR3x1, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_VECTOR3x1, val);
     _awd_append_attr(list, attr);
 }
 
@@ -74,7 +74,7 @@ awd_set_attr_vec3x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 void 
 awd_set_attr_vec4x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, VECTOR4x1, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_VECTOR4x1, val);
     _awd_append_attr(list, attr);
 }
 
@@ -82,7 +82,7 @@ awd_set_attr_vec4x1(AWD_attr_list *list, const char *key, awd_float64 *val)
 void 
 awd_set_attr_mtx3x3(AWD_attr_list *list, const char *key, awd_float64 *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, MATRIX3x3, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_MATRIX3x3, val);
     _awd_append_attr(list, attr);
 }
 
@@ -90,7 +90,7 @@ awd_set_attr_mtx3x3(AWD_attr_list *list, const char *key, awd_float64 *val)
 void 
 awd_set_attr_mtx4x4(AWD_attr_list *list, const char *key, awd_float64 *val)
 {
-    AWD_attr *attr = _awd_create_attr(key, MATRIX4x4, val);
+    AWD_attr *attr = _awd_create_attr(key, AWD_ATTR_MATRIX4x4, val);
     _awd_append_attr(list, attr);
 }
 

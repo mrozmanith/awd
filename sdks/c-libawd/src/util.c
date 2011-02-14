@@ -3,6 +3,11 @@
 
 #include "libawd.h"
 
+// Get mkstemp replacement
+#ifdef WIN32
+#include "awdw32.h"
+#endif
+
 awd_float64 *
 awdutil_id_mtx4(awd_float64 *mtx)
 {
@@ -19,7 +24,7 @@ awdutil_id_mtx4(awd_float64 *mtx)
 }
 
 
-inline awd_uint32
+awd_uint32
 awdutil_stream_len(AWD_mesh_data_str *str, awd_bool opt_for_acc)
 {
     return (str->num_elements * awdutil_stream_elem_size(str, opt_for_acc));

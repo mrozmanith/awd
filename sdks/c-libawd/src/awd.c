@@ -1,6 +1,11 @@
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+
+#ifdef WIN32
+#include "awdw32.h"
+#else
+#include <unistd.h>
+#endif
 
 #include "libawd.h"
 
@@ -112,7 +117,8 @@ awd_flush(AWD *awd, int out_fd)
 
     tmp_len = lseek(tmp_fd, 0, SEEK_END);
     tmp_buf = malloc(tmp_len);
-    pread(tmp_fd, tmp_buf, tmp_len, 0);
+	lseek(tmp_fd, 0, SEEK_SET);
+    read(tmp_fd, tmp_buf, tmp_len, 0);
 
     // Temp file no longer needed
     close(tmp_fd);
