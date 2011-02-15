@@ -100,6 +100,7 @@ awd_flush(AWD *awd, int out_fd)
     awd_uint8 *body_buf;
     awd_uint32 body_len;
 
+    tmp_len = 0;
     tmp_fd = awdutil_mktmp(&tmp_path);
     if (tmp_fd < 0) {
         extern int errno;
@@ -108,14 +109,13 @@ awd_flush(AWD *awd, int out_fd)
     }
 
     if (awd->meshes) {
-        _awd_write_blocks(awd, awd->meshes, tmp_fd, &_awd_write_mesh_data);
+        tmp_len += _awd_write_blocks(awd, awd->meshes, tmp_fd, &_awd_write_mesh_data);
     }
 
     if (awd->mesh_instances) {
-        _awd_write_blocks(awd, awd->mesh_instances, tmp_fd, &_awd_write_mesh_inst);
+        tmp_len += _awd_write_blocks(awd, awd->mesh_instances, tmp_fd, &_awd_write_mesh_inst);
     }
 
-    tmp_len = lseek(tmp_fd, 0, SEEK_END);
     tmp_buf = malloc(tmp_len);
 	lseek(tmp_fd, 0, SEEK_SET);
     read(tmp_fd, tmp_buf, tmp_len);

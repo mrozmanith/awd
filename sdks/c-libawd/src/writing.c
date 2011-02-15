@@ -24,23 +24,27 @@ _awd_write_header(AWD *awd, int fd, awd_uint32 body_length)
 }
 
 
-void 
-_awd_write_blocks(AWD *awd, AWD_block_list *list, int fd, void (*write_func)(AWD *, AWD_block *, int fd))
+size_t
+_awd_write_blocks(AWD *awd, AWD_block_list *list, int fd, size_t (*write_func)(AWD *, AWD_block *, int fd))
 {
+    size_t total_len;
     AWD_block *next;
+
+    total_len = 0;
 
     next = list->first_block;
     while (next) {
         next->id = ++awd->_last_block_id;
 
-
-        write_func(awd, next, fd);
+        total_len += write_func(awd, next, fd);
         next = next->next;
     }
+
+    return total_len;
 }
 
 
-void 
+size_t
 _awd_write_block_header(AWD_block *block, awd_uint32 length, int fd)
 {
     awd_uint8 ns_id;
@@ -58,24 +62,30 @@ _awd_write_block_header(AWD_block *block, awd_uint32 length, int fd)
     write(fd, &ns_id, sizeof(awd_uint8));
     write(fd, &block->type, sizeof(awd_uint8));
     write(fd, &length, sizeof(awd_uint32));
+
+    return 10;
 }
 
 
 
-void
+size_t
 _awd_write_attributes(AWD *awd, AWD_attr_list *attributes, int fd)
 {
+    size_t len;
     AWD_attr *attr;
 
+    len = 0;
     attr = attributes->first_attr;
     while (attr) {
         printf("attr: %s\n", attr->key);
         attr = attr->next;
     }
+
+    return len;
 }
 
 
-void 
+size_t
 _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
 {
     awd_bool wide;
@@ -147,7 +157,11 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
         sub = sub->next;
     }
 
-    _awd_write_attributes(awd, data->attributes, fd);
+    //_awd_write_attributes(awd, data->attributes, fd);
+
+    // Total length is mesh length + length 
+    // of header which is always 10 bytes.
+    return mesh_len + 10;
 }
 
 
@@ -200,7 +214,7 @@ _awd_write_mesh_data_stream(AWD_mesh_data_str *str, awd_bool wide, int fd)
 }
 
 
-void 
+size_t
 _awd_write_mesh_inst(AWD *awd, AWD_block *block, int fd)
 {
     int i;
@@ -223,5 +237,8 @@ _awd_write_mesh_inst(AWD *awd, AWD_block *block, int fd)
         write(fd, &n, sizeof(awd_float64));
     }
     write(fd, &data_id, sizeof(awd_uint32));
+    
+    // Length of header + static 136 body length
+    return 146;
 }
 
