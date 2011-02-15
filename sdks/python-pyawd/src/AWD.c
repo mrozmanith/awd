@@ -48,11 +48,13 @@ pyawd_AWD_init(pyawd_AWD *self, PyObject *args, PyObject *kwds)
 
     char *kwlist[] = {"compression", "streaming", "wide", NULL};
 
+	flags = 0;
+	compression = 0;
+
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|bbb", kwlist,
                                     &compression, &streaming, &wide))
         return -1;
 
-    flags = 0;
     if (streaming == Py_True)
         flags |= AWD_STREAMING;
     if (wide == Py_True)
