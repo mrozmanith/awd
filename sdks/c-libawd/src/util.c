@@ -72,6 +72,7 @@ awdutil_check_flag(AWD *awd, awd_uint16 flag)
 int
 awdutil_mktmp(char **path)
 {
+	int err;
     int len;
     int fd;
     char *tpl;
@@ -80,7 +81,14 @@ awdutil_mktmp(char **path)
     tpl = malloc(len);
     strncpy(tpl, TMPFILE_TEMPLATE, len);
 
+#ifdef WIN32
+	err = _mktemp_s(tpl, len+1);
+	if (err==0)
+		fd = _open(tpl, _O_CREAT|_O_TEMPORARY|_O_RDWR|_O_BINARY, _S_IWRITE);
+	else fd = 0;
+#else
     fd = mkstemp(tpl);
+#endif
 
     if (path)
         *path = tpl;
