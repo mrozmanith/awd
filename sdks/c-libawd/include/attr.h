@@ -17,14 +17,13 @@ typedef enum {
 } AWD_attr_type;
 
 
-struct AWD_attr_struct {
+typedef struct _AWD_attr {
     char *key;
     AWD_attr_type type;
     void *value;
 
-    struct AWD_attr_struct *next;
-};
-typedef struct AWD_attr_struct AWD_attr;
+    struct _AWD_attr *next;
+} AWD_attr;
 
 typedef struct {
     AWD_attr *first_attr;

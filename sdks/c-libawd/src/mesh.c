@@ -10,6 +10,7 @@ awd_create_mesh_data()
 
     mesh = malloc(sizeof(AWD_mesh_data));
     mesh->first_sub_mesh = NULL;
+    mesh->attributes = awd_create_attr_list();
 
     return mesh;
 }

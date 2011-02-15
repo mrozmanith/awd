@@ -10,6 +10,7 @@ awd_create_attr_list()
     AWD_attr_list *list;
 
     list = malloc(sizeof(AWD_attr_list));
+    list->first_attr = NULL;
 
     return list;
 }

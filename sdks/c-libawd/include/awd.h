@@ -73,7 +73,7 @@ AWD *               awd_create(AWD_compression, awd_uint16);
 
 // Structure management functions
 //awd_bool            awd_add_mesh_data(AWD *, AWD_mesh_data *, AWD_attr_list *);
-awd_bool            awd_add_mesh_inst(AWD *, AWD_mesh_data *, awd_float64 *, AWD_attr_list *);
+awd_bool            awd_add_mesh_inst(AWD *, AWD_mesh_data *, awd_float64 *);
 
 // Misc
 awd_bool            awd_flush(AWD*, int);

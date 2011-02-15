@@ -3,6 +3,7 @@
 
 
 #include "awd.h"
+#include "attr.h"
 #include "material.h"
 
 
@@ -57,7 +58,8 @@ typedef struct _AWD_sub_mesh {
  * Mesh geometry data
 */
 typedef struct _AWD_mesh_data {
-    AWD_sub_mesh *                  first_sub_mesh;
+    AWD_sub_mesh *      first_sub_mesh;
+    AWD_attr_list *     attributes;
 } AWD_mesh_data;
 
 
@@ -65,13 +67,15 @@ typedef struct _AWD_mesh_data {
  * Mesh instance.
 */
 typedef struct _AWD_mesh_inst {
-    AWD_mesh_data *data;
-    void *parent;
-    awd_float64 *transform_mtx;
+    AWD_mesh_data *     data;
+    void *              parent;
+    awd_float64 *       transform_mtx;
+    AWD_attr_list *     attributes;
 } AWD_mesh_inst;
 
 
 
+AWD_mesh_inst *     awd_create_mesh_inst(void);
 AWD_mesh_data *     awd_create_mesh_data(void);
 AWD_sub_mesh *      awd_create_sub_mesh(void);
 

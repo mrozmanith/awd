@@ -42,7 +42,7 @@ awd_create(AWD_compression compression, awd_uint16 flags)
 
 
 awd_bool 
-awd_add_mesh_inst(AWD *awd, AWD_mesh_data *data, awd_float64 *mtx, AWD_attr_list *attributes)
+awd_add_mesh_inst(AWD *awd, AWD_mesh_data *data, awd_float64 *mtx)
 {
     AWD_mesh_inst *inst;
     AWD_block *inst_block;
@@ -118,7 +118,7 @@ awd_flush(AWD *awd, int out_fd)
     tmp_len = lseek(tmp_fd, 0, SEEK_END);
     tmp_buf = malloc(tmp_len);
 	lseek(tmp_fd, 0, SEEK_SET);
-    read(tmp_fd, tmp_buf, tmp_len, 0);
+    read(tmp_fd, tmp_buf, tmp_len);
 
     // Temp file no longer needed
     close(tmp_fd);

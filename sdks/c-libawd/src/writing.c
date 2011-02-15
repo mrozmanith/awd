@@ -61,6 +61,20 @@ _awd_write_block_header(AWD_block *block, awd_uint32 length, int fd)
 }
 
 
+
+void
+_awd_write_attributes(AWD *awd, AWD_attr_list *attributes, int fd)
+{
+    AWD_attr *attr;
+
+    attr = attributes->first_attr;
+    while (attr) {
+        printf("attr: %s\n", attr->key);
+        attr = attr->next;
+    }
+}
+
+
 void 
 _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
 {
@@ -132,6 +146,8 @@ _awd_write_mesh_data(AWD *awd, AWD_block *block, int fd)
 
         sub = sub->next;
     }
+
+    _awd_write_attributes(awd, data->attributes, fd);
 }
 
 
