@@ -72,27 +72,41 @@ awdutil_check_flag(AWD *awd, awd_uint16 flag)
 int
 awdutil_mktmp(char **path)
 {
-	int err;
-    int len;
     int fd;
-    char *tpl;
-
-    len = strlen(TMPFILE_TEMPLATE);
-    tpl = malloc(len);
-    strncpy(tpl, TMPFILE_TEMPLATE, len);
+    int tpl_len;
+    char *tmp_path;
 
 #ifdef WIN32
-	err = _mktemp_s(tpl, len+1);
-	if (err==0)
-		fd = _open(tpl, _O_CREAT|_O_TEMPORARY|_O_RDWR|_O_BINARY, _S_IWRITE);
-	else fd = 0;
+    int ret;
+	int path_len;
+
+    tmp_path = malloc(TMPPATH_MAXLEN);
+
+    tpl_len = strlen(TMPFILE_TEMPLATE);
+	path_len = GetTempPath(TMPPATH_MAXLEN, tmp_path);
+    if (path_len==0 || (path_len+tpl_len) > TMPPATH_MAXLEN)
+        return -1;
+
+    // Concatenate path and template and null-terminate.
+    strncpy(tmp_path+path_len, TMPFILE_TEMPLATE, tpl_len);
+    memset(tmp_path+path_len+tpl_len, 0, 1);
+
+    ret = _mktemp_s(tmp_path, path_len+tpl_len+1);
+	if (ret==0)
+		fd = _open(tmp_path, _O_CREAT|_O_TEMPORARY|_O_RDWR|_O_BINARY, _S_IWRITE);
+	else fd = -1;
+
 #else
-    fd = mkstemp(tpl);
+    tpl_len = strlen(TMPFILE_TEMPLATE);
+    tmp_path = malloc(tpl_len);
+    strncpy(tmp_path, TMPFILE_TEMPLATE, tpl_len);
+
+    fd = mkstemp(tmp_path);
 #endif
 
     if (path)
-        *path = tpl;
-    else free(tpl);
+	    *path = tmp_path;
+    else free(tmp_path);
 
     return fd;
 }
