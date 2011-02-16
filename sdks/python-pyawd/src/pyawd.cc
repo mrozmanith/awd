@@ -2,6 +2,7 @@
 #include <awd/libawd.h>
 
 #include "AWD.h"
+#include "AWDAttrBlock.h"
 #include "AWDSubMesh.h"
 #include "AWDMeshData.h"
 #include "AWDMeshInst.h"
@@ -61,6 +62,7 @@ PyObject *_init_pyawd(PyObject *m)
 
     // Prepare class data types
     if ((PyType_Ready(&pyawd_AWDType) < 0)
+        || (PyType_Ready(&pyawd_AWDAttrBlockType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshDataType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshInstType) < 0)
         || (PyType_Ready(&pyawd_AWDSubMeshType) < 0))
@@ -69,6 +71,8 @@ PyObject *_init_pyawd(PyObject *m)
     // Add classes to module
     Py_INCREF(&pyawd_AWDType);
     PyModule_AddObject(m, "AWD", (PyObject *)&pyawd_AWDType);
+    Py_INCREF(&pyawd_AWDAttrBlockType);
+    PyModule_AddObject(m, "AWDAttrBlock", (PyObject *)&pyawd_AWDAttrBlockType);
     Py_INCREF(&pyawd_AWDMeshDataType);
     PyModule_AddObject(m, "AWDMeshData", (PyObject *)&pyawd_AWDMeshDataType);
     Py_INCREF(&pyawd_AWDSubMeshType);

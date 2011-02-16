@@ -3,6 +3,7 @@
 
 #include <awd/libawd.h>
 
+#include "util.h"
 #include "AWD.h"
 #include "AWDMeshData.h"
 
@@ -60,7 +61,8 @@ pyawd_AWD_init(pyawd_AWD *self, PyObject *args, PyObject *kwds)
     if (wide == Py_True)
         flags |= AWD_OPTIMIZE_FOR_ACCURACY;
 
-    self->ob_awd = awd_create(compression, flags);
+    self->ob_awd = new AWD((AWD_compression)compression, flags);
+    self->first_mesh_data = NULL;
 
     return 0;
 }
@@ -105,14 +107,35 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
         return NULL;
 
 
-    mtx = malloc(16 * sizeof(awd_float64));
+    mtx = (awd_float64*)malloc(16 * sizeof(awd_float64));
     if (!pyawdutil_pylist_to_float64(mtx_arg, mtx, 16)) {
         // TODO: Set exception
         return NULL;
     }
 
     mesh = (pyawd_AWDMeshData *) data_arg;
-    awd_add_mesh_inst(self->ob_awd, mesh->ob_data, mtx, NULL);
+    self->ob_awd->add_mesh_data(mesh->ob_data);
+    // TODO: Make this nicer
+    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data));
+
+    // Add mesh to internal list
+    if (self->first_mesh_data == NULL) {
+        self->first_mesh_data = mesh;
+    }
+    else {
+        pyawd_AWDMeshData *next;
+
+        next = self->first_mesh_data;
+        while (1) {
+            if (next->next) {
+                next = next->next;
+            }
+            else {
+                next->next = mesh;
+                break;
+            }
+        }
+    }
 
 
     Py_RETURN_NONE;
@@ -141,7 +164,14 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
     fd = PyObject_AsFileDescriptor(fobj);
 
     if (fd >= 0) {
-        awd_flush(self->ob_awd, fd);
+        pyawd_AWDMeshData *cur_md;
+        cur_md = self->first_mesh_data;
+        while (cur_md) {
+            cur_md = cur_md->next;
+        }
+
+        // Write buffer
+        self->ob_awd->flush(fd);
         Py_RETURN_NONE;
     }
     else {

@@ -5,18 +5,21 @@
 
 #include <awd/libawd.h>
 
+#include "AWDAttrBlock.h"
 #include "AWDSubMesh.h"
 
 
 extern PyTypeObject pyawd_AWDMeshDataType;
 
 
-typedef struct {
-    PyObject_HEAD
+typedef struct _pyawd_AWDMeshData {
+    pyawd_AWDAttrBlock base;
 
-    AWD_mesh_data *ob_data;
+    AWDMeshData *ob_data;
 
     pyawd_AWDSubMesh *first_sub_mesh;
+
+    struct _pyawd_AWDMeshData *next;
 } pyawd_AWDMeshData;
 
 

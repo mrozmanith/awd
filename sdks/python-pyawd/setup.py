@@ -7,12 +7,13 @@ from distutils.core import setup, Extension
 version_macro = ('PYTHON_VERSION', sys.version_info[0])
 
 source_files = [
-    'src/pyawd.c',
-    'src/util.c',
-    'src/AWD.c',
-    'src/AWDMeshData.c',
-    'src/AWDMeshInst.c',
-    'src/AWDSubMesh.c'
+    'src/pyawd.cc',
+    'src/util.cc',
+    'src/AWD.cc',
+    'src/AWDAttrBlock.cc',
+    'src/AWDMeshData.cc',
+    'src/AWDMeshInst.cc',
+    'src/AWDSubMesh.cc'
 ]
 
 pyawd = Extension('pyawd', 

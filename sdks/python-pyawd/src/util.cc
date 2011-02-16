@@ -9,7 +9,7 @@ pyawdutil_pylist_to_float64(PyObject *list, awd_float64 *buf, unsigned int num_i
         register unsigned int i;
 
         if (buf == NULL)
-            buf = malloc(num_items * sizeof(awd_float64));
+            buf = (awd_float64*)malloc(num_items * sizeof(awd_float64));
 
         for (i=0; i<num_items; i++) {
             PyObject *item;
@@ -35,7 +35,7 @@ pyawdutil_pylist_to_float32(PyObject *list, awd_float32 *buf, unsigned int num_i
         register unsigned int i;
 
         if (buf == NULL)
-            buf = malloc(num_items * sizeof(awd_float32));
+            buf = (awd_float32*)malloc(num_items * sizeof(awd_float32));
 
         for (i=0; i<num_items; i++) {
             PyObject *item;
@@ -64,7 +64,7 @@ pyawdutil_pylist_to_uint32(PyObject *list, awd_uint32 *buf, unsigned int num_ite
         register unsigned int i;
 
         if (buf == NULL)
-            buf = malloc(num_items * sizeof(awd_uint32));
+            buf = (awd_uint32*)malloc(num_items * sizeof(awd_uint32));
 
         for (i=0; i<num_items; i++) {
             PyObject *item;
@@ -92,7 +92,7 @@ pyawdutil_pylist_to_uint16(PyObject *list, awd_uint16 *buf, unsigned int num_ite
         register unsigned int i;
 
         if (buf == NULL)
-            buf = malloc(num_items * sizeof(awd_uint16));
+            buf = (awd_uint16*)malloc(num_items * sizeof(awd_uint16));
 
         for (i=0; i<num_items; i++) {
             PyObject *item;

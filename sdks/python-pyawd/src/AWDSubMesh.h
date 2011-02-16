@@ -11,7 +11,7 @@ extern PyTypeObject pyawd_AWDSubMeshType;
 typedef struct {
     PyObject_HEAD
 
-    AWD_sub_mesh *ob_sub;
+    AWDSubMesh *ob_sub;
 
     //struct _pyawd_AWDSubMesh *  next;
 } pyawd_AWDSubMesh;

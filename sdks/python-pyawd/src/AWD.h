@@ -5,6 +5,8 @@
 
 #include <awd/libawd.h>
 
+#include "AWDMeshData.h"
+
 #define PYAWD_MAJOR_VERSION 0
 #define PYAWD_MINOR_VERSION 1
 
@@ -17,6 +19,8 @@ typedef struct {
 
     AWD         *ob_awd;
     int         ob_has_written_header;
+
+    pyawd_AWDMeshData *first_mesh_data;
 } pyawd_AWD;
 
 

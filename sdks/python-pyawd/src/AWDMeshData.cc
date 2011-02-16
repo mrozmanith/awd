@@ -5,6 +5,7 @@
 #include "util.h"
 #include "AWDMeshData.h"
 #include "AWDSubMesh.h"
+#include "AWDAttrBlock.h"
 
 #include <awd/libawd.h>
 
@@ -40,7 +41,12 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
-    self->ob_data = awd_create_mesh_data();
+    self->ob_data = new AWDMeshData();
+    self->next = NULL;
+
+    // Superclass __init__
+    pyawd_AWDAttrBlock_init((pyawd_AWDAttrBlock *)self, args, kwds);
+
     return 0;
 }
 
@@ -60,7 +66,7 @@ pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject
         return NULL;
     
     sub = (pyawd_AWDSubMesh *)sub_arg;
-    awd_mesh_add_sub(self->ob_data, sub->ob_sub);
+    self->ob_data->add_sub_mesh(sub->ob_sub);
 
     Py_RETURN_NONE;
 }
@@ -114,7 +120,7 @@ PyTypeObject pyawd_AWDMeshDataType = {
     pyawd_AWDMeshData_methods,              /* tp_methods */
     0,                                      /* tp_members */
     0,                                      /* tp_getset */
-    0,                                      /* tp_base */
+    &pyawd_AWDAttrBlockType,                /* tp_base */
     0,                                      /* tp_dict */
     0,                                      /* tp_descr_get */
     0,                                      /* tp_descr_set */

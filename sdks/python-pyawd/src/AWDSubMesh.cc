@@ -40,7 +40,7 @@ int
 pyawd_AWDSubMesh_init(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kwds)
 {
     //TODO: Add material
-    self->ob_sub = awd_create_sub_mesh();
+    self->ob_sub = new AWDSubMesh();
 
     return 0;
 }
@@ -51,7 +51,7 @@ PyObject *
 pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kwds)
 {
     AWD_mesh_str_type str_type;
-    AWD_data_str_ptr data;
+    AWD_str_ptr data;
     PyObject *data_list;
     size_t data_len;
 
@@ -63,11 +63,11 @@ pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kw
     switch (str_type) {
         case UVS:
         case VERTICES:
-            data.f64 = malloc(data_len * sizeof(awd_float64));
+            data.f64 = (awd_float64*)malloc(data_len * sizeof(awd_float64));
             pyawdutil_pylist_to_float64(data_list, data.f64, data_len);
             break;
         case TRIANGLES:
-            data.ui32 = malloc(data_len * sizeof(awd_uint32));
+            data.ui32 = (awd_uint32*)malloc(data_len * sizeof(awd_uint32));
             pyawdutil_pylist_to_uint32(data_list, data.ui32, data_len);
             break;
         default:
@@ -75,7 +75,7 @@ pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kw
             return NULL;
     }
 
-    awd_sub_mesh_add_stream(self->ob_sub, str_type, data_len, data);
+    self->ob_sub->add_stream(str_type, data, data_len);
 
     Py_RETURN_NONE;
 }
