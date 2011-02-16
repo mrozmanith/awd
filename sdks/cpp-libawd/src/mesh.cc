@@ -3,6 +3,13 @@
 #include "libawd.h"
 
 
+
+AWDSubMesh::AWDSubMesh()
+{
+    this->first_stream = NULL;
+    this->last_stream = NULL;
+}
+
 void 
 AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
 {
@@ -15,8 +22,9 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
     }
     else {
         this->last_stream->next = str;
-        this->last_stream = str;
     }
+
+    this->last_stream = str;
 }
 
 
@@ -27,6 +35,8 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 AWDMeshData::AWDMeshData()
 {
     this->type = MESH_DATA;
+    this->first_sub = NULL;
+    this->last_sub = NULL;
 }
 
 void 

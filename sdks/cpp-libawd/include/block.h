@@ -20,6 +20,7 @@ class AWDBlock
     public:
         AWDBlock * next;
 
+        AWDBlock();
         awd_baddr get_addr();
 
         size_t write_block(int, awd_bool, awd_baddr);

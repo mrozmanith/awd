@@ -28,6 +28,7 @@ class AWDSubMesh
         AWDDataStream * last_stream;
 
     public:
+        AWDSubMesh();
         AWDDataStream * first_stream;
         AWDSubMesh * next;
 

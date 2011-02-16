@@ -2,6 +2,11 @@
 #include <cstdio>
 
 
+AWDBlock::AWDBlock()
+{
+    this->next = NULL;
+}
+
 size_t
 AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
 {
@@ -74,6 +79,7 @@ AWDBlockList::append(AWDBlock *block)
 AWDBlockIterator::AWDBlockIterator(AWDBlockList *list)
 {
     this->list = list;
+    this->cur_block = NULL;
     this->reset();
 }
 

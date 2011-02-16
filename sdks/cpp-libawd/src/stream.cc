@@ -5,6 +5,7 @@ AWDDataStream::AWDDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_el
     this->type = type;
     this->data = data;
     this->num_elements = num_elements;
+    this->next = NULL;
 }
 
 
