@@ -17,8 +17,6 @@
 #define AWD_OPTIMIZE_FOR_ACCURACY   0x2
 
 
-using namespace std;
-
 class AWD
 {
     private:

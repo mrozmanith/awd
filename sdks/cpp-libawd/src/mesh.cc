@@ -3,6 +3,8 @@
 #include "libawd.h"
 #ifdef WIN32
 #include "awdw32.h"
+#else
+#include <unistd.h>
 #endif
 
 

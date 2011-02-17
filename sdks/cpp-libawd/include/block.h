@@ -1,6 +1,8 @@
 #ifndef _LIBAWD_BLOCKS_H
 #define _LIBAWD_BLOCKS_H
 
+#include <stdlib.h>
+
 #include "awd_types.h"
 
 class AWDBlock
