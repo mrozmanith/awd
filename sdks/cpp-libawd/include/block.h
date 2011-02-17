@@ -1,11 +1,7 @@
 #ifndef _LIBAWD_BLOCKS_H
 #define _LIBAWD_BLOCKS_H
 
-#include <unistd.h>
-
 #include "awd_types.h"
-
-using namespace std;
 
 class AWDBlock
 {

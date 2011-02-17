@@ -3,6 +3,7 @@
 
 #include <Python.h>
 
+#include <awd/block.h>
 #include <awd/mesh.h>
 
 

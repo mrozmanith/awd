@@ -35,7 +35,7 @@ awdutil_mktmp(char **path)
     int ret;
 	int path_len;
 
-    tmp_path = malloc(TMPPATH_MAXLEN);
+    tmp_path = (char*)malloc(TMPPATH_MAXLEN);
 
     tpl_len = strlen(TMPFILE_TEMPLATE);
 	path_len = GetTempPath(TMPPATH_MAXLEN, tmp_path);

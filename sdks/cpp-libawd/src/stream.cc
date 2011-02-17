@@ -1,4 +1,9 @@
+#include <stdlib.h>
+
 #include "libawd.h"
+#ifdef WIN32
+#include "awdw32.h"
+#endif
 
 AWDDataStream::AWDDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
 {

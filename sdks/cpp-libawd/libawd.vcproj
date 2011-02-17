@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="pyawd"
-	ProjectGUID="{158897B1-EE9B-4C38-BFE3-E73CB4EF2350}"
-	RootNamespace="pyawd"
+	Name="libawd"
+	ProjectGUID="{9C852FB1-3261-4AD6-8ACD-C97B1AAEBA29}"
+	RootNamespace="libawd"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="build"
 			IntermediateDirectory="build"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\c-libawd\build;Python\Include;Python\PC"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYAWD_EXPORTS;"
+				AdditionalIncludeDirectories="include;lib\lzma;lib\zlib"
+				PreprocessorDefinitions="WIN32;_7ZIP_ST"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,20 +60,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="python26_d.lib"
-				OutputFile="build\pyawd_d.pyd"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="Python\PCbuild"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -85,9 +75,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -95,7 +82,7 @@
 			Name="Release|Win32"
 			OutputDirectory="build"
 			IntermediateDirectory="build"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -114,8 +101,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\cpp-libawd\build;Python\Include;Python\PC"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYAWD_EXPORTS;"
+				AdditionalIncludeDirectories="include;lib\lzma;lib\zlib"
+				PreprocessorDefinitions="WIN32;_7ZIP_ST"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -132,22 +119,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="python26.lib"
-				OutputFile="build\pyawd.pyd"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="Python\PCbuild"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -159,10 +134,8 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y /I include build\awd"
 			/>
 		</Configuration>
 	</Configurations>
@@ -175,27 +148,107 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\src\AWD.h"
+				RelativePath=".\lib\lzma\Alloc.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDAttrBlock.h"
+				RelativePath=".\include\awd.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshData.h"
+				RelativePath=".\include\awd_types.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshInst.h"
+				RelativePath=".\include\awdlzma.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDSubMesh.h"
+				RelativePath=".\include\awdw32.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\util.h"
+				RelativePath=".\include\block.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\Bra.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\deflate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inffast.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inffixed.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inflate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inftrees.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\libawd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzFind.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzFindMt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzHash.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaDec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaEnc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaLib.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\mesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\stream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\Types.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\zconf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\zlib.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\zutil.h"
 				>
 			</File>
 		</Filter>
@@ -211,31 +264,67 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\AWD.cc"
+				RelativePath=".\lib\lzma\Alloc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDAttrBlock.cc"
+				RelativePath=".\src\awd.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshData.cc"
+				RelativePath=".\src\awdlzma.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshInst.cc"
+				RelativePath=".\src\block.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDSubMesh.cc"
+				RelativePath=".\lib\lzma\Bra.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\pyawd.cc"
+				RelativePath=".\lib\zlib\deflate.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inffast.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\inflate.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzFind.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaDec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaEnc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\lzma\LzmaLib.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\mesh.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\stream.cc"
 				>
 			</File>
 			<File
 				RelativePath=".\src\util.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\zutil.c"
 				>
 			</File>
 		</Filter>

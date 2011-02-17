@@ -4,7 +4,12 @@
 #include "awd.h"
 #include "awd_types.h"
 
+#ifdef WIN32
+#define TMPPATH_MAXLEN 256
+#define TMPFILE_TEMPLATE "awd.XXXXXX"
+#else
 #define TMPFILE_TEMPLATE "/tmp/awd.XXXXXX"
+#endif
 
 // Utility functions
 int             awdutil_mktmp(char **path);

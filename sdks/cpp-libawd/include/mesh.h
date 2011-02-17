@@ -5,8 +5,6 @@
 #include "block.h"
 #include "stream.h"
 
-using namespace std;
-
 
 /**
  * Data stream type

@@ -1,6 +1,7 @@
 #include "libawd.h"
-#include <cstdio>
-
+#ifdef WIN32
+#include "awdw32.h"
+#endif
 
 AWDBlock::AWDBlock()
 {
@@ -70,7 +71,6 @@ AWDBlockList::append(AWDBlock *block)
 
     this->last_block = block;
     this->num_blocks++;
-    printf("added block %d\n", this->num_blocks);
 }
 
 
