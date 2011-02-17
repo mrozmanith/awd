@@ -31,14 +31,16 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 void
 AWD::add_mesh_data(AWDMeshData *block)
 {
-    this->mesh_data_blocks->append(block);
+    if (!this->mesh_data_blocks->contains(block))
+        this->mesh_data_blocks->append(block);
 }
 
 
 void
 AWD::add_mesh_inst(AWDMeshInst *block)
 {
-    this->mesh_inst_blocks->append(block);
+    if (!this->mesh_inst_blocks->contains(block))
+        this->mesh_inst_blocks->append(block);
 }
 
 

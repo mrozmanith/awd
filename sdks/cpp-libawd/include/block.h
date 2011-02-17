@@ -36,7 +36,9 @@ class AWDBlockList
         AWDBlock * last_block;
 
         AWDBlockList();
+
         void append(AWDBlock *);
+        awd_bool contains(AWDBlock *);
 };
 
 class AWDBlockIterator

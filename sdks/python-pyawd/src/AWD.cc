@@ -166,9 +166,11 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
     if (fd >= 0) {
         pyawd_AWDMeshData *cur_md;
         cur_md = self->first_mesh_data;
+        /*
         while (cur_md) {
             cur_md = cur_md->next;
         }
+        */
 
         // Write buffer
         self->ob_awd->flush(fd);

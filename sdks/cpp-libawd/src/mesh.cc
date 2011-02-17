@@ -8,6 +8,7 @@ AWDSubMesh::AWDSubMesh()
 {
     this->first_stream = NULL;
     this->last_stream = NULL;
+    this->next = NULL;
 }
 
 void 
@@ -47,8 +48,9 @@ AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
     }
     else {
         this->last_sub->next = sub;
-        this->last_sub = sub;
     }
+    
+    this->last_sub = sub;
 }
 
 

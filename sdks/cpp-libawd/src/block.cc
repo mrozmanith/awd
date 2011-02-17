@@ -70,6 +70,24 @@ AWDBlockList::append(AWDBlock *block)
 
     this->last_block = block;
     this->num_blocks++;
+    printf("added block %d\n", this->num_blocks);
+}
+
+
+awd_bool
+AWDBlockList::contains(AWDBlock *block)
+{
+    AWDBlock *cur;
+
+    cur = this->first_block;
+    while (cur) {
+        if (cur == block)
+            return AWD_TRUE;
+
+        cur = cur->next;
+    }
+
+    return AWD_FALSE;
 }
 
 
