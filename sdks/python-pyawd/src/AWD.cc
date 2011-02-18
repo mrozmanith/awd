@@ -116,7 +116,7 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
     mesh = (pyawd_AWDMeshData *) data_arg;
     self->ob_awd->add_mesh_data(mesh->ob_data);
     // TODO: Make this nicer
-    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data));
+    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data, mtx));
 
     // Add mesh to internal list
     if (self->first_mesh_data == NULL) {

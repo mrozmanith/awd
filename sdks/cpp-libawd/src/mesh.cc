@@ -142,12 +142,32 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
 AWDMeshInst::AWDMeshInst(AWDMeshData *data)
 {
+    awd_float64 *mtx;
+
+    mtx = (awd_float64*)malloc(16*sizeof(awd_float64));
+    mtx[1] = mtx[2] = mtx[3] = mtx[4] = 0.0f;
+    mtx[6] = mtx[7] = mtx[8] = mtx[9] = 0.0f;
+    mtx[11] = mtx[12] = mtx[13] = mtx[14] = 0.0f;
+    mtx[0] = mtx[5] = mtx[10] = mtx[15] = 1.0f;
+
+    this->init();
+    this->set_data(data);
+    this->set_transform(mtx);
+}
+
+
+AWDMeshInst::AWDMeshInst(AWDMeshData *data, awd_float64 *mtx)
+{
+    this->init();
+    this->set_data(data);
+    this->set_transform(mtx);
+}
+
+
+void
+AWDMeshInst::init()
+{
     this->type = MESH_INSTANCE;
-    this->data = data;
-    this->transform_mtx[0] = 1.0;
-    this->transform_mtx[5] = 1.0;
-    this->transform_mtx[10] = 1.0;
-    this->transform_mtx[15] = 1.0;
 }
 
 
@@ -155,6 +175,20 @@ AWDMeshData *
 AWDMeshInst::get_data()
 {
     return this->data;
+}
+
+
+void
+AWDMeshInst::set_data(AWDMeshData *data)
+{
+    this->data = data;
+}
+
+
+void
+AWDMeshInst::set_transform(awd_float64 *mtx)
+{
+    this->transform_mtx = mtx;
 }
 
 

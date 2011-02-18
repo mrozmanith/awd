@@ -56,7 +56,9 @@ class AWDMeshInst : public AWDBlock
 {
     private:
         AWDMeshData * data;
-        awd_float64 transform_mtx[16];
+        awd_float64 * transform_mtx;
+
+        void init();
 
     protected:
         awd_uint32 calc_body_length(awd_bool);
@@ -64,8 +66,13 @@ class AWDMeshInst : public AWDBlock
 
     public:
         AWDMeshInst(AWDMeshData *);
+        AWDMeshInst(AWDMeshData *, awd_float64 *);
+
+        void set_transform(awd_float64 *);
 
         AWDMeshData * get_data();
+        void set_data(AWDMeshData *);
+
 };
 
 #endif
