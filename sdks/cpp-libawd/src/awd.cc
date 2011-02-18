@@ -22,6 +22,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->flags = flags;
     this->mesh_data_blocks = new AWDBlockList();
     this->mesh_inst_blocks = new AWDBlockList();
+    this->skeleton_blocks = new AWDBlockList();
 
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -43,6 +44,13 @@ AWD::add_mesh_inst(AWDMeshInst *block)
         this->mesh_inst_blocks->append(block);
 }
 
+
+void
+AWD::add_skeleton(AWDSkeleton *block)
+{
+    if (!this->skeleton_blocks->contains(block))
+        this->skeleton_blocks->append(block);
+}
 
 
 
@@ -101,6 +109,7 @@ AWD::flush(int out_fd)
         return AWD_FALSE;
     }
 
+    tmp_len += this->write_blocks(this->skeleton_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_data_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_inst_blocks, tmp_fd);
 

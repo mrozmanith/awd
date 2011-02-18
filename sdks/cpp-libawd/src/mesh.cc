@@ -144,11 +144,7 @@ AWDMeshInst::AWDMeshInst(AWDMeshData *data)
 {
     awd_float64 *mtx;
 
-    mtx = (awd_float64*)malloc(16*sizeof(awd_float64));
-    mtx[1] = mtx[2] = mtx[3] = mtx[4] = 0.0f;
-    mtx[6] = mtx[7] = mtx[8] = mtx[9] = 0.0f;
-    mtx[11] = mtx[12] = mtx[13] = mtx[14] = 0.0f;
-    mtx[0] = mtx[5] = mtx[10] = mtx[15] = 1.0f;
+    mtx = awdutil_id_mtx4(NULL);
 
     this->init();
     this->set_data(data);
@@ -202,8 +198,6 @@ AWDMeshInst::calc_body_length(awd_bool wide)
 void
 AWDMeshInst::write_body(int fd, awd_bool wide)
 {
-    int i;
-    awd_float64 n;
     awd_baddr parent_addr;
     awd_baddr data_addr;
 
@@ -213,9 +207,6 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
     data_addr = UI32(this->data->get_addr());
 
     write(fd, &parent_addr, sizeof(awd_baddr));
-    for (i=0; i<16; i++) {
-        n = F64(this->transform_mtx[i]);
-        write(fd, &n, sizeof(awd_float64));
-    }
+    awdutil_write_mtx4(fd, this->transform_mtx);
     write(fd, &data_addr, sizeof(awd_uint32));
 }

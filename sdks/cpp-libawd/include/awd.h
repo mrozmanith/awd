@@ -3,6 +3,7 @@
 
 #include "mesh.h"
 #include "block.h"
+#include "skeleton.h"
 #include "awd_types.h"
 
 
@@ -26,6 +27,7 @@ class AWD
         awd_uint16 flags;
         AWD_compression compression;
 
+        AWDBlockList * skeleton_blocks;
         AWDBlockList * mesh_data_blocks;
         AWDBlockList * mesh_inst_blocks;
 
@@ -42,6 +44,7 @@ class AWD
 
         void add_mesh_data(AWDMeshData *);
         void add_mesh_inst(AWDMeshInst *);
+        void add_skeleton(AWDSkeleton *);
 };
 
 #endif

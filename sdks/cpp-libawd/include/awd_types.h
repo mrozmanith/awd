@@ -44,7 +44,7 @@ typedef enum {
     LIGHT_SOURCE,
 
     // Animation
-    ARMATURE=60,
+    SKELETON=60,
 
     // Misc
     COMMAND=254

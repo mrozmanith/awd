@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <string.h>
+#include <cstdio>
 
 #include "libawd.h"
 
 // Get mkstemp replacement
 #ifdef WIN32
 #include "awdw32.h"
+#else
+#include <unistd.h>
 #endif
 
 awd_float64 *
@@ -21,6 +24,31 @@ awdutil_id_mtx4(awd_float64 *mtx)
     mtx[12] = 0.0; mtx[13] = 0.0; mtx[14] = 0.0; mtx[15] = 1.0;
 
     return mtx;
+}
+
+
+void
+awdutil_write_mtx4(int fd, awd_float64 *mtx)
+{
+    int i;
+    awd_float64 n;
+    for (i=0; i<16; i++) {
+        n = F64(mtx[i]);
+        write(fd, &n, sizeof(awd_float64));
+    }
+}
+
+
+void
+awdutil_write_varstr(int fd, const char *str)
+{
+    awd_uint16 len;
+    awd_uint16 len_be;
+    
+    len = (awd_uint16)strlen(str);
+    len_be = UI16(len);
+    write(fd, &len_be, sizeof(awd_uint16));
+    write(fd, str, len);
 }
 
 
