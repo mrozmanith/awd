@@ -6,6 +6,7 @@
 #include "util.h"
 #include "AWD.h"
 #include "AWDMeshData.h"
+#include "AWDSkeleton.h"
 
 
 
@@ -142,6 +143,26 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
 }
 
 
+
+/**
+ * AWD.add_skeleton()
+*/
+PyObject *
+pyawd_AWD_add_skeleton(pyawd_AWD *self, PyObject *args)
+{
+    PyObject *skel_arg;
+    pyawd_AWDSkeleton *skel;
+
+    if (!PyArg_ParseTuple(args, "O!", &pyawd_AWDSkeletonType, &skel_arg))
+        return NULL;
+
+    skel = (pyawd_AWDSkeleton *)skel_arg;
+    self->ob_awd->add_skeleton(skel->ob_skeleton);
+    
+    Py_RETURN_NONE;
+}
+
+
 /**
  * AWD.flush()
 */
@@ -194,6 +215,9 @@ PyMethodDef pyawd_AWD_methods[] = {
 
     { "add_mesh_inst", (PyCFunction)pyawd_AWD_add_mesh_inst, METH_VARARGS | METH_KEYWORDS,
         "Add a mesh instance block to the AWD document." },
+
+    { "add_skeleton", (PyCFunction)pyawd_AWD_add_skeleton, METH_VARARGS,
+        "Add a skeleton block to the AWD document." },
 
     { "flush", (PyCFunction)pyawd_AWD_flush, METH_VARARGS,
         "Flush everything in the AWD object to an output stream." },

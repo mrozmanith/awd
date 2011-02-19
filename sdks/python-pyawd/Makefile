@@ -3,6 +3,7 @@ LIBPATH31=./build/lib.macosx-10.3-fat-3.1
 LIBPATH26=./build/lib.macosx-10.3-fat-2.6
 
 DIST_CFLAGS=-g -arch ppc -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -fno-strict-aliasing -fno-common -dynamic -I/usr/local/include/
+CFLAGS=-c $(DIST_FLAGS)
 
 SO=pyawd.so
 BLENSITE=$(BLENPATH)/site-packages

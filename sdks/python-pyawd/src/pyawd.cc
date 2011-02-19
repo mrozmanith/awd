@@ -6,6 +6,8 @@
 #include "AWDSubMesh.h"
 #include "AWDMeshData.h"
 #include "AWDMeshInst.h"
+#include "AWDSkeleton.h"
+#include "AWDSkeletonJoint.h"
 
 
 #if PYTHON_VERSION == 3
@@ -62,6 +64,8 @@ PyObject *_init_pyawd(PyObject *m)
 
     // Prepare class data types
     if ((PyType_Ready(&pyawd_AWDType) < 0)
+        || (PyType_Ready(&pyawd_AWDSkeletonJointType) < 0)
+        || (PyType_Ready(&pyawd_AWDSkeletonType) < 0)
         || (PyType_Ready(&pyawd_AWDAttrBlockType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshDataType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshInstType) < 0)
@@ -79,6 +83,10 @@ PyObject *_init_pyawd(PyObject *m)
     PyModule_AddObject(m, "AWDSubMesh", (PyObject *)&pyawd_AWDSubMeshType);
     Py_INCREF(&pyawd_AWDMeshInstType);
     PyModule_AddObject(m, "AWDMeshInst", (PyObject *)&pyawd_AWDMeshInstType);
+    Py_INCREF(&pyawd_AWDSkeletonType);
+    PyModule_AddObject(m, "AWDSkeleton", (PyObject *)&pyawd_AWDSkeletonType);
+    Py_INCREF(&pyawd_AWDSkeletonJointType);
+    PyModule_AddObject(m, "AWDSkeletonJoint", (PyObject *)&pyawd_AWDSkeletonJointType);
 
     return m;
 }

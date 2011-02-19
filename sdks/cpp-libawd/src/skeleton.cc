@@ -44,30 +44,22 @@ AWDSkeletonJoint::get_parent()
 AWDSkeletonJoint *
 AWDSkeletonJoint::add_child_joint(AWDSkeletonJoint *joint)
 {
-
-    if (joint->get_parent() != NULL) {
-        // TODO: Remove from old parent
-    }
-
-    // Find place in list of children
-    if (this->first_child == NULL) {
-        this->first_child = joint;
-    }
-    else {
-        AWDSkeletonJoint *cur = this->first_child;
-        while (1) {
-            if (cur->next == NULL) {
-                cur->next = joint;
-            }
-            else {
-                cur = cur->next;
-                break;
-            }
+    if (joint != NULL) {
+        if (joint->get_parent() != NULL) {
+            // TODO: Remove from old parent
         }
-    }
 
-    joint->set_parent(this);
-    this->last_child = joint;
+        // Find place in list of children
+        if (this->first_child == NULL) {
+            this->first_child = joint;
+        }
+        else {
+            this->last_child->next = joint;
+        }
+
+        joint->set_parent(this);
+        this->last_child = joint;
+    }
 
     return joint;
 }
@@ -184,6 +176,9 @@ AWDSkeletonJoint *
 AWDSkeleton::set_root_joint(AWDSkeletonJoint *joint)
 {
     this->root_joint = joint;
+    if (this->root_joint != NULL)
+        this->root_joint->set_parent(NULL);
+
     return joint;
 }
 

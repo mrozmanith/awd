@@ -11,6 +11,8 @@ source_files = [
     'src/util.cc',
     'src/AWD.cc',
     'src/AWDAttrBlock.cc',
+    'src/AWDSkeleton.cc',
+    'src/AWDSkeletonJoint.cc',
     'src/AWDMeshData.cc',
     'src/AWDMeshInst.cc',
     'src/AWDSubMesh.cc'
