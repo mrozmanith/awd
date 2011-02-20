@@ -5,7 +5,8 @@
 #include "skeleton.h"
 
 
-AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_float64 *bind_mtx)
+AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_float64 *bind_mtx) :
+    AWDAttrElement()
 {
     this->next = NULL;
     this->first_child = NULL;
@@ -137,7 +138,8 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id)
 
 
 
-AWDSkeleton::AWDSkeleton(const char *name, awd_uint16 name_len)
+AWDSkeleton::AWDSkeleton(const char *name, awd_uint16 name_len) :
+    AWDAttrElement()
 {
     this->name = NULL;
     this->name_len = name_len;
@@ -158,6 +160,8 @@ AWDSkeleton::calc_body_length(awd_bool wide)
     awd_uint32 len;
 
     len = sizeof(awd_uint16) + this->name_len + sizeof(awd_uint32);
+    len += this->calc_attr_length(true,true);
+
     if (this->root_joint != NULL)
         len += this->root_joint->calc_length();
 
@@ -176,6 +180,8 @@ AWDSkeleton::write_body(int fd, awd_bool wide)
 
     if (this->root_joint != NULL)
         this->root_joint->write_joint(fd, 1);
+
+    this->write_attributes(fd, true, true);
 }
 
 

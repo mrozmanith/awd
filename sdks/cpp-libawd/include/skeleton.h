@@ -2,10 +2,11 @@
 #define _LIBAWD_SKELETON_H
 
 #include "block.h"
+#include "attr.h"
 
 
 
-class AWDSkeletonJoint
+class AWDSkeletonJoint : public AWDAttrElement
 {
     private:
         awd_uint32 id;
@@ -32,7 +33,7 @@ class AWDSkeletonJoint
 };
 
 
-class AWDSkeleton : public AWDBlock
+class AWDSkeleton : public AWDBlock, public AWDAttrElement
 {
     private:
         char *name;
