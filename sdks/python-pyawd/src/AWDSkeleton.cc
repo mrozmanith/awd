@@ -36,16 +36,27 @@ pyawd_AWDSkeleton_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDSkeleton_init(pyawd_AWDSkeleton *self, PyObject *args, PyObject *kwds)
 {
+    int name_len;
     const char *name;
 
+    /*
     char *kwlist[] = {"name"};
 
     name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|s", kwlist, &name))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|s#", kwlist, &name, &name_len))
+        return -1;
+        */
+
+    if (!PyArg_ParseTuple(args, "|s#", &name, &name_len))
         return -1;
 
-    if (name == NULL) name = "";
-    self->ob_skeleton = new AWDSkeleton(name);
+    if (name == NULL) {
+        name = "";
+        name_len = 0;
+    }
+
+    // TODO: Fail if unicode
+    self->ob_skeleton = new AWDSkeleton((char *)name, name_len);
 
     return 0;
 }

@@ -46,6 +46,7 @@ pyawd_AWDSkeletonJoint_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDSkeletonJoint_init(pyawd_AWDSkeletonJoint *self, PyObject *args, PyObject *kwds)
 {
+    int name_len;
     const char *name;
     PyListObject *mtx_list;
     awd_float64 *mtx;
@@ -56,18 +57,23 @@ pyawd_AWDSkeletonJoint_init(pyawd_AWDSkeletonJoint *self, PyObject *args, PyObje
     mtx = NULL;
     mtx_list = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|sO!", kwlist, &name,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|s#O!", kwlist, &name, &name_len,
                           &PyList_Type, &mtx_list))
         return NULL;
 
-    if (name==NULL) name = "";
+    // Fail if unicode
+    if (name==NULL) {
+        name = "";
+        name_len = 0;
+    }
+
     if (mtx_list != NULL) {
         mtx = pyawdutil_pylist_to_float64((PyObject *)mtx_list, NULL, 16);
     }
 
     self->name = name;
     self->bind_mtx = mtx_list;
-    self->ob_joint = new AWDSkeletonJoint(name, mtx);
+    self->ob_joint = new AWDSkeletonJoint(name, name_len, mtx);
 
     return 0;
 }

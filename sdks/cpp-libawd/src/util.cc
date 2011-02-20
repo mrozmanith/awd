@@ -40,15 +40,19 @@ awdutil_write_mtx4(int fd, awd_float64 *mtx)
 
 
 void
-awdutil_write_varstr(int fd, const char *str)
+awdutil_write_varstr(int fd, const char *str, awd_uint16 str_len)
 {
-    awd_uint16 len;
     awd_uint16 len_be;
-    
-    len = (awd_uint16)strlen(str);
-    len_be = UI16(len);
-    write(fd, &len_be, sizeof(awd_uint16));
-    write(fd, str, len);
+
+    if (str != NULL) {
+        len_be = UI16(str_len);
+        write(fd, &len_be, sizeof(awd_uint16));
+        write(fd, str, str_len);
+    }
+    else {
+        len_be = 0;
+        write(fd, &len_be, sizeof(awd_uint16));
+    }
 }
 
 

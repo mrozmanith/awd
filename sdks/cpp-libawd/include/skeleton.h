@@ -4,11 +4,13 @@
 #include "block.h"
 
 
+
 class AWDSkeletonJoint
 {
     private:
         awd_uint32 id;
-        const char *name;
+        char *name;
+        awd_uint16 name_len;
         awd_float64 *bind_mtx;
 
         AWDSkeletonJoint *parent;
@@ -18,7 +20,7 @@ class AWDSkeletonJoint
     public:
         AWDSkeletonJoint *next;
 
-        AWDSkeletonJoint(const char *, awd_float64 *);
+        AWDSkeletonJoint(const char *, awd_uint16, awd_float64 *);
 
         int write_joint(int, awd_uint32);
         int calc_length();
@@ -33,7 +35,8 @@ class AWDSkeletonJoint
 class AWDSkeleton : public AWDBlock
 {
     private:
-        const char *name;
+        char *name;
+        awd_uint16 name_len;
         AWDSkeletonJoint *root_joint;
 
     protected:
@@ -41,7 +44,7 @@ class AWDSkeleton : public AWDBlock
         void write_body(int, awd_bool);
 
     public:
-        AWDSkeleton(const char *);
+        AWDSkeleton(const char *, awd_uint16);
 
         AWDSkeletonJoint *set_root_joint(AWDSkeletonJoint *);
         AWDSkeletonJoint *get_root_joint();
