@@ -30,6 +30,14 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     pyawd_AWDMeshData *self;
 
     self = (pyawd_AWDMeshData *)type->tp_alloc(type, 0);
+    if (self) {
+        self->next = NULL;
+        self->skeleton = NULL;
+        self->first_sub_mesh = NULL;
+        self->last_sub_mesh = NULL;
+        self->num_sub_meshes = 0;
+        self->ob_data = new AWDMeshData();
+    }
 
     return (PyObject *)self;
 }
@@ -41,10 +49,6 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
-    self->ob_data = new AWDMeshData();
-    self->skeleton = NULL;
-    self->next = NULL;
-
     // Superclass __init__
     pyawd_AWDAttrBlock_init((pyawd_AWDAttrBlock *)self, args, kwds);
 
@@ -72,7 +76,65 @@ pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject
     sub = (pyawd_AWDSubMesh *)sub_arg;
     self->ob_data->add_sub_mesh(sub->ob_sub);
 
+    if (self->first_sub_mesh == NULL) {
+        self->first_sub_mesh = sub;
+    }
+    else {
+        self->last_sub_mesh->next = sub;
+    }
+
+    self->last_sub_mesh = sub;
+    self->last_sub_mesh->next = NULL;
+    self->num_sub_meshes++;
+
+
     Py_RETURN_NONE;
+}
+
+
+/**
+ * AWDMeshData[] (sub-meshes through subscripting)
+*/
+static PyObject *
+pyawd_AWDMeshData_mp_subscript(pyawd_AWDMeshData *self, PyObject *key)
+{
+    if (PyInt_Check(key)) {
+        long idx;
+        idx = PyInt_AsLong(key);
+        if (idx < self->num_sub_meshes) {
+            long cur_idx;
+            pyawd_AWDSubMesh *cur;
+
+            cur_idx = 0;
+            cur = self->first_sub_mesh;
+            while (cur) {
+                if (cur_idx == idx)
+                    return (PyObject *)cur;
+
+                cur = cur->next;
+                cur_idx++;
+            }
+
+        }
+        else {
+            // TODO: Set exception
+            return NULL;
+        }
+    }
+    else {
+        // TODO: Set exception
+        return NULL;
+    }
+}
+
+
+/**
+ * len(AWDMeshData)
+*/
+static int
+pyawd_AWDMeshData_mp_length(pyawd_AWDMeshData *self)
+{
+    return self->num_sub_meshes;
 }
 
 
@@ -131,6 +193,13 @@ PyGetSetDef pyawd_AWDMeshData_getset[] = {
 };
 
 
+/**
+ * Mapping protocol dictionary
+*/
+PyMappingMethods pyawd_AWDMeshDataMapping = {
+    (lenfunc)pyawd_AWDMeshData_mp_length,   /* mp_length */
+    (binaryfunc)pyawd_AWDMeshData_mp_subscript,/* mp_subscript */
+};
 
 /**
  * Type object
@@ -148,7 +217,7 @@ PyTypeObject pyawd_AWDMeshDataType = {
     0,                                      /* tp_repr */
     0,                                      /* tp_as_number */
     0,                                      /* tp_as_sequence */
-    0,                                      /* tp_as_mapping */
+    &pyawd_AWDMeshDataMapping,               /* tp_as_mapping */
     0,                                      /* tp_hash  */
     0,                                      /* tp_call */
     0,                                      /* tp_str */

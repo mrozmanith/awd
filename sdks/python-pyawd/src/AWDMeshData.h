@@ -20,6 +20,8 @@ typedef struct _pyawd_AWDMeshData {
 
     pyawd_AWDSkeleton *skeleton;
     pyawd_AWDSubMesh *first_sub_mesh;
+    pyawd_AWDSubMesh *last_sub_mesh;
+    int num_sub_meshes;
 
     struct _pyawd_AWDMeshData *next;
 } pyawd_AWDMeshData;

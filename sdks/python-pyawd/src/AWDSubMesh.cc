@@ -28,6 +28,10 @@ pyawd_AWDSubMesh_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     pyawd_AWDSubMesh *self;
 
     self = (pyawd_AWDSubMesh *)type->tp_alloc(type, 0);
+    if (self != NULL) {
+        self->next = NULL;
+        self->ob_sub = new AWDSubMesh();
+    }
 
     return (PyObject *)self;
 }
@@ -40,8 +44,6 @@ int
 pyawd_AWDSubMesh_init(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kwds)
 {
     //TODO: Add material
-    self->ob_sub = new AWDSubMesh();
-
     return 0;
 }
 
