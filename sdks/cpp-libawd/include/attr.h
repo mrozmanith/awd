@@ -12,7 +12,8 @@ typedef enum {
     INT32,
     FLOAT32,
     FLOAT64,
-    STRING
+    STRING,
+    BADDR,
 } AWD_attr_type;
 
 
@@ -22,6 +23,7 @@ typedef union {
     awd_int32 *i32;
     awd_float32 *f32;
     awd_float64 *f64;
+    awd_baddr *addr;
     char *str;
 } AWD_attr_val_ptr;
 

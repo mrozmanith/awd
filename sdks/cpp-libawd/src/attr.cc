@@ -32,6 +32,7 @@ AWDAttr::write_attr(int fd)
                 val.i16++;
                 break;
 
+            case BADDR:
             case INT32:
                 i32_be = UI32(*val.i32);
                 write(fd, &i32_be, sizeof(awd_int32));

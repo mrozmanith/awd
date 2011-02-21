@@ -4,6 +4,10 @@
 #include "awd_types.h"
 #include "block.h"
 #include "stream.h"
+#include "skeleton.h"
+
+
+#define PROP_MD_SKELETON 1
 
 
 /**
@@ -34,25 +38,34 @@ class AWDSubMesh
 };
 
 
-class AWDMeshData : public AWDBlock
+class AWDMeshData : public AWDBlock, public AWDAttrElement
 {
     private:
+        int num_subs;
         AWDSubMesh * first_sub;
         AWDSubMesh * last_sub;
 
+        AWDSkeleton * skeleton;
+
     protected:
         awd_uint32 calc_body_length(awd_bool);
+        void prepare_write();
         void write_body(int, awd_bool);
 
     public:
         AWDMeshData();
 
+        int get_num_subs();
+        AWDSubMesh *get_sub_at(int);
         void add_sub_mesh(AWDSubMesh *);
+
+        AWDSkeleton *get_skeleton();
+        void set_skeleton(AWDSkeleton *skeleton);
 };
 
 
 
-class AWDMeshInst : public AWDBlock
+class AWDMeshInst : public AWDBlock, public AWDAttrElement
 {
     private:
         AWDMeshData * data;

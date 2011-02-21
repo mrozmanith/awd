@@ -38,11 +38,14 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 
 
 
-AWDMeshData::AWDMeshData()
+AWDMeshData::AWDMeshData() :
+    AWDAttrElement()
 {
     this->type = MESH_DATA;
     this->first_sub = NULL;
     this->last_sub = NULL;
+    this->skeleton = NULL;
+    this->num_subs = 0;
 }
 
 void 
@@ -55,7 +58,51 @@ AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
         this->last_sub->next = sub;
     }
     
+    this->num_subs++;
     this->last_sub = sub;
+}
+
+
+int
+AWDMeshData::get_num_subs()
+{
+    return this->num_subs;
+}
+
+
+AWDSubMesh *
+AWDMeshData::get_sub_at(int idx)
+{
+    if (idx < this->num_subs) {
+        int cur_idx;
+        AWDSubMesh *cur;
+
+        cur_idx = 0;
+        cur = this->first_sub;
+        while (cur) {
+            if (cur_idx == idx)
+                return cur;
+
+            cur_idx++;
+            cur = cur->next;
+        }
+    }
+
+    return NULL;
+}
+
+
+AWDSkeleton *
+AWDMeshData::get_skeleton()
+{
+    return this->skeleton;
+}
+
+
+void
+AWDMeshData::set_skeleton(AWDSkeleton *skeleton)
+{
+    this->skeleton = skeleton;
 }
 
 
@@ -67,7 +114,8 @@ AWDMeshData::calc_body_length(awd_bool wide)
 
     // Calculate length of entire mesh 
     // data (not block header)
-    mesh_len = 0;
+    mesh_len = sizeof(awd_uint16) + sizeof(awd_uint16); // TODO: Add name length
+    mesh_len += this->calc_attr_length(true,true);
     sub = this->first_sub;
     while (sub) {
         AWDDataStream *str;
@@ -86,15 +134,35 @@ AWDMeshData::calc_body_length(awd_bool wide)
         sub = sub->next;
     }
 
+
     return mesh_len;
 }
 
+
+void
+AWDMeshData::prepare_write()
+{
+    // Set skeleton addr property if there is 
+    // a skeleton bound to this mesh.
+    if (this->skeleton) {
+        AWD_attr_val_ptr val;
+        val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
+        *val.addr = this->skeleton->get_addr();
+        this->properties->set(PROP_MD_SKELETON, val, sizeof(awd_baddr), BADDR);
+    }
+}
 
 
 void
 AWDMeshData::write_body(int fd, awd_bool wide)
 {
+    awd_uint16 num_subs_be;
     AWDSubMesh *sub;
+
+    // Write name and sub count
+    num_subs_be = UI16(this->num_subs);
+    awdutil_write_varstr(fd, "", 0); // TODO: Replace with name
+    write(fd, &num_subs_be, sizeof(awd_uint16));
 
     // Write all sub-meshes
     sub = this->first_sub;
@@ -132,8 +200,8 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
         sub = sub->next;
     }
-
-    //_awd_write_attributes(awd, data->attributes, fd);
+    
+    this->write_attributes(fd, true, true);
 }
 
 
@@ -193,6 +261,7 @@ AWDMeshInst::calc_body_length(awd_bool wide)
 {
     return 136;
 }
+
 
 
 void

@@ -10,6 +10,15 @@ AWDBlock::AWDBlock()
     this->next = NULL;
 }
 
+
+void
+AWDBlock::prepare_write()
+{
+    // Does nothing by default. Can be optionally
+    // overriden by sub-classes to take any actions
+    // that need to happen before length is calculated
+}
+
 size_t
 AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
 {
@@ -19,6 +28,8 @@ AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
     awd_baddr block_addr_be;
 
     this->addr = addr;
+
+    this->prepare_write();
     length = this->calc_body_length(wide);
 
     //TODO: Get addr of actual namespace

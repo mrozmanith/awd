@@ -13,6 +13,7 @@ class AWDSkeletonJoint : public AWDAttrElement
         char *name;
         awd_uint16 name_len;
         awd_float64 *bind_mtx;
+        int num_children;
 
         AWDSkeletonJoint *parent;
         AWDSkeletonJoint *first_child;
@@ -25,6 +26,7 @@ class AWDSkeletonJoint : public AWDAttrElement
 
         int write_joint(int, awd_uint32);
         int calc_length();
+        int calc_num_children();
 
         awd_uint32 get_id();
         void set_parent(AWDSkeletonJoint *);

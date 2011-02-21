@@ -14,6 +14,7 @@ AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_fl
     this->name = NULL;
     this->name_len = name_len;
     this->bind_mtx = bind_mtx;
+    this->num_children = 0;
 
     if (name != NULL) {
         this->name = (char*)malloc(this->name_len+1);
@@ -68,6 +69,7 @@ AWDSkeletonJoint::add_child_joint(AWDSkeletonJoint *joint)
         joint->set_parent(this);
         this->last_child = joint;
         this->last_child->next = NULL;
+        this->num_children++;
     }
 
     return joint;
@@ -89,6 +91,23 @@ AWDSkeletonJoint::calc_length()
     }
 
     return len;
+}
+
+
+int
+AWDSkeletonJoint::calc_num_children()
+{
+    int num_children;
+    AWDSkeletonJoint *child;
+
+    num_children = this->num_children;
+    child = this->first_child;
+    while (child) {
+        num_children += child->calc_num_children();
+        child = child->next;
+    }
+
+    return num_children;
 }
 
 
@@ -172,11 +191,14 @@ AWDSkeleton::calc_body_length(awd_bool wide)
 void
 AWDSkeleton::write_body(int fd, awd_bool wide)
 {
-    awd_uint32 num_joints;
+    awd_uint32 num_joints_be;
 
-    num_joints = 0;
+    num_joints_be = 0;
+    if (this->root_joint != NULL)
+        num_joints_be = UI32(1 + this->root_joint->calc_num_children());
+
     awdutil_write_varstr(fd, this->name, this->name_len);
-    write(fd, &num_joints, sizeof(awd_uint32));
+    write(fd, &num_joints_be, sizeof(awd_uint32));
 
     if (this->root_joint != NULL)
         this->root_joint->write_joint(fd, 1);
