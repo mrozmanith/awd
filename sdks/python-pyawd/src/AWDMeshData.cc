@@ -42,6 +42,7 @@ int
 pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
     self->ob_data = new AWDMeshData();
+    self->skeleton = NULL;
     self->next = NULL;
 
     // Superclass __init__
@@ -52,6 +53,9 @@ pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 
 
 
+/**
+ * AWDMeshData.add_sub_mesh()
+*/
 PyObject *
 pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
@@ -72,6 +76,36 @@ pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject
 }
 
 
+/**
+ * AWDMeshData.skeleton (setter)
+*/
+static int
+pyawd_AWDMeshData_set_skeleton(pyawd_AWDMeshData *self, PyObject *value, void *closure)
+{
+    if (PyObject_IsInstance(value, (PyObject *)&pyawd_AWDSkeletonType)) {
+        self->skeleton = (pyawd_AWDSkeleton *)value;
+        self->ob_data->set_skeleton(self->skeleton->ob_skeleton);
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+
+
+/**
+ * AWDMeshData.skeleton (getter)
+*/
+static PyObject *
+pyawd_AWDMeshData_get_skeleton(pyawd_AWDMeshData *self, void *closure)
+{
+    if (self->skeleton != NULL)
+        return (PyObject *)self->skeleton;
+
+    Py_RETURN_NONE;
+}
+
+
 
 /**
  * Method dictionary
@@ -80,6 +114,19 @@ PyMethodDef pyawd_AWDMeshData_methods[] = {
     { "add_sub_mesh", (PyCFunction)pyawd_AWDMeshData_add_sub_mesh, METH_VARARGS | METH_KEYWORDS,
         "Add a sub-mesh (geometry) to a mesh data block." },
 
+    { NULL }
+};
+
+
+/**
+ * Getter/setter dictionary
+*/
+PyGetSetDef pyawd_AWDMeshData_getset[] = {
+    { "skeleton",
+        (getter)pyawd_AWDMeshData_get_skeleton,
+        (setter)pyawd_AWDMeshData_set_skeleton,
+        "Defines the skeleton that this mesh is bound to (if any)",
+        NULL },
     { NULL }
 };
 
@@ -119,7 +166,7 @@ PyTypeObject pyawd_AWDMeshDataType = {
     0,                                      /* tp_iternext */
     pyawd_AWDMeshData_methods,              /* tp_methods */
     0,                                      /* tp_members */
-    0,                                      /* tp_getset */
+    pyawd_AWDMeshData_getset,               /* tp_getset */
     &pyawd_AWDAttrBlockType,                /* tp_base */
     0,                                      /* tp_dict */
     0,                                      /* tp_descr_get */

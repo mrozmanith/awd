@@ -5,6 +5,7 @@
 
 #include <awd/libawd.h>
 
+#include "AWDSkeleton.h"
 #include "AWDAttrBlock.h"
 #include "AWDSubMesh.h"
 
@@ -17,6 +18,7 @@ typedef struct _pyawd_AWDMeshData {
 
     AWDMeshData *ob_data;
 
+    pyawd_AWDSkeleton *skeleton;
     pyawd_AWDSubMesh *first_sub_mesh;
 
     struct _pyawd_AWDMeshData *next;
