@@ -87,6 +87,8 @@ pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject
     self->last_sub_mesh->next = NULL;
     self->num_sub_meshes++;
 
+    // Protect from GC
+    Py_INCREF(sub);
 
     Py_RETURN_NONE;
 }
