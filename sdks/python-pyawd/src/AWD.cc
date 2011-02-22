@@ -30,6 +30,8 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (pyawd_AWD *)type->tp_alloc(type, 0);
     if (self != NULL) {
+        self->first_mesh_data = NULL;
+        self->last_mesh_data = NULL;
     }
 
     return (PyObject *)self;
@@ -63,7 +65,6 @@ pyawd_AWD_init(pyawd_AWD *self, PyObject *args, PyObject *kwds)
         flags |= AWD_OPTIMIZE_FOR_ACCURACY;
 
     self->ob_awd = new AWD((AWD_compression)compression, flags);
-    self->first_mesh_data = NULL;
 
     return 0;
 }
@@ -115,28 +116,24 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
     }
 
     mesh = (pyawd_AWDMeshData *) data_arg;
-    self->ob_awd->add_mesh_data(mesh->ob_data);
-    // TODO: Make this nicer
-    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data, mtx));
 
     // Add mesh to internal list
     if (self->first_mesh_data == NULL) {
         self->first_mesh_data = mesh;
     }
     else {
-        pyawd_AWDMeshData *next;
-
-        next = self->first_mesh_data;
-        while (1) {
-            if (next->next) {
-                next = next->next;
-            }
-            else {
-                next->next = mesh;
-                break;
-            }
-        }
+        self->last_mesh_data->next = mesh;
     }
+
+    Py_INCREF(mesh);
+    self->last_mesh_data = mesh;
+    self->last_mesh_data->next = NULL;
+
+
+    // Add to libawd internal structure
+    // TODO: Make this nicer
+    self->ob_awd->add_mesh_data(mesh->ob_data);
+    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data, mtx));
 
 
     Py_RETURN_NONE;
@@ -157,6 +154,7 @@ pyawd_AWD_add_skeleton(pyawd_AWD *self, PyObject *args)
         return NULL;
 
     skel = (pyawd_AWDSkeleton *)skel_arg;
+    Py_INCREF(skel);
     self->ob_awd->add_skeleton(skel->ob_skeleton);
     
     Py_RETURN_NONE;

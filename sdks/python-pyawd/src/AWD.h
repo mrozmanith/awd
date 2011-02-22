@@ -21,6 +21,7 @@ typedef struct {
     int         ob_has_written_header;
 
     pyawd_AWDMeshData *first_mesh_data;
+    pyawd_AWDMeshData *last_mesh_data;
 } pyawd_AWD;
 
 
