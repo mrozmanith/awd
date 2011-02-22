@@ -191,6 +191,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\AWDSkeleton.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\AWDSkeletonJoint.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\AWDSubMesh.h"
 				>
 			</File>
@@ -224,6 +232,14 @@
 			</File>
 			<File
 				RelativePath=".\src\AWDMeshInst.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\AWDSkeleton.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\AWDSkeletonJoint.cc"
 				>
 			</File>
 			<File

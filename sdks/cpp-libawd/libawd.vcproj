@@ -152,6 +152,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\attr.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\awd.h"
 				>
 			</File>
@@ -228,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\skeleton.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\stream.h"
 				>
 			</File>
@@ -265,6 +273,10 @@
 			>
 			<File
 				RelativePath=".\lib\lzma\Alloc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\attr.cc"
 				>
 			</File>
 			<File
@@ -313,6 +325,10 @@
 			</File>
 			<File
 				RelativePath=".\src\mesh.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\skeleton.cc"
 				>
 			</File>
 			<File

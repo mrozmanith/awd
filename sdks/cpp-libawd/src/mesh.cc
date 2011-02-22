@@ -148,7 +148,7 @@ AWDMeshData::prepare_write()
         AWD_attr_val_ptr val;
         val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
         *val.addr = this->skeleton->get_addr();
-        this->properties->set(PROP_MD_SKELETON, val, sizeof(awd_baddr), BADDR);
+        this->properties->set(PROP_MD_SKELETON, val, sizeof(awd_baddr), AWD_ATTR_BADDR);
     }
 }
 

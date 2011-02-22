@@ -6,6 +6,10 @@
 #include "attr.h"
 #include "util.h"
 
+#ifdef WIN32
+#include "awdw32.h"
+#endif
+
 
 void
 AWDAttr::write_attr(int fd)
@@ -25,36 +29,36 @@ AWDAttr::write_attr(int fd)
     while (bytes_written < this->value_len) {
         // Check type, and write data accordingly
         switch (this->type) {
-            case INT16:
+            case AWD_ATTR_INT16:
                 i16_be = UI16(*val.i16);
                 write(fd, &i16_be, sizeof(awd_int16));
                 bytes_written += sizeof(awd_int16);
                 val.i16++;
                 break;
 
-            case BADDR:
-            case INT32:
+            case AWD_ATTR_BADDR:
+            case AWD_ATTR_INT32:
                 i32_be = UI32(*val.i32);
                 write(fd, &i32_be, sizeof(awd_int32));
                 bytes_written += sizeof(awd_int32);
                 val.i32++;
                 break;
 
-            case FLOAT32:
+            case AWD_ATTR_FLOAT32:
                 f32_be = F32(*val.f32);
                 write(fd, &f32_be, sizeof(awd_float32));
                 bytes_written += sizeof(awd_float32);
                 val.f32++;
                 break;
 
-            case FLOAT64:
+            case AWD_ATTR_FLOAT64:
                 f64_be = F64(*val.f64);
                 write(fd, &f64_be, sizeof(awd_float64));
                 bytes_written += sizeof(awd_float64);
                 val.f64++;
                 break;
 
-            case STRING:
+            case AWD_ATTR_STRING:
                 // Write entire string in one go
                 write(fd, val.str, this->value_len);
                 bytes_written += this->value_len;

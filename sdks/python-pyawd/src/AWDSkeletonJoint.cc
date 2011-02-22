@@ -107,6 +107,8 @@ pyawd_AWDSkeletonJoint_add_child_joint(pyawd_AWDSkeletonJoint *self, PyObject *a
 
     // Add to libawd joint
     self->ob_joint->add_child_joint(joint->ob_joint);
+
+    Py_RETURN_NONE;
 }
 
 

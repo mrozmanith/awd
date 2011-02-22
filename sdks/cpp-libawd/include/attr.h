@@ -8,12 +8,12 @@
 typedef awd_uint16 awd_propkey;
 
 typedef enum {
-    INT16=1,
-    INT32,
-    FLOAT32,
-    FLOAT64,
-    STRING,
-    BADDR,
+    AWD_ATTR_INT16=1,
+    AWD_ATTR_INT32,
+    AWD_ATTR_FLOAT32,
+    AWD_ATTR_FLOAT64,
+    AWD_ATTR_STRING,
+    AWD_ATTR_BADDR,
 } AWD_attr_type;
 
 

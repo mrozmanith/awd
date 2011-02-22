@@ -63,10 +63,6 @@ pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 PyObject *
 pyawd_AWDMeshData_add_sub_mesh(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
-    int tris_len;
-    int verts_len;
-    awd_bool wide;
-
     PyObject *sub_arg;
     pyawd_AWDSubMesh *sub;
 
@@ -117,6 +113,9 @@ pyawd_AWDMeshData_mp_subscript(pyawd_AWDMeshData *self, PyObject *key)
                 cur_idx++;
             }
 
+            // If reached, could not be found, which is 
+            // extremely unlogical since idx < num_sub_meshes
+            Py_RETURN_NONE;
         }
         else {
             // TODO: Set exception

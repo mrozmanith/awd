@@ -4,6 +4,10 @@
 #include "util.h"
 #include "skeleton.h"
 
+#ifdef WIN32
+#include "awdw32.h"
+#endif
+
 
 AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_float64 *bind_mtx) :
     AWDAttrElement()
