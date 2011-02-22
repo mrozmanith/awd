@@ -165,6 +165,9 @@ AWDMeshData::write_body(int fd, awd_bool wide)
     awdutil_write_varstr(fd, "", 0); // TODO: Replace with name
     write(fd, &num_subs_be, sizeof(awd_uint16));
 
+    // Write list of optional properties
+    this->properties->write_attributes(fd);
+
     // Write all sub-meshes
     sub = this->first_sub;
     while (sub) {
@@ -202,7 +205,8 @@ AWDMeshData::write_body(int fd, awd_bool wide)
         sub = sub->next;
     }
     
-    this->write_attributes(fd, true, true);
+    // Write list of user attributes
+    this->user_attributes->write_attributes(fd);
 }
 
 

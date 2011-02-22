@@ -128,7 +128,6 @@ class AWDAttrElement
         AWDUserAttrList *user_attributes;
 
         awd_uint32 calc_attr_length(bool, bool);
-        void write_attributes(int, bool, bool);
 };
 
 #endif

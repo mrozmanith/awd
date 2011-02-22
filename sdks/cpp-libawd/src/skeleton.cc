@@ -204,10 +204,15 @@ AWDSkeleton::write_body(int fd, awd_bool wide)
     awdutil_write_varstr(fd, this->name, this->name_len);
     write(fd, &num_joints_be, sizeof(awd_uint32));
 
+    // Write optional properties
+    this->properties->write_attributes(fd);
+
+    // Write joints (if any)
     if (this->root_joint != NULL)
         this->root_joint->write_joint(fd, 1);
 
-    this->write_attributes(fd, true, true);
+    // Write user attributes
+    this->user_attributes->write_attributes(fd);
 }
 
 

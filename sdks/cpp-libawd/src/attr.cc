@@ -371,10 +371,4 @@ AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr)
 }
 
 
-void
-AWDAttrElement::write_attributes(int fd, bool with_props, bool with_user_attr)
-{
-    if (with_props) this->properties->write_attributes(fd);
-    if (with_user_attr) this->user_attributes->write_attributes(fd);
-}
 
