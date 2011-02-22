@@ -44,7 +44,7 @@ AWDDataStream::write_stream(int fd, awd_bool wide)
     num = this->num_elements;
     // TODO: Consider making this nicer by storing 
     // data type in class somehow.
-    if (this->type == VERTICES || this->type == UVS) {
+    if (this->type == VERTICES || this->type == UVS || this->type == VERTEX_WEIGHTS) {
         for (e=0; e<num; e++) {
             awd_float64 *p = (this->data.f64 + e);
             if (wide) {
@@ -106,6 +106,9 @@ AWDMeshDataStream::get_elem_size(awd_bool wide)
         case VERTEX_TANGENTS:
             break;
         case FACE_NORMALS:
+            break;
+        case VERTEX_WEIGHTS:
+            elem_size = sizeof(awd_float32);
             break;
     }
 

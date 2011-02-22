@@ -146,8 +146,16 @@ static int
 pyawd_AWDMeshData_set_skeleton(pyawd_AWDMeshData *self, PyObject *value, void *closure)
 {
     if (PyObject_IsInstance(value, (PyObject *)&pyawd_AWDSkeletonType)) {
+        if (self->skeleton)
+            Py_DECREF(self->skeleton);
+
+        // Store python skeleton object and increase ref count
         self->skeleton = (pyawd_AWDSkeleton *)value;
+        Py_INCREF(self->skeleton);
+
+        // Store in libawd struct as well
         self->ob_data->set_skeleton(self->skeleton->ob_skeleton);
+
         return 0;
     }
     else {

@@ -65,6 +65,7 @@ pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kw
     switch (str_type) {
         case UVS:
         case VERTICES:
+        case VERTEX_WEIGHTS:
             data.f64 = (awd_float64*)malloc(data_len * sizeof(awd_float64));
             pyawdutil_pylist_to_float64(data_list, data.f64, data_len);
             break;

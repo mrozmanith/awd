@@ -31,6 +31,7 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
     }
 
     this->last_stream = str;
+    this->last_stream->next = NULL;
 }
 
 

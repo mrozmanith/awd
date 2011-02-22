@@ -20,6 +20,7 @@ typedef enum {
     VERTEX_NORMALS,
     VERTEX_TANGENTS,
     FACE_NORMALS,
+    VERTEX_WEIGHTS,
 } AWD_mesh_str_type;
 
 
