@@ -1,5 +1,5 @@
-#ifndef _AWD_TYPES_H
-#define _AWD_TYPES_H
+#ifndef _LIBAWD_AWD_TYPES_H
+#define _LIBAWD_AWD_TYPES_H
 
 
 // POD types
@@ -19,6 +19,12 @@ typedef unsigned int awd_baddr;
 typedef unsigned char awd_bool;
 
 
+#define AWD_TRUE 1
+#define AWD_FALSE 0
+#define AWD_NULL 0
+
+
+
 // Byte order conversions
 #define UI16(x) awdutil_swapui16(x)
 #define UI32(x) awdutil_swapui32(x)
@@ -29,22 +35,34 @@ typedef unsigned char awd_bool;
 typedef enum {
     NULL_REF=0,
 
-    // Scene graph
-    SCENE=1,
-    CONTAINER,
-    MESH_INSTANCE,
-    MESH_DATA,
-    BSP_TREE,
-    OCT_TREE,
+    // Geometry/data
+    MESH_DATA=1,
+    PATH_DATA=2,
 
-    // Materials/lighting
-    MATERIAL=40,
-    TEXTURE,
-    SHADER,
-    LIGHT_SOURCE,
+    // Scene objects
+    SCENE=21,
+    CONTAINER=22,
+    PRIMITIVE=23,
+    MESH_INSTANCE=24,
+    PATH_INSTANCE=25,
+
+    LIGHT=41,
+    CAMERA=42,
+    SOUND_SOURCE=43,
+
+    // Partitioning
+    BSP_TREE=61,
+    OCT_TREE=62,
+
+    // Materials
+    MATERIAL=81,
+    TEXTURE=82,
+    SHADER=83,
 
     // Animation
-    SKELETON=60,
+    SKELETON=101,
+    SKELETON_POSE=102,
+    SKELETON_ANIM=103,
 
     // Misc
     COMMAND=254

@@ -10,22 +10,15 @@
 
 
 AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_float64 *bind_mtx) :
+    AWDNamedElement(name, name_len),
     AWDAttrElement()
 {
     this->next = NULL;
     this->first_child = NULL;
     this->last_child = NULL;
-    this->name = NULL;
-    this->name_len = name_len;
     this->bind_mtx = bind_mtx;
     this->num_children = 0;
 
-    if (name != NULL) {
-        this->name = (char*)malloc(this->name_len+1);
-        strncpy(this->name, name, this->name_len);
-        this->name[this->name_len] = 0;
-    }
-    
     if (this->bind_mtx == NULL) {
         this->bind_mtx = awdutil_id_mtx4(NULL);
     }
@@ -87,7 +80,7 @@ AWDSkeletonJoint::calc_length()
     int len;
     AWDSkeletonJoint *child;
     
-    len = sizeof(awd_uint16) + this->name_len + 136;
+    len = sizeof(awd_uint16) + this->get_name_length() + 136;
     child = this->first_child;
     while (child) {
         len += child->calc_length();
@@ -135,7 +128,7 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id)
     // Write this joint
     write(fd, &id_be, sizeof(awd_uint32));
     write(fd, &par_id_be, sizeof(awd_uint32));
-    awdutil_write_varstr(fd, this->name, this->name_len);
+    awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     awdutil_write_mtx4(fd, this->bind_mtx);
 
     // Write children
@@ -162,18 +155,11 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id)
 
 
 AWDSkeleton::AWDSkeleton(const char *name, awd_uint16 name_len) :
+    AWDBlock(SKELETON),
+    AWDNamedElement(name, name_len), 
     AWDAttrElement()
 {
-    this->name = NULL;
-    this->name_len = name_len;
-    this->type = SKELETON;
     this->root_joint = NULL;
-
-    if (name != NULL) {
-        this->name = (char*)malloc(this->name_len+1);
-        strncpy(this->name, name, this->name_len);
-        this->name[this->name_len] = 0;
-    }
 }
 
 
@@ -182,7 +168,7 @@ AWDSkeleton::calc_body_length(awd_bool wide)
 {
     awd_uint32 len;
 
-    len = sizeof(awd_uint16) + this->name_len + sizeof(awd_uint32);
+    len = sizeof(awd_uint16) + this->get_name_length() + sizeof(awd_uint32);
     len += this->calc_attr_length(true,true);
 
     if (this->root_joint != NULL)
@@ -201,7 +187,7 @@ AWDSkeleton::write_body(int fd, awd_bool wide)
     if (this->root_joint != NULL)
         num_joints_be = UI32(1 + this->root_joint->calc_num_children());
 
-    awdutil_write_varstr(fd, this->name, this->name_len);
+    awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     write(fd, &num_joints_be, sizeof(awd_uint32));
 
     // Write optional properties

@@ -2,7 +2,8 @@
 #include <string.h>
 #include <cstdio>
 
-#include "libawd.h"
+#include "util.h"
+#include "awd_types.h"
 
 // Get mkstemp replacement
 #ifdef WIN32

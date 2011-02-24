@@ -4,15 +4,12 @@
 #include "mesh.h"
 #include "block.h"
 #include "skeleton.h"
+#include "skelanim.h"
 #include "awd_types.h"
 
 
 #define AWD_MAJOR_VERSION 0
 #define AWD_MINOR_VERSION 1
-
-#define AWD_TRUE 1
-#define AWD_FALSE 0
-#define AWD_NULL 0
 
 #define AWD_STREAMING               0x1
 #define AWD_OPTIMIZE_FOR_ACCURACY   0x2
@@ -27,6 +24,8 @@ class AWD
         awd_uint16 flags;
         AWD_compression compression;
 
+        AWDBlockList * skelpose_blocks;
+        AWDBlockList * skelanim_blocks;
         AWDBlockList * skeleton_blocks;
         AWDBlockList * mesh_data_blocks;
         AWDBlockList * mesh_inst_blocks;
@@ -45,6 +44,8 @@ class AWD
         void add_mesh_data(AWDMeshData *);
         void add_mesh_inst(AWDMeshInst *);
         void add_skeleton(AWDSkeleton *);
+        void add_skeleton_pose(AWDSkeletonPose *);
+        void add_skeleton_anim(AWDSkeletonAnimation *);
 };
 
 #endif

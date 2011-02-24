@@ -1,13 +1,18 @@
-#include "libawd.h"
+#include "awd_types.h"
+#include "block.h"
+#include "util.h"
+
 #ifdef WIN32
 #include "awdw32.h"
 #else
 #include <unistd.h>
 #endif
 
-AWDBlock::AWDBlock()
+
+AWDBlock::AWDBlock(AWD_block_type type) 
 {
     this->next = NULL;
+    this->type = type;
 }
 
 
@@ -75,15 +80,17 @@ AWDBlockList::AWDBlockList()
 void 
 AWDBlockList::append(AWDBlock *block)
 {
-    if (this->first_block == NULL) {
-        this->first_block = block;
-    }
-    else {
-        this->last_block->next = block;
-    }
+    if (!this->contains(block)) {
+        if (this->first_block == NULL) {
+            this->first_block = block;
+        }
+        else {
+            this->last_block->next = block;
+        }
 
-    this->last_block = block;
-    this->num_blocks++;
+        this->last_block = block;
+        this->num_blocks++;
+    }
 }
 
 

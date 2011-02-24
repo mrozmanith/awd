@@ -6,12 +6,12 @@
 
 
 
-class AWDSkeletonJoint : public AWDAttrElement
+class AWDSkeletonJoint : 
+    public AWDNamedElement,
+    public AWDAttrElement
 {
     private:
         awd_uint32 id;
-        char *name;
-        awd_uint16 name_len;
         awd_float64 *bind_mtx;
         int num_children;
 
@@ -35,11 +35,12 @@ class AWDSkeletonJoint : public AWDAttrElement
 };
 
 
-class AWDSkeleton : public AWDBlock, public AWDAttrElement
+class AWDSkeleton : 
+    public AWDBlock, 
+    public AWDNamedElement,
+    public AWDAttrElement
 {
     private:
-        char *name;
-        awd_uint16 name_len;
         AWDSkeletonJoint *root_joint;
 
     protected:

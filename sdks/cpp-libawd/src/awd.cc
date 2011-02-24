@@ -8,7 +8,12 @@
 #include <unistd.h>
 #endif
 
-#include "libawd.h"
+#include "awd.h"
+#include "mesh.h"
+#include "skeleton.h"
+#include "skelanim.h"
+#include "util.h"
+#include "awdlzma.h"
 
 #include "Types.h"
 #include "LzmaEnc.h"
@@ -23,6 +28,8 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->mesh_data_blocks = new AWDBlockList();
     this->mesh_inst_blocks = new AWDBlockList();
     this->skeleton_blocks = new AWDBlockList();
+    this->skelanim_blocks = new AWDBlockList();
+    this->skelpose_blocks = new AWDBlockList();
 
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -32,24 +39,35 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 void
 AWD::add_mesh_data(AWDMeshData *block)
 {
-    if (!this->mesh_data_blocks->contains(block))
-        this->mesh_data_blocks->append(block);
+    this->mesh_data_blocks->append(block);
 }
 
 
 void
 AWD::add_mesh_inst(AWDMeshInst *block)
 {
-    if (!this->mesh_inst_blocks->contains(block))
-        this->mesh_inst_blocks->append(block);
+    this->mesh_inst_blocks->append(block);
 }
 
 
 void
 AWD::add_skeleton(AWDSkeleton *block)
 {
-    if (!this->skeleton_blocks->contains(block))
-        this->skeleton_blocks->append(block);
+    this->skeleton_blocks->append(block);
+}
+
+
+void
+AWD::add_skeleton_pose(AWDSkeletonPose *block)
+{
+    this->skelpose_blocks->append(block);
+}
+
+
+void
+AWD::add_skeleton_anim(AWDSkeletonAnimation *block)
+{
+    this->skelanim_blocks->append(block);
 }
 
 
@@ -110,6 +128,8 @@ AWD::flush(int out_fd)
     }
 
     tmp_len += this->write_blocks(this->skeleton_blocks, tmp_fd);
+    tmp_len += this->write_blocks(this->skelpose_blocks, tmp_fd);
+    tmp_len += this->write_blocks(this->skelanim_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_data_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_inst_blocks, tmp_fd);
 

@@ -1,10 +1,12 @@
 #ifndef _LIBAWD_MESH_H
 #define _LIBAWD_MESH_H
 
-#include "awd_types.h"
+#include "attr.h"
+#include "name.h"
 #include "block.h"
 #include "stream.h"
 #include "skeleton.h"
+#include "awd_types.h"
 
 
 #define PROP_MD_SKELETON 1
@@ -39,7 +41,10 @@ class AWDSubMesh
 };
 
 
-class AWDMeshData : public AWDBlock, public AWDAttrElement
+class AWDMeshData : 
+    public AWDBlock, 
+    public AWDNamedElement,
+    public AWDAttrElement
 {
     private:
         int num_subs;
@@ -54,7 +59,7 @@ class AWDMeshData : public AWDBlock, public AWDAttrElement
         void write_body(int, awd_bool);
 
     public:
-        AWDMeshData();
+        AWDMeshData(const char *, awd_uint16);
 
         int get_num_subs();
         AWDSubMesh *get_sub_at(int);
@@ -66,7 +71,10 @@ class AWDMeshData : public AWDBlock, public AWDAttrElement
 
 
 
-class AWDMeshInst : public AWDBlock, public AWDAttrElement
+class AWDMeshInst : 
+    public AWDBlock, 
+    public AWDNamedElement,
+    public AWDAttrElement
 {
     private:
         AWDMeshData * data;
@@ -79,8 +87,8 @@ class AWDMeshInst : public AWDBlock, public AWDAttrElement
         void write_body(int, awd_bool);
 
     public:
-        AWDMeshInst(AWDMeshData *);
-        AWDMeshInst(AWDMeshData *, awd_float64 *);
+        AWDMeshInst(const char *, awd_uint16, AWDMeshData *);
+        AWDMeshInst(const char *, awd_uint16, AWDMeshData *, awd_float64 *);
 
         void set_transform(awd_float64 *);
 

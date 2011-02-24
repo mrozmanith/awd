@@ -1,6 +1,11 @@
 #include <stdlib.h>
 
-#include "libawd.h"
+#include "mesh.h"
+#include "block.h"
+#include "name.h"
+#include "attr.h"
+#include "util.h"
+
 #ifdef WIN32
 #include "awdw32.h"
 #else
@@ -39,10 +44,11 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 
 
 
-AWDMeshData::AWDMeshData() :
-    AWDAttrElement()
+AWDMeshData::AWDMeshData(const char *name, awd_uint16 name_len) :
+    AWDBlock(MESH_DATA),
+    AWDNamedElement(name, name_len),
+    AWDAttrElement() 
 {
-    this->type = MESH_DATA;
     this->first_sub = NULL;
     this->last_sub = NULL;
     this->skeleton = NULL;
@@ -115,7 +121,8 @@ AWDMeshData::calc_body_length(awd_bool wide)
 
     // Calculate length of entire mesh 
     // data (not block header)
-    mesh_len = sizeof(awd_uint16) + sizeof(awd_uint16); // TODO: Add name length
+    mesh_len = sizeof(awd_uint16); // Num subs
+    mesh_len += sizeof(awd_uint16) + this->get_name_length();
     mesh_len += this->calc_attr_length(true,true);
     sub = this->first_sub;
     while (sub) {
@@ -162,7 +169,7 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
     // Write name and sub count
     num_subs_be = UI16(this->num_subs);
-    awdutil_write_varstr(fd, "", 0); // TODO: Replace with name
+    awdutil_write_varstr(fd, this->get_name(), this->get_name_length()); 
     write(fd, &num_subs_be, sizeof(awd_uint16));
 
     // Write list of optional properties
@@ -213,30 +220,27 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
 
 
-AWDMeshInst::AWDMeshInst(AWDMeshData *data)
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data) :
+    AWDBlock(MESH_INSTANCE),
+    AWDNamedElement(name, name_len),
+    AWDAttrElement()
 {
     awd_float64 *mtx;
 
     mtx = awdutil_id_mtx4(NULL);
 
-    this->init();
     this->set_data(data);
     this->set_transform(mtx);
 }
 
 
-AWDMeshInst::AWDMeshInst(AWDMeshData *data, awd_float64 *mtx)
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data, awd_float64 *mtx) :
+    AWDBlock(MESH_INSTANCE),
+    AWDNamedElement(name, name_len),
+    AWDAttrElement() 
 {
-    this->init();
     this->set_data(data);
     this->set_transform(mtx);
-}
-
-
-void
-AWDMeshInst::init()
-{
-    this->type = MESH_INSTANCE;
 }
 
 
@@ -264,7 +268,7 @@ AWDMeshInst::set_transform(awd_float64 *mtx)
 awd_uint32
 AWDMeshInst::calc_body_length(awd_bool wide)
 {
-    return 136;
+    return 136 + sizeof(awd_uint16) + this->get_name_length();
 }
 
 
@@ -280,7 +284,12 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
     parent_addr = 0;
     data_addr = UI32(this->data->get_addr());
 
+    // Write scene block common fields
+    // TODO: Move this to separate base class
     write(fd, &parent_addr, sizeof(awd_baddr));
     awdutil_write_mtx4(fd, this->transform_mtx);
+    awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
+
+    // Write mesh data address
     write(fd, &data_addr, sizeof(awd_uint32));
 }

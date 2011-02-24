@@ -1,7 +1,7 @@
 #ifndef _LIBAWD_STREAM_H
 #define _LIBAWD_STREAM_H
 
-#include "libawd.h"
+#include "awd_types.h"
 
 /** 
  * Data stream pointer
