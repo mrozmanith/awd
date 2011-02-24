@@ -17,11 +17,14 @@ extern PyTypeObject pyawd_AWDType;
 typedef struct {
     PyObject_HEAD
 
+    PyObject    *mesh_data_blocks;
+    PyObject    *mesh_inst_blocks;
+    PyObject    *skeleton_blocks;
+    PyObject    *skelanim_blocks;
+    PyObject    *skelpose_blocks;
+
     AWD         *ob_awd;
     int         ob_has_written_header;
-
-    pyawd_AWDMeshData *first_mesh_data;
-    pyawd_AWDMeshData *last_mesh_data;
 } pyawd_AWD;
 
 

@@ -36,7 +36,6 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->first_sub_mesh = NULL;
         self->last_sub_mesh = NULL;
         self->num_sub_meshes = 0;
-        self->ob_data = new AWDMeshData();
     }
 
     return (PyObject *)self;
@@ -51,6 +50,9 @@ pyawd_AWDMeshData_init(pyawd_AWDMeshData *self, PyObject *args, PyObject *kwds)
 {
     // Superclass __init__
     pyawd_AWDAttrBlock_init((pyawd_AWDAttrBlock *)self, args, kwds);
+
+    // TODO: Get name from params
+    self->ob_data = new AWDMeshData("", 0);
 
     return 0;
 }

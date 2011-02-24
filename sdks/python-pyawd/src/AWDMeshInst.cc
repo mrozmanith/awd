@@ -2,6 +2,8 @@
 #include "structmember.h"
 
 #include "AWDMeshInst.h"
+#include "AWDMeshData.h"
+#include "AWDMatrix4.h"
 
 #include <awd/libawd.h>
 
@@ -39,6 +41,36 @@ pyawd_AWDMeshInst_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDMeshInst_init(pyawd_AWDMeshInst *self, PyObject *args, PyObject *kwds)
 {
+    PyObject *name;
+    PyObject *tf;
+    PyObject *md;
+
+    char *kwlist[] = {"data", "name", "transform"};
+
+    tf = NULL;
+    md = NULL;
+    name = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!O!O!", kwlist,
+        &pyawd_AWDMeshDataType, &md, &PyString_Type, &name, &pyawd_AWDMatrix4Type, &tf))
+        return NULL;
+
+    if (name == NULL)
+        name = PyString_FromString("");
+    if (tf == NULL)
+        tf = (PyObject*)pyawd_AWDMatrix4_new(&pyawd_AWDMatrix4Type, NULL, NULL);
+    if (md == NULL)
+        md = Py_None;
+
+    Py_INCREF(name);
+    self->name = name;
+
+    Py_INCREF(tf);
+    self->transform = tf;
+    
+    Py_INCREF(md);
+    self->mesh_data = md;
+
     return 0;
 }
 

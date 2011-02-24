@@ -7,6 +7,9 @@
 #include "AWD.h"
 #include "AWDMeshData.h"
 #include "AWDSkeleton.h"
+#include "AWDMeshInst.h"
+#include "AWDSkeletonPose.h"
+#include "AWDSkeletonAnimation.h"
 
 
 
@@ -30,8 +33,17 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (pyawd_AWD *)type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->first_mesh_data = NULL;
-        self->last_mesh_data = NULL;
+        self->mesh_data_blocks = PyList_New(0);
+        self->mesh_inst_blocks = PyList_New(0);
+        self->skeleton_blocks = PyList_New(0);
+        self->skelanim_blocks = PyList_New(0);
+        self->skelpose_blocks = PyList_New(0);
+
+        Py_INCREF(self->mesh_data_blocks);
+        Py_INCREF(self->mesh_inst_blocks);
+        Py_INCREF(self->skeleton_blocks);
+        Py_INCREF(self->skelanim_blocks);
+        Py_INCREF(self->skelpose_blocks);
     }
 
     return (PyObject *)self;
@@ -74,16 +86,15 @@ pyawd_AWD_init(pyawd_AWD *self, PyObject *args, PyObject *kwds)
  * AWD.add_mesh_data()
 */
 PyObject *
-pyawd_AWD_add_mesh_data(pyawd_AWD *self, PyObject *args)
+pyawd_AWD_add_mesh_data(pyawd_AWD *self, PyObject *arg)
 {
-    pyawd_AWDMeshData *mesh;
-    PyObject *arg;
-
-    if (!PyArg_ParseTuple(args, "O!", &pyawd_AWDMeshDataType, &arg))
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDMeshDataType)) {
+        PyList_Append(self->mesh_data_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDMeshData");
         return NULL;
-
-    // TODO: Add to ob_awd
-    mesh = (pyawd_AWDMeshData *) arg;
+    }
 
     Py_RETURN_NONE;
 }
@@ -93,48 +104,15 @@ pyawd_AWD_add_mesh_data(pyawd_AWD *self, PyObject *args)
  * AWD.add_mesh_inst()
 */
 PyObject *
-pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
+pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *arg)
 {
-    pyawd_AWDMeshData *mesh;
-    PyObject *data_arg;
-    PyObject *mtx_arg;
-    awd_float64 *mtx;
-
-
-    char *kwlist[] = { "data", "transform", NULL };
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!", kwlist, 
-                                    &pyawd_AWDMeshDataType, &data_arg,
-                                    &PyList_Type, &mtx_arg))
-        return NULL;
-
-
-    mtx = (awd_float64*)malloc(16 * sizeof(awd_float64));
-    if (!pyawdutil_pylist_to_float64(mtx_arg, mtx, 16)) {
-        // TODO: Set exception
-        return NULL;
-    }
-
-    mesh = (pyawd_AWDMeshData *) data_arg;
-
-    // Add mesh to internal list
-    if (self->first_mesh_data == NULL) {
-        self->first_mesh_data = mesh;
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDMeshInstType)) {
+        PyList_Append(self->mesh_inst_blocks, arg);
     }
     else {
-        self->last_mesh_data->next = mesh;
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDMeshInst");
+        return NULL;
     }
-
-    Py_INCREF(mesh);
-    self->last_mesh_data = mesh;
-    self->last_mesh_data->next = NULL;
-
-
-    // Add to libawd internal structure
-    // TODO: Make this nicer
-    self->ob_awd->add_mesh_data(mesh->ob_data);
-    self->ob_awd->add_mesh_inst(new AWDMeshInst(mesh->ob_data, mtx));
-
 
     Py_RETURN_NONE;
 }
@@ -145,20 +123,55 @@ pyawd_AWD_add_mesh_inst(pyawd_AWD *self, PyObject *args, PyObject *kwds)
  * AWD.add_skeleton()
 */
 PyObject *
-pyawd_AWD_add_skeleton(pyawd_AWD *self, PyObject *args)
+pyawd_AWD_add_skeleton(pyawd_AWD *self, PyObject *arg)
 {
-    PyObject *skel_arg;
-    pyawd_AWDSkeleton *skel;
-
-    if (!PyArg_ParseTuple(args, "O!", &pyawd_AWDSkeletonType, &skel_arg))
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDSkeletonType)) {
+        PyList_Append(self->skeleton_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDSkeleton");
         return NULL;
-
-    skel = (pyawd_AWDSkeleton *)skel_arg;
-    Py_INCREF(skel);
-    self->ob_awd->add_skeleton(skel->ob_skeleton);
+    }
     
     Py_RETURN_NONE;
 }
+
+
+/**
+ * AWD.add_skeleton_anim()
+*/
+PyObject *
+pyawd_AWD_add_skeleton_anim(pyawd_AWD *self, PyObject *arg)
+{
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDSkeletonAnimationType)) {
+        PyList_Append(self->skelanim_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDSkeletonAnim");
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+/**
+ * AWD.add_skeleton_pose()
+*/
+PyObject *
+pyawd_AWD_add_skeleton_pose(pyawd_AWD *self, PyObject *arg)
+{
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDSkeletonPoseType)) {
+        PyList_Append(self->skelpose_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDSkeletonPose");
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 
 /**
@@ -183,13 +196,107 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
     fd = PyObject_AsFileDescriptor(fobj);
 
     if (fd >= 0) {
-        pyawd_AWDMeshData *cur_md;
-        cur_md = self->first_mesh_data;
-        /*
-        while (cur_md) {
-            cur_md = cur_md->next;
+        int i;
+        int len;
+
+        // TODO: Mark objects as written, and if encountered
+        // in another place, add them only if not marked as written
+
+        len = PyList_Size(self->skelpose_blocks);
+        for (i=0; i<len; i++) {
+            int ii;
+            char *name;
+            int name_len;
+            int num_jtf;
+            pyawd_AWDSkeletonPose *pose;
+
+            pose = (pyawd_AWDSkeletonPose *)PyList_GetItem(self->skelpose_blocks, i);
+            name = PyString_AsString(pose->name);
+            name_len = PyString_Size(pose->name);
+            pose->ob_pose = new AWDSkeletonPose(name, name_len);
+            self->ob_awd->add_skeleton_pose(pose->ob_pose);
+
+            // TODO: Move this into pose or anywhere but here
+            num_jtf = PyList_Size(pose->transforms);
+            for (ii=0; ii<num_jtf; ii++) {
+                PyObject *joint_tf;
+
+                joint_tf = PyList_GetItem(pose->transforms, ii);
+                if (joint_tf != Py_None) {
+                    pose->ob_pose->set_next_transform(
+                        ((pyawd_AWDMatrix4*)joint_tf)->raw_data);
+                }
+                else {
+                    pose->ob_pose->set_next_transform(NULL);
+                }
+            }
         }
-        */
+
+        len = PyList_Size(self->skelanim_blocks);
+        for (i=0; i<len; i++) {
+            int ii;
+            char *name;
+            int name_len;
+            int num_frames;
+            pyawd_AWDSkeletonAnimation *anim;
+
+            anim = (pyawd_AWDSkeletonAnimation*)PyList_GetItem(self->skelanim_blocks, i);
+            name = PyString_AsString(anim->name);
+            name_len = PyString_Size(anim->name);
+            num_frames = PyList_Size(anim->frames);
+
+            anim->ob_anim = new AWDSkeletonAnimation(name, name_len, num_frames);
+            self->ob_awd->add_skeleton_anim(anim->ob_anim);
+
+            for (ii=0; ii<num_frames; ii++) {
+                PyObject *pose;
+                pose = PyList_GetItem(anim->frames, ii);
+                anim->ob_anim->set_next_frame_pose(
+                    ((pyawd_AWDSkeletonPose*)pose)->ob_pose);
+            }
+        }
+
+        len = PyList_Size(self->skeleton_blocks);
+        for (i=0; i<len; i++) {
+            pyawd_AWDSkeleton *skel;
+            skel = (pyawd_AWDSkeleton *)PyList_GetItem(self->skeleton_blocks, i);
+            // TODO: Wait with building skeleton until now
+            self->ob_awd->add_skeleton(skel->ob_skeleton);
+        }
+
+        // Mesh data blocks
+        len = PyList_Size(self->mesh_data_blocks);
+        for (i=0; i<len; i++) {
+            pyawd_AWDMeshData *md;
+            md = (pyawd_AWDMeshData*)PyList_GetItem(self->mesh_data_blocks, i);
+            self->ob_awd->add_mesh_data(md->ob_data);
+        }
+
+        // Mesh instances
+        len = PyList_Size(self->mesh_inst_blocks);
+        for (i=0; i<len; i++) {
+            char *name;
+            int name_len;
+            awd_float64 *mtx;
+            AWDMeshData *awd_md;
+            AWDMeshInst *awd_inst;
+            pyawd_AWDMeshInst *inst;
+
+            inst = (pyawd_AWDMeshInst*)PyList_GetItem(self->mesh_inst_blocks, i);
+
+            mtx = NULL;
+            if (inst->transform)
+                mtx = ((pyawd_AWDMatrix4*)inst->transform)->raw_data;
+
+            awd_md = NULL;
+            if (inst->mesh_data)
+                awd_md = ((pyawd_AWDMeshData*)inst->mesh_data)->ob_data;
+            
+            name = PyString_AsString(inst->name);
+            name_len = PyString_Size(inst->name);
+            awd_inst = new AWDMeshInst(name, name_len, awd_md, mtx);
+            self->ob_awd->add_mesh_inst(awd_inst);
+        }
 
         // Write buffer
         self->ob_awd->flush(fd);
@@ -208,14 +315,20 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
  * Method dictionary
 */
 PyMethodDef pyawd_AWD_methods[] = {
-    { "add_mesh_data", (PyCFunction)pyawd_AWD_add_mesh_data, METH_VARARGS,
+    { "add_mesh_data", (PyCFunction)pyawd_AWD_add_mesh_data, METH_O,
         "Add a mesh data block to the AWD document." },
 
-    { "add_mesh_inst", (PyCFunction)pyawd_AWD_add_mesh_inst, METH_VARARGS | METH_KEYWORDS,
+    { "add_mesh_inst", (PyCFunction)pyawd_AWD_add_mesh_inst, METH_O,
         "Add a mesh instance block to the AWD document." },
 
-    { "add_skeleton", (PyCFunction)pyawd_AWD_add_skeleton, METH_VARARGS,
+    { "add_skeleton", (PyCFunction)pyawd_AWD_add_skeleton, METH_O,
         "Add a skeleton block to the AWD document." },
+
+    { "add_skeleton_pose", (PyCFunction)pyawd_AWD_add_skeleton_pose, METH_O,
+        "Add a skeleton pose block to the AWD document." },
+
+    { "add_skeleton_anim", (PyCFunction)pyawd_AWD_add_skeleton_anim, METH_O,
+        "Add a skeleton animation block to the AWD document." },
 
     { "flush", (PyCFunction)pyawd_AWD_flush, METH_VARARGS,
         "Flush everything in the AWD object to an output stream." },
@@ -226,48 +339,67 @@ PyMethodDef pyawd_AWD_methods[] = {
 
 
 /**
+ * Member dictionary
+*/
+PyMemberDef pyawd_AWD_members[] = {
+    { "mesh_data_blocks", T_OBJECT_EX, offsetof(pyawd_AWD, mesh_data_blocks), READONLY,
+        "MeshData blocks that have been added to the AWD document." },
+    { "mesh_inst_blocks", T_OBJECT_EX, offsetof(pyawd_AWD, mesh_inst_blocks), READONLY,
+        "MeshInstance blocks that have been added to the AWD document." },
+    { "skeleton_blocks", T_OBJECT_EX, offsetof(pyawd_AWD, skeleton_blocks), READONLY,
+        "Skeleton blocks that have been added to the AWD document." },
+    { "skeleton_anim_blocks", T_OBJECT_EX, offsetof(pyawd_AWD, skelanim_blocks), READONLY,
+        "SkeletonAnimation blocks that have been added to the AWD document." },
+    { "skeleton_pose_blocks", T_OBJECT_EX, offsetof(pyawd_AWD, skelpose_blocks), READONLY,
+        "SkeletonPose blocks that have been added to the AWD document." },
+    { NULL }
+};
+
+
+
+/**
  * Type object 
 */
 PyTypeObject pyawd_AWDType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pyawd.AWD",                        /* tp_name */
-    sizeof(pyawd_AWD),                  /* tp_basicsize */
-    0,                                  /* tp_itemsize */
-    (destructor)pyawd_AWD_dealloc,      /* tp_dealloc */
-    0,                                  /* tp_print */
-    0,                                  /* tp_getattr */
-    0,                                  /* tp_setattr */
-    0,                                  /* tp_reserved */
-    0,                                  /* tp_repr */
-    0,                                  /* tp_as_number */
-    0,                                  /* tp_as_sequence */
-    0,                                  /* tp_as_mapping */
-    0,                                  /* tp_hash  */
-    0,                                  /* tp_call */
-    0,                                  /* tp_str */
-    0,                                  /* tp_getattro */
-    0,                                  /* tp_setattro */
-    0,                                  /* tp_as_buffer */
+    "pyawd.AWD",                        // tp_name
+    sizeof(pyawd_AWD),                  // tp_basicsize
+    0,                                  // tp_itemsize
+    (destructor)pyawd_AWD_dealloc,      // tp_dealloc
+    0,                                  // tp_print
+    0,                                  // tp_getattr
+    0,                                  // tp_setattr
+    0,                                  // tp_reserved
+    0,                                  // tp_repr
+    0,                                  // tp_as_number
+    0,                                  // tp_as_sequence
+    0,                                  // tp_as_mapping
+    0,                                  // tp_hash 
+    0,                                  // tp_call
+    0,                                  // tp_str
+    0,                                  // tp_getattro
+    0,                                  // tp_setattro
+    0,                                  // tp_as_buffer
     Py_TPFLAGS_DEFAULT |
-        Py_TPFLAGS_BASETYPE,            /* tp_flags */
-    "AWD document object.",             /* tp_doc */
-    0,                                  /* tp_traverse */
-    0,                                  /* tp_clear */
-    0,                                  /* tp_richcompare */
-    0,                                  /* tp_weaklistoffset */
-    0,                                  /* tp_iter */
-    0,                                  /* tp_iternext */
-    pyawd_AWD_methods,                  /* tp_methods */
-    0,                                  /* tp_members */
-    0,                                  /* tp_getset */
-    0,                                  /* tp_base */
-    0,                                  /* tp_dict */
-    0,                                  /* tp_descr_get */
-    0,                                  /* tp_descr_set */
-    0,                                  /* tp_dictoffset */
-    (initproc)pyawd_AWD_init,           /* tp_init */
-    0,                                  /* tp_alloc */
-    pyawd_AWD_new,                      /* tp_new */
+        Py_TPFLAGS_BASETYPE,            // tp_flags
+    "AWD document object.",             // tp_doc
+    0,                                  // tp_traverse
+    0,                                  // tp_clear
+    0,                                  // tp_richcompare
+    0,                                  // tp_weaklistoffset
+    0,                                  // tp_iter
+    0,                                  // tp_iternext
+    pyawd_AWD_methods,                  // tp_methods
+    pyawd_AWD_members,                  // tp_members
+    0,                                  // tp_getset
+    0,                                  // tp_base
+    0,                                  // tp_dict
+    0,                                  // tp_descr_get
+    0,                                  // tp_descr_set
+    0,                                  // tp_dictoffset
+    (initproc)pyawd_AWD_init,           // tp_init
+    0,                                  // tp_alloc
+    pyawd_AWD_new,                      // tp_new
 };
 
 

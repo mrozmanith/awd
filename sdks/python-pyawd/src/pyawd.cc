@@ -2,12 +2,15 @@
 #include <awd/libawd.h>
 
 #include "AWD.h"
+#include "AWDMatrix4.h"
 #include "AWDAttrBlock.h"
 #include "AWDSubMesh.h"
 #include "AWDMeshData.h"
 #include "AWDMeshInst.h"
 #include "AWDSkeleton.h"
+#include "AWDSkeletonPose.h"
 #include "AWDSkeletonJoint.h"
+#include "AWDSkeletonAnimation.h"
 
 
 #if PYTHON_VERSION == 3
@@ -65,6 +68,9 @@ PyObject *_init_pyawd(PyObject *m)
 
     // Prepare class data types
     if ((PyType_Ready(&pyawd_AWDType) < 0)
+        || (PyType_Ready(&pyawd_AWDMatrix4Type) < 0)
+        || (PyType_Ready(&pyawd_AWDSkeletonPoseType) < 0)
+        || (PyType_Ready(&pyawd_AWDSkeletonAnimationType) < 0)
         || (PyType_Ready(&pyawd_AWDSkeletonJointType) < 0)
         || (PyType_Ready(&pyawd_AWDSkeletonType) < 0)
         || (PyType_Ready(&pyawd_AWDAttrBlockType) < 0)
@@ -74,6 +80,8 @@ PyObject *_init_pyawd(PyObject *m)
         return NULL;
 
     // Add classes to module
+    Py_INCREF(&pyawd_AWDMatrix4Type);
+    PyModule_AddObject(m, "AWDMatrix4", (PyObject *)&pyawd_AWDMatrix4Type);
     Py_INCREF(&pyawd_AWDType);
     PyModule_AddObject(m, "AWD", (PyObject *)&pyawd_AWDType);
     Py_INCREF(&pyawd_AWDAttrBlockType);
@@ -88,6 +96,10 @@ PyObject *_init_pyawd(PyObject *m)
     PyModule_AddObject(m, "AWDSkeleton", (PyObject *)&pyawd_AWDSkeletonType);
     Py_INCREF(&pyawd_AWDSkeletonJointType);
     PyModule_AddObject(m, "AWDSkeletonJoint", (PyObject *)&pyawd_AWDSkeletonJointType);
+    Py_INCREF(&pyawd_AWDSkeletonPoseType);
+    PyModule_AddObject(m, "AWDSkeletonPose", (PyObject *)&pyawd_AWDSkeletonPoseType);
+    Py_INCREF(&pyawd_AWDSkeletonAnimationType);
+    PyModule_AddObject(m, "AWDSkeletonAnimation", (PyObject *)&pyawd_AWDSkeletonAnimationType);
 
     return m;
 }

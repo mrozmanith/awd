@@ -13,14 +13,17 @@ source_files = [
     'src/AWDAttrBlock.cc',
     'src/AWDSkeleton.cc',
     'src/AWDSkeletonJoint.cc',
+    'src/AWDSkeletonPose.cc',
+    'src/AWDSkeletonAnimation.cc',
     'src/AWDMeshData.cc',
     'src/AWDMeshInst.cc',
-    'src/AWDSubMesh.cc'
+    'src/AWDSubMesh.cc',
+    'src/AWDMatrix4.cc',
 ]
 
 pyawd = Extension('pyawd', 
     libraries = [ 'awd' ],
-    include_dirs = [ '/usr/local/include' ],
+    include_dirs = [ 'include', '/usr/local/include' ],
     define_macros = [ version_macro ],
     sources = source_files )
 
