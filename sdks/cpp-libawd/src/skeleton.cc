@@ -131,6 +131,8 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id)
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     awdutil_write_mtx4(fd, this->bind_mtx);
 
+    //  TODO: Write attributes
+
     // Write children
     child_id = id+1;
     num_written = 1;

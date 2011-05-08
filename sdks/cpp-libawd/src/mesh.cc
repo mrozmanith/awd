@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <cstdio>
 
 #include "mesh.h"
 #include "block.h"
@@ -52,6 +53,7 @@ AWDMeshData::AWDMeshData(const char *name, awd_uint16 name_len) :
     this->first_sub = NULL;
     this->last_sub = NULL;
     this->skeleton = NULL;
+    this->bind_mtx = NULL;
     this->num_subs = 0;
 }
 
@@ -113,6 +115,20 @@ AWDMeshData::set_skeleton(AWDSkeleton *skeleton)
 }
 
 
+awd_float64 *
+AWDMeshData::get_bind_mtx()
+{
+    return this->bind_mtx;
+}
+
+
+void
+AWDMeshData::set_bind_mtx(awd_float64 *bind_mtx)
+{
+    this->bind_mtx = bind_mtx;
+}
+
+
 awd_uint32
 AWDMeshData::calc_body_length(awd_bool wide)
 {
@@ -150,13 +166,21 @@ AWDMeshData::calc_body_length(awd_bool wide)
 void
 AWDMeshData::prepare_write()
 {
+
     // Set skeleton addr property if there is 
     // a skeleton bound to this mesh.
     if (this->skeleton) {
-        AWD_attr_val_ptr val;
-        val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
-        *val.addr = this->skeleton->get_addr();
-        this->properties->set(PROP_MD_SKELETON, val, sizeof(awd_baddr), AWD_ATTR_BADDR);
+        AWD_attr_val_ptr skel_val;
+        AWD_attr_val_ptr bind_val;
+        skel_val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
+        *skel_val.addr = this->skeleton->get_addr();
+        this->properties->set(PROP_MD_SKELETON, skel_val, sizeof(awd_baddr), AWD_ATTR_BADDR);
+
+        if (this->bind_mtx == NULL)
+            this->bind_mtx = awdutil_id_mtx4(NULL);
+
+        bind_val.f64 = this->bind_mtx;
+        this->properties->set(PROP_MD_BIND_MTX, bind_val, 16*sizeof(awd_float64), AWD_ATTR_MTX4);
     }
 }
 

@@ -64,6 +64,11 @@ AWDAttr::write_attr(int fd)
                 bytes_written += this->value_len;
                 break;
 
+            case AWD_ATTR_MTX4:
+                awdutil_write_mtx4(fd, val.f64);
+                bytes_written += 128;
+                break;
+
             default:
                 printf("unknown type: %d\n", this->type);
                 return;
@@ -294,6 +299,8 @@ AWDNumAttrList::find(awd_propkey key)
         while (cur) {
             if (cur->key == key)
                 return cur;
+
+            cur = cur->next;
         }
     }
 
@@ -318,14 +325,16 @@ AWDNumAttrList::get(awd_propkey key)
 void
 AWDNumAttrList::set(awd_propkey key, AWD_attr_val_ptr value, awd_uint16 value_length, AWD_attr_type type)
 {
-    bool existed;
+    bool created;
     AWDNumAttr *attr;    
 
-    existed = false;
+    created = false;
     attr = this->find(key);
     if (!attr) {
         attr = new AWDNumAttr();
         attr->key = key;
+
+        created = true;
     }
 
     attr->type = type;
@@ -334,7 +343,7 @@ AWDNumAttrList::set(awd_propkey key, AWD_attr_val_ptr value, awd_uint16 value_le
 
     // Add to internal list if the attribute wasn't
     // originally found there.
-    if (!existed) {
+    if (created) {
         if (!this->first_attr) {
             this->first_attr = attr;
         }

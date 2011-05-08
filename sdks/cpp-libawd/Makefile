@@ -4,7 +4,7 @@ LD=ld
 CXX_SRC=$(wildcard src/*.cc)
 C_SRC=$(wildcard lib/lzma/*.c)
 OBJ=$(CXX_SRC:.cc=.o) $(C_SRC:.c=.o)
-CFLAGS=-Wall -g -L. -arch i386 -arch ppc -arch x86_64
+CFLAGS=-Wall -g -L. -arch i386 -arch x86_64
 INCLUDE=-Iinclude -Ilib/lzma/
 DEFINES=-D_7ZIP_ST
 LIBVER=1.0

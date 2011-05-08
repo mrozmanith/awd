@@ -63,7 +63,7 @@ AWDDataStream::write_stream(int fd, awd_bool wide)
             }
         }
     }
-    else if (this->type == TRIANGLES) {
+    else if (this->type == TRIANGLES || this->type == JOINT_INDICES) {
         for (e=0; e<num; e++) {
             awd_uint32 *p = (this->data.ui32 + e);
 
@@ -110,6 +110,9 @@ AWDMeshDataStream::get_elem_size(awd_bool wide)
         case VERTEX_TANGENTS:
             break;
         case FACE_NORMALS:
+            break;
+        case JOINT_INDICES:
+            elem_size = sizeof(awd_uint16);
             break;
         case VERTEX_WEIGHTS:
             elem_size = sizeof(awd_float32);

@@ -14,6 +14,7 @@ typedef enum {
     AWD_ATTR_FLOAT64,
     AWD_ATTR_STRING,
     AWD_ATTR_BADDR,
+    AWD_ATTR_MTX4,
 } AWD_attr_type;
 
 

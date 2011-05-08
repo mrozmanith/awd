@@ -10,6 +10,7 @@
 
 
 #define PROP_MD_SKELETON 1
+#define PROP_MD_BIND_MTX 2
 
 
 /**
@@ -22,6 +23,7 @@ typedef enum {
     VERTEX_NORMALS,
     VERTEX_TANGENTS,
     FACE_NORMALS,
+    JOINT_INDICES,
     VERTEX_WEIGHTS,
 } AWD_mesh_str_type;
 
@@ -51,6 +53,7 @@ class AWDMeshData :
         AWDSubMesh * first_sub;
         AWDSubMesh * last_sub;
 
+        awd_float64 * bind_mtx;
         AWDSkeleton * skeleton;
 
     protected:
@@ -67,6 +70,9 @@ class AWDMeshData :
 
         AWDSkeleton *get_skeleton();
         void set_skeleton(AWDSkeleton *skeleton);
+
+        awd_float64 *get_bind_mtx();
+        void set_bind_mtx(awd_float64 *bind_mtx);
 };
 
 
