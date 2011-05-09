@@ -55,9 +55,8 @@ typedef enum {
     OCT_TREE=62,
 
     // Materials
-    MATERIAL=81,
+    SIMPLE_MATERIAL=81,
     TEXTURE=82,
-    SHADER=83,
 
     // Animation
     SKELETON=101,
@@ -65,7 +64,8 @@ typedef enum {
     SKELETON_ANIM=103,
 
     // Misc
-    COMMAND=254
+    COMMAND=254,
+    NAMESPACE=255
 
 } AWD_block_type;
 

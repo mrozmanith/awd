@@ -5,6 +5,8 @@
 #include "block.h"
 #include "skeleton.h"
 #include "skelanim.h"
+#include "texture.h"
+#include "material.h"
 #include "awd_types.h"
 
 
@@ -24,6 +26,8 @@ class AWD
         awd_uint16 flags;
         AWD_compression compression;
 
+        AWDBlockList * texture_blocks;
+        AWDBlockList * material_blocks;
         AWDBlockList * skelpose_blocks;
         AWDBlockList * skelanim_blocks;
         AWDBlockList * skeleton_blocks;
@@ -41,6 +45,8 @@ class AWD
         AWD(AWD_compression, awd_uint16);
         awd_uint32 flush(int);
 
+        void add_texture(AWDTexture *);
+        void add_material(AWDSimpleMaterial *);
         void add_mesh_data(AWDMeshData *);
         void add_mesh_inst(AWDMeshInst *);
         void add_skeleton(AWDSkeleton *);

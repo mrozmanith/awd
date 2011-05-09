@@ -25,6 +25,8 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->minor_version = AWD_MINOR_VERSION;
     this->compression = compression;
     this->flags = flags;
+    this->texture_blocks = new AWDBlockList();
+    this->material_blocks = new AWDBlockList();
     this->mesh_data_blocks = new AWDBlockList();
     this->mesh_inst_blocks = new AWDBlockList();
     this->skeleton_blocks = new AWDBlockList();
@@ -33,6 +35,21 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
+}
+
+
+
+void
+AWD::add_material(AWDSimpleMaterial *block)
+{
+    this->material_blocks->append(block);
+}
+
+
+void
+AWD::add_texture(AWDTexture *block)
+{
+    this->texture_blocks->append(block);
 }
 
 
@@ -130,6 +147,8 @@ AWD::flush(int out_fd)
     tmp_len += this->write_blocks(this->skeleton_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skelpose_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skelanim_blocks, tmp_fd);
+    tmp_len += this->write_blocks(this->texture_blocks, tmp_fd);
+    tmp_len += this->write_blocks(this->material_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_data_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_inst_blocks, tmp_fd);
 
