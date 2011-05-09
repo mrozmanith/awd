@@ -201,7 +201,6 @@ AWDMeshData::write_body(int fd, awd_bool wide)
     sub = this->first_sub;
     while (sub) {
         AWDDataStream *str;
-        awd_baddr mat_id;
         awd_uint32 sub_len;
 
         sub_len = 0;
@@ -245,6 +244,8 @@ AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *dat
 
     mtx = awdutil_id_mtx4(NULL);
 
+    this->materials = new AWDBlockList();
+
     this->set_data(data);
     this->set_transform(mtx);
 }
@@ -257,6 +258,14 @@ AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *dat
 {
     this->set_data(data);
     this->set_transform(mtx);
+    this->materials = new AWDBlockList();
+}
+
+
+void
+AWDMeshInst::add_material(AWDSimpleMaterial *material)
+{
+    this->materials->append(material);
 }
 
 
@@ -284,7 +293,8 @@ AWDMeshInst::set_transform(awd_float64 *mtx)
 awd_uint32
 AWDMeshInst::calc_body_length(awd_bool wide)
 {
-    return 136 + sizeof(awd_uint16) + this->get_name_length();
+    return 136 + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
+        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true);
 }
 
 
@@ -292,8 +302,11 @@ AWDMeshInst::calc_body_length(awd_bool wide)
 void
 AWDMeshInst::write_body(int fd, awd_bool wide)
 {
+    AWDBlock *block;
+    AWDBlockIterator *it;
     awd_baddr parent_addr;
     awd_baddr data_addr;
+    awd_uint16 num_materials;
 
     // TODO: Use (and create) awd->scene_blocks instead
     // Get IDs for references, verify byte-order
@@ -308,4 +321,17 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
 
     // Write mesh data address
     write(fd, &data_addr, sizeof(awd_uint32));
+
+    // Write materials list. First write material count, and then
+    // iterate over materials block list and write all addresses
+    num_materials = UI16(this->materials->get_num_blocks());
+    write(fd, &num_materials, sizeof(awd_uint16));
+    it = new AWDBlockIterator(this->materials);
+    while ((block = it->next()) != NULL) {
+        awd_baddr addr = UI32(block->get_addr());
+        write(fd, &addr, sizeof(awd_baddr));
+    }
+
+    this->properties->write_attributes(fd);
+    this->user_attributes->write_attributes(fd);
 }

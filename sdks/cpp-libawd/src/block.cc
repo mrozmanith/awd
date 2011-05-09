@@ -111,6 +111,13 @@ AWDBlockList::contains(AWDBlock *block)
 }
 
 
+int
+AWDBlockList::get_num_blocks()
+{
+    return this->num_blocks;
+}
+
+
 
 
 

@@ -38,6 +38,8 @@ class AWDBlockList
 
         void append(AWDBlock *);
         awd_bool contains(AWDBlock *);
+
+        int get_num_blocks();
 };
 
 class AWDBlockIterator
