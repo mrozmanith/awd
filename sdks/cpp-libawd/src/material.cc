@@ -48,7 +48,7 @@ AWDSimpleMaterial::set_texture(AWDTexture *texture)
 awd_uint32
 AWDSimpleMaterial::calc_body_length(awd_bool wide)
 {
-    return 1 + this->get_name_length() + this->calc_attr_length(true,true);
+    return 3 + this->get_name_length() + this->calc_attr_length(true,true);
 }
 
 

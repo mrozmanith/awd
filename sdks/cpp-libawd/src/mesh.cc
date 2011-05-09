@@ -144,9 +144,8 @@ AWDMeshData::calc_body_length(awd_bool wide)
     while (sub) {
         AWDDataStream *str;
         
-        // add size of mat ID and sub-mesh
-        // length (both awd_uint32)
-        mesh_len += 8;
+        // add size of sub-mesh length
+        mesh_len += 4;
 
         str = sub->first_stream;
         while (str) {
@@ -157,7 +156,6 @@ AWDMeshData::calc_body_length(awd_bool wide)
 
         sub = sub->next;
     }
-
 
     return mesh_len;
 }
@@ -214,16 +212,10 @@ AWDMeshData::write_body(int fd, awd_bool wide)
             str = str->next;
         }
 
-        // TODO: Find material correctly
-        //mat_id = _awd_get_block_id_by_data(sub->material);
-        mat_id = 0;
-
         // Verify byte-order
-        mat_id = UI32(mat_id);
         sub_len = UI32(sub_len);
 
         // Write sub-mesh header
-        write(fd, &mat_id, sizeof(awd_baddr)); 
         write(fd, &sub_len, sizeof(awd_uint32));
 
         str = sub->first_stream;
