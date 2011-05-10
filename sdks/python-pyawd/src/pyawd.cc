@@ -28,6 +28,16 @@ static PyMethodDef pyawd_methods[] = {
 #endif
 
 
+void _add_int_const(PyTypeObject *type, const char *attr, int val)
+{
+    PyObject *pyval;
+    
+    pyval = PyInt_FromLong(val);
+    Py_INCREF(pyval);
+    PyDict_SetItemString(type->tp_dict, attr, pyval);
+}
+
+
 /*
  * Python version-agnostic method to initialize pyawd module.
  * Invoked in different ways depending on whether this module
@@ -52,21 +62,6 @@ PyObject *_init_pyawd(PyObject *m)
     PyModule_AddObject(m, "pyawd_version", pyawd_ver);
     PyModule_AddObject(m, "libawd_version", libawd_ver);
 
-    // Enumeration constants
-    PyModule_AddIntConstant(m, "UNCOMPRESSED", UNCOMPRESSED);
-    PyModule_AddIntConstant(m, "DEFLATE", DEFLATE);
-    PyModule_AddIntConstant(m, "LZMA", LZMA);
-
-    PyModule_AddIntConstant(m, "VERTEX_STREAM", VERTICES);
-    PyModule_AddIntConstant(m, "TRIANGLE_STREAM", TRIANGLES);
-    PyModule_AddIntConstant(m, "UV_STREAM", UVS);
-    PyModule_AddIntConstant(m, "VNORMAL_STREAM", VERTEX_NORMALS);
-    PyModule_AddIntConstant(m, "VTANGENT_STREAM", VERTEX_TANGENTS);
-    PyModule_AddIntConstant(m, "FNORMAL_STREAM", FACE_NORMALS);
-    PyModule_AddIntConstant(m, "JINDEX_STREAM", JOINT_INDICES);
-    PyModule_AddIntConstant(m, "VWEIGHT_STREAM", VERTEX_WEIGHTS);
-
-
     // Prepare class data types
     if ((PyType_Ready(&pyawd_AWDType) < 0)
         || (PyType_Ready(&pyawd_AWDMatrix4Type) < 0)
@@ -79,6 +74,22 @@ PyObject *_init_pyawd(PyObject *m)
         || (PyType_Ready(&pyawd_AWDMeshInstType) < 0)
         || (PyType_Ready(&pyawd_AWDSubMeshType) < 0))
         return NULL;
+
+    // AWD type constants
+    _add_int_const(&pyawd_AWDType, "UNCOMPRESSED", UNCOMPRESSED);
+    _add_int_const(&pyawd_AWDType, "DEFLATE", DEFLATE);
+    _add_int_const(&pyawd_AWDType, "LZMA", LZMA);
+
+    // SubMesh type constants
+    _add_int_const(&pyawd_AWDSubMeshType, "VERTICES", VERTICES);
+    _add_int_const(&pyawd_AWDSubMeshType, "TRIANGLES", TRIANGLES);
+    _add_int_const(&pyawd_AWDSubMeshType, "UVS", UVS);
+    _add_int_const(&pyawd_AWDSubMeshType, "VERTEX_NORMALS", VERTEX_NORMALS);
+    _add_int_const(&pyawd_AWDSubMeshType, "VERTEX_TANGENTS", VERTEX_TANGENTS);
+    _add_int_const(&pyawd_AWDSubMeshType, "FACE_NORMALS", FACE_NORMALS);
+    _add_int_const(&pyawd_AWDSubMeshType, "JOINT_INDICES", JOINT_INDICES);
+    _add_int_const(&pyawd_AWDSubMeshType, "VERTEX_WEIGHTS", VERTEX_WEIGHTS);
+
 
     // Add classes to module
     Py_INCREF(&pyawd_AWDMatrix4Type);
