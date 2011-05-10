@@ -3,7 +3,7 @@ LIBPATH31=./build/lib.macosx-10.3-fat-3.1
 LIBPATH26=./build/lib.macosx-10.4-x86_64-2.6
 
 #DIST_CFLAGS=-g -arch ppc -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -fno-strict-aliasing -fno-common -dynamic -I/usr/local/include/
-DIST_CFLAGS=-g -arch i386 -arch x86_64 -fno-strict-aliasing -fno-common -dynamic -I/usr/include
+DIST_CFLAGS=-Wall -g -arch i386 -arch x86_64 -fno-strict-aliasing -fno-common -dynamic -I/usr/include
 CFLAGS=-c -O0 $(DIST_FLAGS)
 
 SO=pyawd.so
