@@ -69,6 +69,7 @@ pyawd_AWDSubMesh_add_stream(pyawd_AWDSubMesh *self, PyObject *args, PyObject *kw
             data.f64 = (awd_float64*)malloc(data_len * sizeof(awd_float64));
             pyawdutil_pylist_to_float64(data_list, data.f64, data_len);
             break;
+        case JOINT_INDICES:
         case TRIANGLES:
             data.ui32 = (awd_uint32*)malloc(data_len * sizeof(awd_uint32));
             pyawdutil_pylist_to_uint32(data_list, data.ui32, data_len);

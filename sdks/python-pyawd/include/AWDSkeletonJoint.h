@@ -14,16 +14,15 @@ typedef struct _pyawd_AWDSkeletonJoint {
 
     AWDSkeletonJoint *ob_joint;
 
-    const char * name;
-    PyListObject * bind_mtx;
+    PyObject *name;
+    PyObject *bind_mtx;
 
-    struct _pyawd_AWDSkeletonJoint *parent;
-    struct _pyawd_AWDSkeletonJoint *first_child;
-    struct _pyawd_AWDSkeletonJoint *last_child;
-    struct _pyawd_AWDSkeletonJoint *next;
+    PyObject *parent;
+    PyObject *children;
 } pyawd_AWDSkeletonJoint;
 
 
+void pyawd_AWDSkeletonJoint__prep(pyawd_AWDSkeletonJoint *);
 
 #endif
 

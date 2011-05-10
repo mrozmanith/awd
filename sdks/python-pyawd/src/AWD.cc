@@ -5,6 +5,7 @@
 
 #include "util.h"
 #include "AWD.h"
+#include "AWDMatrix4.h"
 #include "AWDMeshData.h"
 #include "AWDSkeleton.h"
 #include "AWDMeshInst.h"
@@ -199,9 +200,7 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
         int i;
         int len;
 
-        // TODO: Mark objects as written, and if encountered
-        // in another place, add them only if not marked as written
-
+        // Poses
         len = PyList_Size(self->skelpose_blocks);
         for (i=0; i<len; i++) {
             int ii;
@@ -232,6 +231,7 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
             }
         }
 
+        // Skeleton animations
         len = PyList_Size(self->skelanim_blocks);
         for (i=0; i<len; i++) {
             int ii;
@@ -256,11 +256,13 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
             }
         }
 
+        // Skeletons
         len = PyList_Size(self->skeleton_blocks);
         for (i=0; i<len; i++) {
             pyawd_AWDSkeleton *skel;
             skel = (pyawd_AWDSkeleton *)PyList_GetItem(self->skeleton_blocks, i);
-            // TODO: Wait with building skeleton until now
+            // TODO: Implement this paradigm of "prepping" instances on all types of blocks.
+            pyawd_AWDSkeleton__prep(skel);
             self->ob_awd->add_skeleton(skel->ob_skeleton);
         }
 
@@ -269,6 +271,20 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
         for (i=0; i<len; i++) {
             pyawd_AWDMeshData *md;
             md = (pyawd_AWDMeshData*)PyList_GetItem(self->mesh_data_blocks, i);
+            // TODO: Move this to mesh data prep function
+            if (md->skeleton != Py_None) {
+                pyawd_AWDSkeleton *skel;
+                skel = (pyawd_AWDSkeleton*)md->skeleton;
+                md->ob_data->set_skeleton(skel->ob_skeleton);
+
+            }
+
+            if (md->bind_mtx != Py_None) {
+                pyawd_AWDMatrix4 *mtx;
+                mtx = (pyawd_AWDMatrix4*)md->bind_mtx;
+                md->ob_data->set_bind_mtx(mtx->raw_data);
+            }
+
             self->ob_awd->add_mesh_data(md->ob_data);
         }
 

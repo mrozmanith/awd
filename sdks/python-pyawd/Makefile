@@ -1,9 +1,10 @@
 BLENPATH=/Applications/blender-2.54.app/Contents/MacOS/2.54/python/lib/python3.1
 LIBPATH31=./build/lib.macosx-10.3-fat-3.1
-LIBPATH26=./build/lib.macosx-10.3-fat-2.6
+LIBPATH26=./build/lib.macosx-10.4-x86_64-2.6
 
-DIST_CFLAGS=-g -arch ppc -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -fno-strict-aliasing -fno-common -dynamic -I/usr/local/include/
-CFLAGS=-c $(DIST_FLAGS)
+#DIST_CFLAGS=-g -arch ppc -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -fno-strict-aliasing -fno-common -dynamic -I/usr/local/include/
+DIST_CFLAGS=-g -arch i386 -arch x86_64 -fno-strict-aliasing -fno-common -dynamic -I/usr/include
+CFLAGS=-c -O0 $(DIST_FLAGS)
 
 SO=pyawd.so
 BLENSITE=$(BLENPATH)/site-packages

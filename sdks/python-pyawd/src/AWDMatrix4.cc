@@ -15,6 +15,7 @@ void
 pyawd_AWDMatrix4_dealloc(pyawd_AWDMatrix4 *self)
 {
     Py_TYPE(self)->tp_free((PyObject*)self);
+    free(self->raw_data);
 }
 
 
@@ -27,7 +28,7 @@ pyawd_AWDMatrix4_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     pyawd_AWDMatrix4 *self;
 
     self = (pyawd_AWDMatrix4 *)type->tp_alloc(type, 0);
-    if (self) {
+    if (self != NULL) {
         self->raw_data = awdutil_id_mtx4(NULL);
     }
     return (PyObject *)self;
@@ -95,12 +96,20 @@ static int
 pyawd_AWDMatrix4_mp_ass_subscript(pyawd_AWDMatrix4 *self, PyObject *arg, PyObject *val)
 {
     if (PyInt_Check(arg)) {
-        if (PyFloat_Check(val)) {
+        if (PyNumber_Check(val)) {
             long idx;
 
             idx = PyInt_AsLong(arg);
             if (idx >= 0 && idx < 16) {
-                self->raw_data[idx] = PyFloat_AsDouble(val);
+                PyObject *f = PyNumber_Float(val);
+                if (f) {
+                    self->raw_data[idx] = PyFloat_AsDouble(f);
+                    return 0;
+                }
+                else {
+                    PyErr_SetString(PyExc_RuntimeError, "Could not convert value to float");
+                    return -1;
+                }
             }
             else {
                 PyErr_Format(PyExc_RuntimeError, "Index %ld out of bounds", idx);

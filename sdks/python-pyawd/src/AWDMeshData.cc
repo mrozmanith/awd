@@ -6,6 +6,7 @@
 #include "AWDMeshData.h"
 #include "AWDSubMesh.h"
 #include "AWDAttrBlock.h"
+#include "AWDMatrix4.h"
 
 #include <awd/libawd.h>
 
@@ -32,10 +33,13 @@ pyawd_AWDMeshData_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (pyawd_AWDMeshData *)type->tp_alloc(type, 0);
     if (self) {
         self->next = NULL;
-        self->skeleton = NULL;
+        self->skeleton = Py_None;
+        self->bind_mtx = Py_None;
         self->first_sub_mesh = NULL;
         self->last_sub_mesh = NULL;
         self->num_sub_meshes = 0;
+
+        Py_INCREF(self->skeleton);
     }
 
     return (PyObject *)self;
@@ -152,11 +156,8 @@ pyawd_AWDMeshData_set_skeleton(pyawd_AWDMeshData *self, PyObject *value, void *c
             Py_DECREF(self->skeleton);
 
         // Store python skeleton object and increase ref count
-        self->skeleton = (pyawd_AWDSkeleton *)value;
+        self->skeleton = value;
         Py_INCREF(self->skeleton);
-
-        // Store in libawd struct as well
-        self->ob_data->set_skeleton(self->skeleton->ob_skeleton);
 
         return 0;
     }
@@ -173,7 +174,46 @@ static PyObject *
 pyawd_AWDMeshData_get_skeleton(pyawd_AWDMeshData *self, void *closure)
 {
     if (self->skeleton != NULL)
-        return (PyObject *)self->skeleton;
+        return self->skeleton;
+
+    Py_RETURN_NONE;
+}
+
+
+
+/**
+ * AWDMeshData.bind_matrix (setter)
+*/
+static int
+pyawd_AWDMeshData_set_bind_matrix(pyawd_AWDMeshData *self, PyObject *value, void *closure)
+{
+    if (value == self->bind_mtx)
+        return 0;
+
+    if (PyObject_IsInstance(value, (PyObject *)&pyawd_AWDMatrix4Type)) {
+        if (self->bind_mtx)
+            Py_DECREF(self->bind_mtx);
+
+        self->bind_mtx = value;
+        Py_INCREF(self->bind_mtx);
+
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+
+
+
+/**
+ * AWDMeshData.bind_matrix (getter)
+*/
+static PyObject *
+pyawd_AWDMeshData_get_bind_matrix(pyawd_AWDMeshData *self, void *closure)
+{
+    if (self->bind_mtx != NULL)
+        return self->bind_mtx;
 
     Py_RETURN_NONE;
 }
@@ -199,6 +239,11 @@ PyGetSetDef pyawd_AWDMeshData_getset[] = {
         (getter)pyawd_AWDMeshData_get_skeleton,
         (setter)pyawd_AWDMeshData_set_skeleton,
         "Defines the skeleton that this mesh is bound to (if any)",
+        NULL },
+    { "bind_matrix",
+        (getter)pyawd_AWDMeshData_get_bind_matrix,
+        (setter)pyawd_AWDMeshData_set_bind_matrix,
+        "Defines a matrix that needs to be applied bind pose when this mesh is bound",
         NULL },
     { NULL }
 };
@@ -258,3 +303,8 @@ PyTypeObject pyawd_AWDMeshDataType = {
 };
 
 
+
+void
+pyawd_AWDMeshData__prep(pyawd_AWDMeshData *self)
+{
+}

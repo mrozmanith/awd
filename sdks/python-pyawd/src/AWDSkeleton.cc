@@ -26,6 +26,9 @@ pyawd_AWDSkeleton_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     pyawd_AWDSkeleton *self;
 
     self = (pyawd_AWDSkeleton *)type->tp_alloc(type, 0);
+    if (self) {
+        self->root_joint = Py_None;
+    }
     return (PyObject *)self;
 }
 
@@ -39,24 +42,16 @@ pyawd_AWDSkeleton_init(pyawd_AWDSkeleton *self, PyObject *args, PyObject *kwds)
     int name_len;
     const char *name;
 
-    /*
-    char *kwlist[] = {"name"};
+    char *kwlist[] = { "name", NULL};
 
-    name = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|s#", kwlist, &name, &name_len))
-        return -1;
-        */
-
-    if (!PyArg_ParseTuple(args, "|s#", &name, &name_len))
+    self->name = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist, &PyString_Type, &self->name))
         return -1;
 
-    if (name == NULL) {
-        name = "";
-        name_len = 0;
-    }
+    if (!self->name)
+        self->name = PyString_FromString("");
 
-    // TODO: Fail if unicode
-    self->ob_skeleton = new AWDSkeleton((char *)name, name_len);
+    Py_INCREF(self->name);
 
     return 0;
 }
@@ -65,22 +60,18 @@ pyawd_AWDSkeleton_init(pyawd_AWDSkeleton *self, PyObject *args, PyObject *kwds)
 static int
 pyawd_AWDSkeleton_set_root_joint(pyawd_AWDSkeleton *self, PyObject *value, void *closure)
 {
-    if (value == NULL) {
-        // TODO: Set error
-        return NULL;
-    }
+    if (value == Py_None || PyObject_IsInstance(value, (PyObject *)&pyawd_AWDSkeletonJointType)) {
 
-    if (PyObject_IsInstance(value, (PyObject *)&pyawd_AWDSkeletonJointType)) {
-        pyawd_AWDSkeletonJoint *joint;
+        if (self->root_joint)
+            Py_DECREF(self->root_joint);
 
-        joint = (pyawd_AWDSkeletonJoint *)value;
-        self->root_joint = joint;
-        self->ob_skeleton->set_root_joint(joint->ob_joint);
+        self->root_joint = value;
+        Py_INCREF(self->root_joint);
 
         return 0;
     }
     else {
-        // TODO: Set error
+        PyErr_SetString(PyExc_RuntimeError, "Value must be SkeletonJoint or None");
         return -1;
     }
 }
@@ -120,44 +111,64 @@ PyGetSetDef pyawd_AWDSkeleton_getset[] = {
 */
 PyTypeObject pyawd_AWDSkeletonType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pyawd.AWDSkeleton",                    /* tp_name */
-    sizeof(pyawd_AWDSkeleton),              /* tp_basicsize */
-    0,                                      /* tp_itemsize */
-    (destructor)pyawd_AWDSkeleton_dealloc,  /* tp_dealloc */
-    0,                                      /* tp_print */
-    0,                                      /* tp_getattr */
-    0,                                      /* tp_setattr */
-    0,                                      /* tp_reserved */
-    0,                                      /* tp_repr */
-    0,                                      /* tp_as_number */
-    0,                                      /* tp_as_sequence */
-    0,                                      /* tp_as_mapping */
-    0,                                      /* tp_hash  */
-    0,                                      /* tp_call */
-    0,                                      /* tp_str */
-    0,                                      /* tp_getattro */
-    0,                                      /* tp_setattro */
-    0,                                      /* tp_as_buffer */
+    "pyawd.AWDSkeleton",                        // tp_name
+    sizeof(pyawd_AWDSkeleton),                  // tp_basicsize
+    0,                                          // tp_itemsize
+    (destructor)pyawd_AWDSkeleton_dealloc,      // tp_dealloc
+    0,                                          // tp_print
+    0,                                          // tp_getattr
+    0,                                          // tp_setattr
+    0,                                          // tp_reserved
+    0,                                          // tp_repr
+    0,                                          // tp_as_number
+    0,                                          // tp_as_sequence
+    0,                                          // tp_as_mapping
+    0,                                          // tp_hash 
+    0,                                          // tp_call
+    0,                                          // tp_str
+    0,                                          // tp_getattro
+    0,                                          // tp_setattro
+    0,                                          // tp_as_buffer
     Py_TPFLAGS_DEFAULT |
-        Py_TPFLAGS_BASETYPE,                /* tp_flags */
-    "AWD keleton block.",                   /* tp_doc */
-    0,                                      /* tp_traverse */
-    0,                                      /* tp_clear */
-    0,                                      /* tp_richcompare */
-    0,                                      /* tp_weaklistoffset */
-    0,                                      /* tp_iter */
-    0,                                      /* tp_iternext */
-    pyawd_AWDSkeleton_methods,              /* tp_methods */
-    0,                                      /* tp_members */
-    pyawd_AWDSkeleton_getset,               /* tp_getset */
-    0,                                      /* tp_base */
-    0,                                      /* tp_dict */
-    0,                                      /* tp_descr_get */
-    0,                                      /* tp_descr_set */
-    0,                                      /* tp_dictoffset */
-    (initproc)pyawd_AWDSkeleton_init,       /* tp_init */
-    0,                                      /* tp_alloc */
-    pyawd_AWDSkeleton_new,                  /* tp_new */
+        Py_TPFLAGS_BASETYPE,                    // tp_flags
+    "AWD keleton block.",                       // tp_doc
+    0,                                          // tp_traverse
+    0,                                          // tp_clear
+    0,                                          // tp_richcompare
+    0,                                          // tp_weaklistoffset
+    0,                                          // tp_iter
+    0,                                          // tp_iternext
+    pyawd_AWDSkeleton_methods,                  // tp_methods
+    0,                                          // tp_members
+    pyawd_AWDSkeleton_getset,                   // tp_getset
+    0,                                          // tp_base
+    0,                                          // tp_dict
+    0,                                          // tp_descr_get
+    0,                                          // tp_descr_set
+    0,                                          // tp_dictoffset
+    (initproc)pyawd_AWDSkeleton_init,           // tp_init
+    0,                                          // tp_alloc
+    pyawd_AWDSkeleton_new,                      // tp_new
 };
 
+
+
+void
+pyawd_AWDSkeleton__prep(pyawd_AWDSkeleton *self)
+{
+    char *name;
+    int name_len;
+
+    name = PyString_AsString(self->name);
+    name_len = PyString_Size(self->name);
+
+    self->ob_skeleton = new AWDSkeleton(name, name_len);
+
+    if (self->root_joint != Py_None) {
+        pyawd_AWDSkeletonJoint *root;
+        root = (pyawd_AWDSkeletonJoint *)self->root_joint;
+        pyawd_AWDSkeletonJoint__prep(root);
+        self->ob_skeleton->set_root_joint(root->ob_joint);
+    }
+}
 

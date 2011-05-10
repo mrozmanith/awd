@@ -43,7 +43,7 @@ pyawd_AWDSkeletonPose_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int
 pyawd_AWDSkeletonPose_init(pyawd_AWDSkeletonPose *self, PyObject *args, PyObject *kwds)
 {
-    char *kwlist[] = { "name" };
+    char *kwlist[] = { "name", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist, &PyString_Type, &self->name))
         return NULL;

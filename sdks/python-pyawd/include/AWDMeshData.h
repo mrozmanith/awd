@@ -18,7 +18,8 @@ typedef struct _pyawd_AWDMeshData {
 
     AWDMeshData *ob_data;
 
-    pyawd_AWDSkeleton *skeleton;
+    PyObject *skeleton;
+    PyObject *bind_mtx;
     pyawd_AWDSubMesh *first_sub_mesh;
     pyawd_AWDSubMesh *last_sub_mesh;
     int num_sub_meshes;
@@ -27,13 +28,17 @@ typedef struct _pyawd_AWDMeshData {
 } pyawd_AWDMeshData;
 
 
+/*
 void pyawd_AWDMeshData_dealloc(pyawd_AWDMeshData *);
 PyObject *pyawd_AWDMeshData_new(PyTypeObject *, PyObject *, PyObject *);
 
 int pyawd_AWDMeshData_init(pyawd_AWDMeshData *, PyObject *, PyObject *);
 
 PyObject *pyawd_AWDMeshData_add_sub(pyawd_AWDMeshData *, PyObject *, PyObject *);
+*/
 
+
+void pyawd_AWDMeshData__prep(pyawd_AWDMeshData *);
 
 #endif
 

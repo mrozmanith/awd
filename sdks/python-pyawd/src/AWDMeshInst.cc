@@ -53,7 +53,7 @@ pyawd_AWDMeshInst_init(pyawd_AWDMeshInst *self, PyObject *args, PyObject *kwds)
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!O!O!", kwlist,
         &pyawd_AWDMeshDataType, &md, &PyString_Type, &name, &pyawd_AWDMatrix4Type, &tf))
-        return NULL;
+        return -1;
 
     if (name == NULL)
         name = PyString_FromString("");

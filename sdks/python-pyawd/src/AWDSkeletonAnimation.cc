@@ -42,7 +42,7 @@ pyawd_AWDSkeletonAnimation_new(PyTypeObject *type, PyObject *args, PyObject *kwd
 int
 pyawd_AWDSkeletonAnimation_init(pyawd_AWDSkeletonAnimation *self, PyObject *args, PyObject *kwds)
 {
-    char *kwlist[] = { "name" };
+    char *kwlist[] = { "name", NULL };
 
     //TODO: add list of transforms as param?
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist, &PyString_Type, &self->name))
