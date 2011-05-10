@@ -23,6 +23,7 @@ typedef struct {
     PyObject    *skelanim_blocks;
     PyObject    *skelpose_blocks;
     PyObject    *texture_blocks;
+    PyObject    *material_blocks;
 
     AWD         *ob_awd;
     int         ob_has_written_header;

@@ -12,6 +12,7 @@
 #include "AWDSkeletonPose.h"
 #include "AWDSkeletonAnimation.h"
 #include "AWDTexture.h"
+#include "AWDMaterial.h"
 
 
 
@@ -41,6 +42,7 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->skelanim_blocks = PyList_New(0);
         self->skelpose_blocks = PyList_New(0);
         self->texture_blocks = PyList_New(0);
+        self->material_blocks = PyList_New(0);
 
         Py_INCREF(self->mesh_data_blocks);
         Py_INCREF(self->mesh_inst_blocks);
@@ -48,6 +50,7 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         Py_INCREF(self->skelanim_blocks);
         Py_INCREF(self->skelpose_blocks);
         Py_INCREF(self->texture_blocks);
+        Py_INCREF(self->material_blocks);
     }
 
     return (PyObject *)self;
@@ -195,6 +198,24 @@ pyawd_AWD_add_texture(pyawd_AWD *self, PyObject *arg)
 }
 
 
+/**
+ * AWD.add_material()
+*/
+PyObject *
+pyawd_AWD_add_material(pyawd_AWD *self, PyObject *arg)
+{
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDMaterialType)) {
+        PyList_Append(self->material_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDMaterial");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 
 /**
  * AWD.flush()
@@ -296,6 +317,15 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
             self->ob_awd->add_texture(tex->lawd_obj);
         }
 
+        // Materials
+        len = PyList_Size(self->material_blocks);
+        for (i=0; i<len; i++) {
+            pyawd_AWDMaterial *mat;
+            mat = (pyawd_AWDMaterial *)PyList_GetItem(self->material_blocks, i);
+            pyawd_AWDMaterial__prep(mat);
+            self->ob_awd->add_material(mat->lawd_obj);
+        }
+
 
         // Mesh data blocks
         len = PyList_Size(self->mesh_data_blocks);
@@ -379,6 +409,9 @@ PyMethodDef pyawd_AWD_methods[] = {
 
     { "add_texture", (PyCFunction)pyawd_AWD_add_texture, METH_O,
         "Add a texture block to the AWD document." },
+
+    { "add_material", (PyCFunction)pyawd_AWD_add_material, METH_O,
+        "Add a material block to the AWD document." },
 
     { "flush", (PyCFunction)pyawd_AWD_flush, METH_VARARGS,
         "Flush everything in the AWD object to an output stream." },

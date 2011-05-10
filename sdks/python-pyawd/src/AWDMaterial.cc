@@ -1,6 +1,7 @@
 #include <Python.h>
 #include "structmember.h"
 
+#include "AWDMaterial.h"
 #include "AWDTexture.h"
 
 #include <awd/libawd.h>
@@ -11,21 +12,21 @@
  * free()
 */
 void
-pyawd_AWDTexture_dealloc(pyawd_AWDTexture *self)
+pyawd_AWDMaterial_dealloc(pyawd_AWDMaterial *self)
 {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 
 /**
- * AWDTexture();
+ * AWDMaterial();
 */
 PyObject *
-pyawd_AWDTexture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+pyawd_AWDMaterial_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    pyawd_AWDTexture *self;
+    pyawd_AWDMaterial *self;
 
-    self = (pyawd_AWDTexture *)type->tp_alloc(type, 0);
+    self = (pyawd_AWDMaterial *)type->tp_alloc(type, 0);
     if (self != NULL) {
     }
 
@@ -34,10 +35,10 @@ pyawd_AWDTexture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 
 /**
- * AWDTexture.__init__();
+ * AWDMaterial.__init__();
 */
 int
-pyawd_AWDTexture_init(pyawd_AWDTexture *self, PyObject *args, PyObject *kwds)
+pyawd_AWDMaterial_init(pyawd_AWDMaterial *self, PyObject *args, PyObject *kwds)
 {
     PyObject *name;
     PyObject *type;
@@ -60,7 +61,7 @@ pyawd_AWDTexture_init(pyawd_AWDTexture *self, PyObject *args, PyObject *kwds)
     self->name = name;
 
     Py_INCREF(Py_None);
-    self->url = Py_None;
+    self->texture = Py_None;
 
     return 0;
 }
@@ -69,20 +70,20 @@ pyawd_AWDTexture_init(pyawd_AWDTexture *self, PyObject *args, PyObject *kwds)
 
 
 /**
- * AWDTexture.url (setter)
+ * AWDMaterial.url (setter)
 */
 static int
-pyawd_AWDTexture_set_url(pyawd_AWDTexture *self, PyObject *value, void *closure)
+pyawd_AWDMaterial_set_texture(pyawd_AWDMaterial *self, PyObject *value, void *closure)
 {
-    if (value == self->url)
+    if (value == self->texture)
         return 0;
 
-    if (PyObject_IsInstance(value, (PyObject *)&PyString_Type)) {
-        if (self->url)
-            Py_DECREF(self->url);
+    if (PyObject_IsInstance(value, (PyObject *)&pyawd_AWDTextureType)) {
+        if (self->texture)
+            Py_DECREF(self->texture);
 
-        self->url = value;
-        Py_INCREF(self->url);
+        self->texture= value;
+        Py_INCREF(self->texture);
 
         return 0;
     }
@@ -94,12 +95,12 @@ pyawd_AWDTexture_set_url(pyawd_AWDTexture *self, PyObject *value, void *closure)
 
 
 /**
- * AWDTexture.url (getter)
+ * AWDMaterial.url (getter)
 */
 static PyObject *
-pyawd_AWDTexture_get_url(pyawd_AWDTexture *self, void *closure)
+pyawd_AWDMaterial_get_texture(pyawd_AWDMaterial *self, void *closure)
 {
-    return self->url;
+    return self->texture;
 }
 
 
@@ -107,7 +108,7 @@ pyawd_AWDTexture_get_url(pyawd_AWDTexture *self, void *closure)
 /**
  * Method dictionary
 */
-PyMethodDef pyawd_AWDTexture_methods[] = {
+PyMethodDef pyawd_AWDMaterial_methods[] = {
     { NULL }
 };
 
@@ -115,11 +116,11 @@ PyMethodDef pyawd_AWDTexture_methods[] = {
 /**
  * Getter/setter dictionary
 */
-PyGetSetDef pyawd_AWDTexture_getset[] = {
-    { "url",
-        (getter)pyawd_AWDTexture_get_url,
-        (setter)pyawd_AWDTexture_set_url,
-        "Defines URL from which external texture data should be retrieved (ignored for embedded)",
+PyGetSetDef pyawd_AWDMaterial_getset[] = {
+    { "texture",
+        (getter)pyawd_AWDMaterial_get_texture,
+        (setter)pyawd_AWDMaterial_set_texture,
+        "Defines which texture should be used (for bitmap materials only)",
         NULL },
     { NULL }
 };
@@ -129,12 +130,12 @@ PyGetSetDef pyawd_AWDTexture_getset[] = {
 /**
  * Type object
 */
-PyTypeObject pyawd_AWDTextureType = {
+PyTypeObject pyawd_AWDMaterialType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pyawd.AWDTexture",                     // tp_name 
-    sizeof(pyawd_AWDTexture),               // tp_basicsize 
+    "pyawd.AWDMaterial",                     // tp_name 
+    sizeof(pyawd_AWDMaterial),               // tp_basicsize 
     0,                                      // tp_itemsize 
-    (destructor)pyawd_AWDTexture_dealloc,   // tp_dealloc 
+    (destructor)pyawd_AWDMaterial_dealloc,   // tp_dealloc 
     0,                                      // tp_print 
     0,                                      // tp_getattr 
     0,                                      // tp_setattr 
@@ -158,37 +159,35 @@ PyTypeObject pyawd_AWDTextureType = {
     0,                                      // tp_weaklistoffset 
     0,                                      // tp_iter 
     0,                                      // tp_iternext 
-    pyawd_AWDTexture_methods,               // tp_methods 
+    pyawd_AWDMaterial_methods,               // tp_methods 
     0,                                      // tp_members 
-    pyawd_AWDTexture_getset,                // tp_getset 
+    pyawd_AWDMaterial_getset,                // tp_getset 
     0,                                      // tp_base 
     0,                                      // tp_dict 
     0,                                      // tp_descr_get 
     0,                                      // tp_descr_set 
     0,                                      // tp_dictoffset 
-    (initproc)pyawd_AWDTexture_init,        // tp_init 
+    (initproc)pyawd_AWDMaterial_init,        // tp_init 
     0,                                      // tp_alloc 
-    pyawd_AWDTexture_new,                   // tp_new 
+    pyawd_AWDMaterial_new,                   // tp_new 
 };
 
 
 void
-pyawd_AWDTexture__prep(pyawd_AWDTexture *self)
+pyawd_AWDMaterial__prep(pyawd_AWDMaterial *self)
 {
     char *name;
-    char *url;
     int name_len;
-    int url_len;
     awd_uint8 type;
 
     type = (char)PyInt_AsLong(self->type);
     name = PyString_AsString(self->name);
     name_len = PyString_Size(self->name);
 
-    self->lawd_obj = new AWDTexture(type, name, name_len);
-    if (self->url != Py_None) {
-        url = PyString_AsString(self->url);
-        url_len = PyString_Size(self->url);
-        self->lawd_obj->set_url(url, url_len);
+    self->lawd_obj = new AWDSimpleMaterial(type, name, name_len);
+    if (self->texture != Py_None) {
+        pyawd_AWDTexture *tex;
+        tex = (pyawd_AWDTexture *)self->texture;
+        self->lawd_obj->set_texture(tex->lawd_obj);
     }
 }

@@ -12,6 +12,7 @@
 #include "AWDSkeletonJoint.h"
 #include "AWDSkeletonAnimation.h"
 #include "AWDTexture.h"
+#include "AWDMaterial.h"
 
 
 #if PYTHON_VERSION == 3
@@ -82,7 +83,8 @@ PyObject *_init_pyawd(PyObject *m)
         || (PyType_Ready(&pyawd_AWDMeshDataType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshInstType) < 0)
         || (PyType_Ready(&pyawd_AWDSubMeshType) < 0)
-        || (PyType_Ready(&pyawd_AWDTextureType) < 0))
+        || (PyType_Ready(&pyawd_AWDTextureType) < 0)
+        || (PyType_Ready(&pyawd_AWDMaterialType) > 0))
         return NULL;
 
     // AWD type constants
@@ -100,8 +102,10 @@ PyObject *_init_pyawd(PyObject *m)
     _add_int_const(&pyawd_AWDSubMeshType, "JOINT_INDICES", JOINT_INDICES);
     _add_int_const(&pyawd_AWDSubMeshType, "VERTEX_WEIGHTS", VERTEX_WEIGHTS);
 
-    // Texture type constants
+    // TODO: Get these from libawd
+    // Texture and material type constants
     _add_int_const(&pyawd_AWDTextureType, "EXTERNAL", 0);
+    _add_int_const(&pyawd_AWDMaterialType, "BITMAP", 2);
 
 
     // Add classes to module
@@ -116,6 +120,7 @@ PyObject *_init_pyawd(PyObject *m)
     _add_mod_type(m, "AWDSkeletonPose", &pyawd_AWDSkeletonPoseType);
     _add_mod_type(m, "AWDSkeletonAnimation", &pyawd_AWDSkeletonAnimationType);
     _add_mod_type(m, "AWDTexture", &pyawd_AWDTextureType);
+    _add_mod_type(m, "AWDMaterial", &pyawd_AWDMaterialType);
 
     return m;
 }
