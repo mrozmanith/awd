@@ -15,10 +15,15 @@ extern PyTypeObject pyawd_AWDMeshInstType;
 typedef struct {
     PyObject_HEAD
 
-
     PyObject *name;
     PyObject *transform;
     PyObject *mesh_data;
+    
+    PyObject *materials;
+
+    AWDMeshInst *lawd_obj;
 } pyawd_AWDMeshInst;
+
+void pyawd_AWDMeshInst__prep(pyawd_AWDMeshInst *);
 
 #endif

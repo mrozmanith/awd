@@ -352,27 +352,10 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
         // Mesh instances
         len = PyList_Size(self->mesh_inst_blocks);
         for (i=0; i<len; i++) {
-            char *name;
-            int name_len;
-            awd_float64 *mtx;
-            AWDMeshData *awd_md;
-            AWDMeshInst *awd_inst;
             pyawd_AWDMeshInst *inst;
-
-            inst = (pyawd_AWDMeshInst*)PyList_GetItem(self->mesh_inst_blocks, i);
-
-            mtx = NULL;
-            if (inst->transform)
-                mtx = ((pyawd_AWDMatrix4*)inst->transform)->raw_data;
-
-            awd_md = NULL;
-            if (inst->mesh_data)
-                awd_md = ((pyawd_AWDMeshData*)inst->mesh_data)->ob_data;
-            
-            name = PyString_AsString(inst->name);
-            name_len = PyString_Size(inst->name);
-            awd_inst = new AWDMeshInst(name, name_len, awd_md, mtx);
-            self->ob_awd->add_mesh_inst(awd_inst);
+            inst = (pyawd_AWDMeshInst *)PyList_GetItem(self->mesh_inst_blocks, i);
+            pyawd_AWDMeshInst__prep(inst);
+            self->ob_awd->add_mesh_inst(inst->lawd_obj);
         }
 
         // Write buffer
