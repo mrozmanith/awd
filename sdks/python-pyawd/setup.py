@@ -18,6 +18,7 @@ source_files = [
     'src/AWDMeshData.cc',
     'src/AWDMeshInst.cc',
     'src/AWDSubMesh.cc',
+    'src/AWDTexture.cc',
     'src/AWDMatrix4.cc',
 ]
 

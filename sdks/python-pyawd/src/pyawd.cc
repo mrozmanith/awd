@@ -11,6 +11,7 @@
 #include "AWDSkeletonPose.h"
 #include "AWDSkeletonJoint.h"
 #include "AWDSkeletonAnimation.h"
+#include "AWDTexture.h"
 
 
 #if PYTHON_VERSION == 3
@@ -35,6 +36,14 @@ void _add_int_const(PyTypeObject *type, const char *attr, int val)
     pyval = PyInt_FromLong(val);
     Py_INCREF(pyval);
     PyDict_SetItemString(type->tp_dict, attr, pyval);
+}
+
+
+void
+_add_mod_type(PyObject *m, const char *name, PyTypeObject *type)
+{
+    Py_INCREF(type);
+    PyModule_AddObject(m, name, (PyObject *)type);
 }
 
 
@@ -72,7 +81,8 @@ PyObject *_init_pyawd(PyObject *m)
         || (PyType_Ready(&pyawd_AWDAttrBlockType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshDataType) < 0)
         || (PyType_Ready(&pyawd_AWDMeshInstType) < 0)
-        || (PyType_Ready(&pyawd_AWDSubMeshType) < 0))
+        || (PyType_Ready(&pyawd_AWDSubMeshType) < 0)
+        || (PyType_Ready(&pyawd_AWDTextureType) < 0))
         return NULL;
 
     // AWD type constants
@@ -90,28 +100,22 @@ PyObject *_init_pyawd(PyObject *m)
     _add_int_const(&pyawd_AWDSubMeshType, "JOINT_INDICES", JOINT_INDICES);
     _add_int_const(&pyawd_AWDSubMeshType, "VERTEX_WEIGHTS", VERTEX_WEIGHTS);
 
+    // Texture type constants
+    _add_int_const(&pyawd_AWDTextureType, "EXTERNAL", 0);
+
 
     // Add classes to module
-    Py_INCREF(&pyawd_AWDMatrix4Type);
-    PyModule_AddObject(m, "AWDMatrix4", (PyObject *)&pyawd_AWDMatrix4Type);
-    Py_INCREF(&pyawd_AWDType);
-    PyModule_AddObject(m, "AWD", (PyObject *)&pyawd_AWDType);
-    Py_INCREF(&pyawd_AWDAttrBlockType);
-    PyModule_AddObject(m, "AWDAttrBlock", (PyObject *)&pyawd_AWDAttrBlockType);
-    Py_INCREF(&pyawd_AWDMeshDataType);
-    PyModule_AddObject(m, "AWDMeshData", (PyObject *)&pyawd_AWDMeshDataType);
-    Py_INCREF(&pyawd_AWDSubMeshType);
-    PyModule_AddObject(m, "AWDSubMesh", (PyObject *)&pyawd_AWDSubMeshType);
-    Py_INCREF(&pyawd_AWDMeshInstType);
-    PyModule_AddObject(m, "AWDMeshInst", (PyObject *)&pyawd_AWDMeshInstType);
-    Py_INCREF(&pyawd_AWDSkeletonType);
-    PyModule_AddObject(m, "AWDSkeleton", (PyObject *)&pyawd_AWDSkeletonType);
-    Py_INCREF(&pyawd_AWDSkeletonJointType);
-    PyModule_AddObject(m, "AWDSkeletonJoint", (PyObject *)&pyawd_AWDSkeletonJointType);
-    Py_INCREF(&pyawd_AWDSkeletonPoseType);
-    PyModule_AddObject(m, "AWDSkeletonPose", (PyObject *)&pyawd_AWDSkeletonPoseType);
-    Py_INCREF(&pyawd_AWDSkeletonAnimationType);
-    PyModule_AddObject(m, "AWDSkeletonAnimation", (PyObject *)&pyawd_AWDSkeletonAnimationType);
+    _add_mod_type(m, "AWDMatrix4", &pyawd_AWDMatrix4Type);
+    _add_mod_type(m, "AWD", &pyawd_AWDType);
+    _add_mod_type(m, "AWDAttrBlock", &pyawd_AWDAttrBlockType);
+    _add_mod_type(m, "AWDMeshData", &pyawd_AWDMeshDataType);
+    _add_mod_type(m, "AWDSubMesh", &pyawd_AWDSubMeshType);
+    _add_mod_type(m, "AWDMeshInst", &pyawd_AWDMeshInstType);
+    _add_mod_type(m, "AWDSkeleton", &pyawd_AWDSkeletonType);
+    _add_mod_type(m, "AWDSkeletonJoint", &pyawd_AWDSkeletonJointType);
+    _add_mod_type(m, "AWDSkeletonPose", &pyawd_AWDSkeletonPoseType);
+    _add_mod_type(m, "AWDSkeletonAnimation", &pyawd_AWDSkeletonAnimationType);
+    _add_mod_type(m, "AWDTexture", &pyawd_AWDTextureType);
 
     return m;
 }

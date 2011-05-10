@@ -16,8 +16,6 @@ typedef struct {
     PyObject_HEAD
 
 
-    PyObject *lawd_obj;
-
     PyObject *name;
     PyObject *transform;
     PyObject *mesh_data;

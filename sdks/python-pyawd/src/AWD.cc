@@ -11,6 +11,7 @@
 #include "AWDMeshInst.h"
 #include "AWDSkeletonPose.h"
 #include "AWDSkeletonAnimation.h"
+#include "AWDTexture.h"
 
 
 
@@ -39,12 +40,14 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->skeleton_blocks = PyList_New(0);
         self->skelanim_blocks = PyList_New(0);
         self->skelpose_blocks = PyList_New(0);
+        self->texture_blocks = PyList_New(0);
 
         Py_INCREF(self->mesh_data_blocks);
         Py_INCREF(self->mesh_inst_blocks);
         Py_INCREF(self->skeleton_blocks);
         Py_INCREF(self->skelanim_blocks);
         Py_INCREF(self->skelpose_blocks);
+        Py_INCREF(self->texture_blocks);
     }
 
     return (PyObject *)self;
@@ -174,6 +177,24 @@ pyawd_AWD_add_skeleton_pose(pyawd_AWD *self, PyObject *arg)
 }
 
 
+/**
+ * AWD.add_texture()
+*/
+PyObject *
+pyawd_AWD_add_texture(pyawd_AWD *self, PyObject *arg)
+{
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDTextureType)) {
+        PyList_Append(self->texture_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDTexture");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 
 /**
  * AWD.flush()
@@ -266,6 +287,16 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
             self->ob_awd->add_skeleton(skel->ob_skeleton);
         }
 
+        // Textures
+        len = PyList_Size(self->texture_blocks);
+        for (i=0; i<len; i++) {
+            pyawd_AWDTexture *tex;
+            tex = (pyawd_AWDTexture *)PyList_GetItem(self->texture_blocks, i);
+            pyawd_AWDTexture__prep(tex);
+            self->ob_awd->add_texture(tex->lawd_obj);
+        }
+
+
         // Mesh data blocks
         len = PyList_Size(self->mesh_data_blocks);
         for (i=0; i<len; i++) {
@@ -345,6 +376,9 @@ PyMethodDef pyawd_AWD_methods[] = {
 
     { "add_skeleton_anim", (PyCFunction)pyawd_AWD_add_skeleton_anim, METH_O,
         "Add a skeleton animation block to the AWD document." },
+
+    { "add_texture", (PyCFunction)pyawd_AWD_add_texture, METH_O,
+        "Add a texture block to the AWD document." },
 
     { "flush", (PyCFunction)pyawd_AWD_flush, METH_VARARGS,
         "Flush everything in the AWD object to an output stream." },
