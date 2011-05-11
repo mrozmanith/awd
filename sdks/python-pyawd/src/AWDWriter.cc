@@ -52,7 +52,7 @@ io_AWDWriter_init(io_AWDWriter *self, PyObject *args, PyObject *kwds)
 PyObject *
 io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
 {
-    AWD *awd;
+    AWD *lawd_awd;
     PyObject *awd_obj;
     PyObject *fobj;
     int fd;
@@ -69,10 +69,10 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
 
     fd = PyObject_AsFileDescriptor(fobj);
 
-    awd = new AWD(UNCOMPRESSED,0);
+    lawd_awd = new AWD(UNCOMPRESSED,0);
 
     if (fd >= 0) {
-        __prepare_blocks(awd_obj, "mesh_data_blocks", awd, __prepare_mesh_data);
+        __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, __prepare_mesh_data);
 
     /*
         int i;
@@ -176,23 +176,6 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
         // Mesh data blocks
         len = PyList_Size(self->mesh_data_blocks);
         for (i=0; i<len; i++) {
-            io_AWDWriterMeshData *md;
-            md = (io_AWDWriterMeshData*)PyList_GetItem(self->mesh_data_blocks, i);
-            // TODO: Move this to mesh data prep function
-            if (md->skeleton != Py_None) {
-                io_AWDWriterSkeleton *skel;
-                skel = (io_AWDWriterSkeleton*)md->skeleton;
-                md->ob_data->set_skeleton(skel->ob_skeleton);
-
-            }
-
-            if (md->bind_mtx != Py_None) {
-                io_AWDWriterMatrix4 *mtx;
-                mtx = (io_AWDWriterMatrix4*)md->bind_mtx;
-                md->ob_data->set_bind_mtx(mtx->raw_data);
-            }
-
-            self->ob_awd->add_mesh_data(md->ob_data);
         }
 
         // Mesh instances
@@ -206,7 +189,7 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
         */
 
         // Write buffer
-        awd->flush(fd);
+        lawd_awd->flush(fd);
         Py_RETURN_NONE;
     }
     else {
@@ -281,6 +264,70 @@ PyTypeObject io_AWDWriterType = {
 void
 __prepare_mesh_data(PyObject *block, AWD *awd)
 {
+    int sub_i;
+    int num_subs;
+    AWDMeshData *lawd_md;
+    char *name;
+    int name_len;
+    PyObject *name_attr;
+    PyObject *subs_list;
+
+    name_attr = PyObject_GetAttrString(block, "name");
+    name = PyString_AsString(name_attr);
+    name_len = PyString_Size(name_attr);
+
+    lawd_md = new AWDMeshData(name, name_len);
+
+    // Get list of sub-meshes from python-space attribute __sub_meshes
+    subs_list = PyObject_GetAttrString(block, "_AWDMeshData__sub_meshes");
+    num_subs = PyList_Size(subs_list);
+    for (sub_i=0; sub_i<num_subs; sub_i++) {
+        AWDSubMesh *lawd_sub;
+        int str_i;
+        int num_streams;
+        PyObject *streams_list;
+        PyObject *sub = PyList_GetItem(subs_list, sub_i);
+
+        lawd_sub = new AWDSubMesh();
+
+        // Get list of data streams from python-space attribute __data_streams
+        streams_list = PyObject_GetAttrString(sub, "_AWDSubMesh__data_streams");
+        num_streams = PyList_Size(streams_list);
+        for (str_i=0; str_i<num_streams; str_i++) {
+            int data_len;
+            AWD_mesh_str_type str_type;
+            AWD_str_ptr lawd_data;
+            PyObject *type;
+            PyObject *data;
+            PyObject *str_tuple;
+            
+            // Data streams are simple tuples in python-space, where the first value 
+            // is the stream type and the second is a list containing the stream data
+            str_tuple = PyList_GetItem(streams_list, str_i);
+            type = PyTuple_GetItem(str_tuple, 0);
+            data = PyTuple_GetItem(str_tuple, 1);
+            data_len = PyList_Size(data);
+
+            // Read stream type and treat data differently depending on whether it
+            // should be float or integer data.
+            str_type = (AWD_mesh_str_type)PyInt_AsLong(type);
+            if (str_type == TRIANGLES || str_type == JOINT_INDICES) {
+                lawd_data.ui32 = pyawdutil_pylist_to_uint32(data, NULL, data_len);
+            }
+            else {
+                lawd_data.f64 = pyawdutil_pylist_to_float64(data, NULL, data_len);
+            }
+
+            // Add stream to libawd sub-mesh
+            lawd_sub->add_stream(str_type, lawd_data, data_len);
+        }
+
+        // Add sub-mesh to libawd mesh data
+        lawd_md->add_sub_mesh(lawd_sub);
+    }
+
+
+    awd->add_mesh_data(lawd_md);
 }
 
 
