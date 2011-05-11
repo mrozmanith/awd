@@ -62,6 +62,7 @@ typedef enum {
     SKELETON=101,
     SKELETON_POSE=102,
     SKELETON_ANIM=103,
+    UV_ANIM=121,
 
     // Misc
     COMMAND=254,

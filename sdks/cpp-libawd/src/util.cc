@@ -28,15 +28,27 @@ awdutil_id_mtx4(awd_float64 *mtx)
 }
 
 
+static void
+awdutil_write_floats(int fd, awd_float64 *list, int len)
+{
+    int i;
+    for (i=0; i<len; i++) {
+        awd_float64 n;
+        n = F64(list[i]);
+        write(fd, &n, sizeof(awd_float64));
+    }
+}
+
+void
+awdutil_write_mtx3x2(int fd, awd_float64 *mtx)
+{
+    awdutil_write_floats(fd, mtx, 6);
+}
+
 void
 awdutil_write_mtx4(int fd, awd_float64 *mtx)
 {
-    int i;
-    awd_float64 n;
-    for (i=0; i<16; i++) {
-        n = F64(mtx[i]);
-        write(fd, &n, sizeof(awd_float64));
-    }
+    awdutil_write_floats(fd, mtx, 16);
 }
 
 

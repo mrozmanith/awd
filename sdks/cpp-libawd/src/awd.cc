@@ -32,6 +32,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->skeleton_blocks = new AWDBlockList();
     this->skelanim_blocks = new AWDBlockList();
     this->skelpose_blocks = new AWDBlockList();
+    this->uvanim_blocks = new AWDBlockList();
 
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -85,6 +86,13 @@ void
 AWD::add_skeleton_anim(AWDSkeletonAnimation *block)
 {
     this->skelanim_blocks->append(block);
+}
+
+
+void
+AWD::add_uv_anim(AWDUVAnimation *block)
+{
+    this->uvanim_blocks->append(block);
 }
 
 
@@ -151,6 +159,7 @@ AWD::flush(int out_fd)
     tmp_len += this->write_blocks(this->material_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_data_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_inst_blocks, tmp_fd);
+    tmp_len += this->write_blocks(this->uvanim_blocks, tmp_fd);
 
     tmp_buf = (awd_uint8 *) malloc(tmp_len);
 	lseek(tmp_fd, 0, SEEK_SET);

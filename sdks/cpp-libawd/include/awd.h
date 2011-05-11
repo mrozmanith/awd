@@ -8,6 +8,7 @@
 #include "texture.h"
 #include "material.h"
 #include "awd_types.h"
+#include "uvanim.h"
 
 
 #define AWD_MAJOR_VERSION 0
@@ -33,6 +34,7 @@ class AWD
         AWDBlockList * skeleton_blocks;
         AWDBlockList * mesh_data_blocks;
         AWDBlockList * mesh_inst_blocks;
+        AWDBlockList * uvanim_blocks;
 
         // Flags and misc
         awd_baddr last_used_baddr;
@@ -52,6 +54,7 @@ class AWD
         void add_skeleton(AWDSkeleton *);
         void add_skeleton_pose(AWDSkeletonPose *);
         void add_skeleton_anim(AWDSkeletonAnimation *);
+        void add_uv_anim(AWDUVAnimation *);
 };
 
 #endif
