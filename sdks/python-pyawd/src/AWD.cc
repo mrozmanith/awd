@@ -13,6 +13,7 @@
 #include "AWDSkeletonAnimation.h"
 #include "AWDTexture.h"
 #include "AWDMaterial.h"
+#include "AWDUVAnimation.h"
 
 
 
@@ -43,6 +44,7 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->skelpose_blocks = PyList_New(0);
         self->texture_blocks = PyList_New(0);
         self->material_blocks = PyList_New(0);
+        self->uvanim_blocks = PyList_New(0);
 
         Py_INCREF(self->mesh_data_blocks);
         Py_INCREF(self->mesh_inst_blocks);
@@ -51,6 +53,7 @@ pyawd_AWD_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         Py_INCREF(self->skelpose_blocks);
         Py_INCREF(self->texture_blocks);
         Py_INCREF(self->material_blocks);
+        Py_INCREF(self->uvanim_blocks);
     }
 
     return (PyObject *)self;
@@ -218,6 +221,25 @@ pyawd_AWD_add_material(pyawd_AWD *self, PyObject *arg)
 
 
 /**
+ * AWD.add_uv_anim()
+*/
+PyObject *
+pyawd_AWD_add_uv_anim(pyawd_AWD *self, PyObject *arg)
+{
+    if (PyObject_IsInstance(arg, (PyObject*)&pyawd_AWDUVAnimationType)) {
+        PyList_Append(self->uvanim_blocks, arg);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Argument must be AWDUVAnimation");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
+
+/**
  * AWD.flush()
 */
 PyObject *
@@ -327,6 +349,16 @@ pyawd_AWD_flush(pyawd_AWD *self, PyObject *args)
         }
 
 
+        // UV Animations
+        len = PyList_Size(self->uvanim_blocks);
+        for (i=0; i<len; i++) {
+            pyawd_AWDUVAnimation *uvanim;
+            uvanim = (pyawd_AWDUVAnimation *)PyList_GetItem(self->uvanim_blocks, i);
+            pyawd_AWDUVAnimation__prep(uvanim);
+            self->ob_awd->add_uv_anim(uvanim->lawd_obj);
+        }
+
+
         // Mesh data blocks
         len = PyList_Size(self->mesh_data_blocks);
         for (i=0; i<len; i++) {
@@ -395,6 +427,9 @@ PyMethodDef pyawd_AWD_methods[] = {
 
     { "add_material", (PyCFunction)pyawd_AWD_add_material, METH_O,
         "Add a material block to the AWD document." },
+
+    { "add_uv_anim", (PyCFunction)pyawd_AWD_add_uv_anim, METH_O,
+        "Add a UV animation block to the AWD document." },
 
     { "flush", (PyCFunction)pyawd_AWD_flush, METH_VARARGS,
         "Flush everything in the AWD object to an output stream." },

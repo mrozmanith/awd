@@ -15,12 +15,14 @@ source_files = [
     'src/AWDSkeletonJoint.cc',
     'src/AWDSkeletonPose.cc',
     'src/AWDSkeletonAnimation.cc',
+    'src/AWDUVAnimation.cc',
     'src/AWDMeshData.cc',
     'src/AWDMeshInst.cc',
     'src/AWDSubMesh.cc',
     'src/AWDTexture.cc',
     'src/AWDMaterial.cc',
     'src/AWDMatrix4.cc',
+    'src/AWDMatrix2x3.cc'
 ]
 
 pyawd = Extension('pyawd', 
