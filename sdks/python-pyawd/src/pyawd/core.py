@@ -1,3 +1,5 @@
+from pyawd import io
+
 class AWD:
     UNCOMPRESSED = 0
     DEFLATE = 1
@@ -7,15 +9,20 @@ class AWD:
         self.compression = compression
         self.flags = flags
 
+        self.mesh_inst_blocks = []
+        self.mesh_data_blocks = []
+
     def flush(self, file):
-        pass
+        writer = io.AWDWriter()
+        writer.write(self, file)
         
     def add_texture(self, block):
         pass
     def add_material(self, block):
         pass
     def add_mesh_data(self, block):
-        pass
+        self.mesh_data_blocks.append(block)
+
     def add_mesh_inst(self, block):
         pass
     def add_uv_anim(self, blocks):
