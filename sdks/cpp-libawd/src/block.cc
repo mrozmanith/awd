@@ -11,7 +11,6 @@
 
 AWDBlock::AWDBlock(AWD_block_type type) 
 {
-    this->next = NULL;
     this->type = type;
 }
 
@@ -81,27 +80,48 @@ void
 AWDBlockList::append(AWDBlock *block)
 {
     if (!this->contains(block)) {
+        list_block *ctr = (list_block *)malloc(sizeof(list_block));
+        ctr->block = block;
         if (this->first_block == NULL) {
-            this->first_block = block;
+            this->first_block = ctr;
         }
         else {
-            this->last_block->next = block;
+            this->last_block->next = ctr;
         }
 
-        this->last_block = block;
+        this->last_block = ctr;
+        this->last_block->next = NULL;
         this->num_blocks++;
     }
+}
+
+
+void
+AWDBlockList::force_append(AWDBlock *block)
+{
+    list_block *ctr = (list_block *)malloc(sizeof(list_block));
+    ctr->block = block;
+    if (this->first_block == NULL) {
+        this->first_block = ctr;
+    }
+    else {
+        this->last_block->next = ctr;
+    }
+    
+    this->last_block = ctr;
+    this->last_block->next = NULL;
+    this->num_blocks++;
 }
 
 
 awd_bool
 AWDBlockList::contains(AWDBlock *block)
 {
-    AWDBlock *cur;
+    list_block *cur;
 
     cur = this->first_block;
     while (cur) {
-        if (cur == block)
+        if (cur->block == block)
             return AWD_TRUE;
 
         cur = cur->next;
@@ -139,11 +159,13 @@ AWDBlockIterator::reset()
 AWDBlock *
 AWDBlockIterator::next()
 {
-    AWDBlock *tmp;
+    list_block *tmp;
 
     tmp = this->cur_block;
     if (this->cur_block != NULL)
         this->cur_block = this->cur_block->next;
 
-    return tmp;
+    if (tmp)
+        return tmp->block;
+    else return NULL;
 }

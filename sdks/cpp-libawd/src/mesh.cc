@@ -265,7 +265,7 @@ AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *dat
 void
 AWDMeshInst::add_material(AWDSimpleMaterial *material)
 {
-    this->materials->append(material);
+    this->materials->force_append(material);
 }
 
 
@@ -324,7 +324,8 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
 
     // Write materials list. First write material count, and then
     // iterate over materials block list and write all addresses
-    num_materials = UI16(this->materials->get_num_blocks());
+    printf("material count: %d\n", this->materials->get_num_blocks());
+    num_materials = UI16((awd_uint16)this->materials->get_num_blocks());
     write(fd, &num_materials, sizeof(awd_uint16));
     it = new AWDBlockIterator(this->materials);
     while ((block = it->next()) != NULL) {

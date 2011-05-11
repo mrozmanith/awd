@@ -25,18 +25,25 @@ class AWDBlock
         size_t write_block(int, awd_bool, awd_baddr);
 };
 
+typedef struct _list_block
+{
+    AWDBlock *block;
+    struct _list_block *next;
+} list_block;
+
 class AWDBlockList
 {
     private:
         int num_blocks;
 
     public:
-        AWDBlock * first_block;
-        AWDBlock * last_block;
+        list_block *first_block;
+        list_block *last_block;
 
         AWDBlockList();
 
         void append(AWDBlock *);
+        void force_append(AWDBlock *);
         awd_bool contains(AWDBlock *);
 
         int get_num_blocks();
@@ -46,7 +53,7 @@ class AWDBlockIterator
 {
     private:
         AWDBlockList * list;
-        AWDBlock * cur_block;
+        list_block * cur_block;
 
     public:
         AWDBlockIterator(AWDBlockList *);
