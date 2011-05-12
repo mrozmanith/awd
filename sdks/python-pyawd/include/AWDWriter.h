@@ -20,5 +20,8 @@ void __prepare_mesh_data(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_mesh_inst(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_texture(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_material(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_skeleton(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_skelanim(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_skelpose(PyObject *, AWD *, pyawd_bcache *);
 
 #endif

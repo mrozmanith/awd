@@ -13,6 +13,10 @@ class AWD:
         self.material_blocks = []
         self.mesh_inst_blocks = []
         self.mesh_data_blocks = []
+        self.uvanim_blocks = []
+        self.skelanim_blocks = []
+        self.skelpose_blocks = []
+        self.skeleton_blocks = []
 
     def flush(self, file):
         writer = io.AWDWriter()
@@ -30,7 +34,16 @@ class AWD:
     def add_mesh_inst(self, block):
         self.mesh_inst_blocks.append(block)
 
-    def add_uv_anim(self, blocks):
-        pass
+    def add_uv_anim(self, block):
+        self.uvanim_blocks.append(block)
+
+    def add_skeleton(self, block):
+        self.skeleton_blocks.append(block)
+
+    def add_skeleton_pose(self, block):
+        self.skelpose_blocks.append(block)
+
+    def add_skeleton_anim(self, block):
+        self.skelanim_blocks.append(block)
 
 

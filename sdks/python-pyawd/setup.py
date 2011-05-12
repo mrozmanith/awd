@@ -12,6 +12,7 @@ source_files = [
     'src/prepgeom.cc',
     'src/prepscene.cc',
     'src/prepmaterial.cc',
+    'src/prepanim.cc',
     'src/io.cc',
     'src/AWDWriter.cc'
 ]
