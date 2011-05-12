@@ -159,3 +159,40 @@ __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     pyawd_bcache_add(bcache, block, lawd_pose);
 }
 
+
+
+void
+__prepare_uvanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
+{
+    int i;
+    int len;
+    char *name;
+    int name_len;
+    PyObject *frames_attr;
+    PyObject *name_attr;
+    AWDUVAnimation *lawd_anim;
+
+    name_attr = PyObject_GetAttrString(block, "name");
+    name = PyString_AsString(name_attr);
+    name_len = PyString_Size(name_attr);
+
+    lawd_anim = new AWDUVAnimation(name, name_len);
+
+    frames_attr = PyObject_GetAttrString(block, "frames");
+    len = PyList_Size(frames_attr);
+    for (i=0; i<len; i++) {
+        PyObject *py_mtx;
+        PyObject *raw_data_attr;
+        awd_float64 *mtx;
+
+        py_mtx = PyList_GetItem(frames_attr, i);
+        raw_data_attr = PyObject_GetAttrString(py_mtx, "raw_data");
+        mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 6);
+
+        lawd_anim->set_next_frame_tf(mtx);
+    }
+
+    awd->add_uv_anim(lawd_anim);
+    pyawd_bcache_add(bcache, block, lawd_anim);
+}
+

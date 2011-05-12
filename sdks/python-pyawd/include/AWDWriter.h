@@ -23,5 +23,6 @@ void __prepare_material(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_skeleton(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_skelanim(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_skelpose(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_uvanim(PyObject *, AWD *, pyawd_bcache *);
 
 #endif

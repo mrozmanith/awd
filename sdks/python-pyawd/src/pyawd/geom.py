@@ -24,6 +24,9 @@ class AWDMeshData:
     def add_sub_mesh(self, sub):
         self.__sub_meshes.append(sub)
 
+    def __len__(self):
+        return len(self.__sub_meshes)
+
     def __getitem__(self, index):
         return self.__sub_meshes[index]
 
