@@ -9,6 +9,8 @@ version_macro = ('PYTHON_VERSION', sys.version_info[0])
 source_files = [
     'src/util.cc',
     'src/bcache.cc',
+    'src/prepgeom.cc',
+    'src/prepscene.cc',
     'src/io.cc',
     'src/AWDWriter.cc'
 ]
