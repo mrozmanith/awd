@@ -77,6 +77,8 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
         bcache = (pyawd_bcache *)malloc(sizeof(pyawd_bcache));
         pyawd_bcache_init(bcache);
 
+        __prepare_blocks(awd_obj, "texture_blocks", lawd_awd, bcache, __prepare_texture);
+        __prepare_blocks(awd_obj, "material_blocks", lawd_awd, bcache, __prepare_material);
         __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, bcache, __prepare_mesh_data);
         __prepare_blocks(awd_obj, "mesh_inst_blocks", lawd_awd, bcache, __prepare_mesh_inst);
 

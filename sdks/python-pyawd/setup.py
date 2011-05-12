@@ -11,6 +11,7 @@ source_files = [
     'src/bcache.cc',
     'src/prepgeom.cc',
     'src/prepscene.cc',
+    'src/prepmaterial.cc',
     'src/io.cc',
     'src/AWDWriter.cc'
 ]

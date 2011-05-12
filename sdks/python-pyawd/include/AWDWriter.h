@@ -15,10 +15,10 @@ typedef struct {
 } io_AWDWriter;
 
 
-
-
 void __prepare_blocks(PyObject *, const char *, AWD *, pyawd_bcache *, void (*)(PyObject*,AWD*,pyawd_bcache*));
 void __prepare_mesh_data(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_mesh_inst(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_texture(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_material(PyObject *, AWD *, pyawd_bcache *);
 
 #endif

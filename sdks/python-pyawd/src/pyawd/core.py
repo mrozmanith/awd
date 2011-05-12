@@ -9,6 +9,8 @@ class AWD:
         self.compression = compression
         self.flags = flags
 
+        self.texture_blocks = []
+        self.material_blocks = []
         self.mesh_inst_blocks = []
         self.mesh_data_blocks = []
 
@@ -17,9 +19,11 @@ class AWD:
         writer.write(self, file)
         
     def add_texture(self, block):
-        pass
+        self.texture_blocks.append(block)
+
     def add_material(self, block):
-        pass
+        self.material_blocks.append(block)
+
     def add_mesh_data(self, block):
         self.mesh_data_blocks.append(block)
 
