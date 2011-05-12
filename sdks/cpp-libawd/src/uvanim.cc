@@ -23,7 +23,7 @@ AWDUVAnimation::AWDUVAnimation(const char *name, awd_uint16 name_len) :
 awd_uint32
 AWDUVAnimation::calc_body_length(awd_bool wide)
 {
-    return 2 + this->get_name_length() + this->num_frames * 48 + this->calc_attr_length(true,true);
+    return 2 + this->get_name_length() + 2 + this->num_frames * 48 + this->calc_attr_length(true,true);
 }
 
 
@@ -38,13 +38,14 @@ AWDUVAnimation::write_body(int fd, awd_bool wide)
     num_frames = UI16(this->num_frames);
     write(fd, &num_frames, sizeof(awd_uint16));
 
+    this->properties->write_attributes(fd);
+
     cur_fr = this->first_frame;
     while (cur_fr) {
         awdutil_write_mtx3x2(fd, cur_fr->transform_mtx);
         cur_fr = cur_fr->next;
     }
 
-    this->properties->write_attributes(fd);
     this->user_attributes->write_attributes(fd);
 }
 
