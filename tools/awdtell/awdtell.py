@@ -14,6 +14,12 @@ include = 0
 offset = 0
 indent_level = 0
 
+BT_MESH_DATA = 1
+BT_MESH_INST = 24
+BT_SKELETON = 101
+BT_SKELPOSE = 102
+BT_SKELANIM = 103
+
 
 def printl(str=''):
     global indent_level
@@ -110,14 +116,55 @@ def print_skeleton(data):
         joint_name = read_var_str(data, offs)
         printl('JOINT %s (id=%d, parent=%d)' % (
             joint_name, joint_id, parent_id))
-            
-        offs += (2 + len(joint_name) + 128)
+
+        offs += (2 + len(joint_name))
+        mtx = struct.unpack_from('>16d', data, offs)
+
+        indent_level += 1
+        print_matrix(mtx)
+        indent_level -= 1
+
+        offs += 128
         joints_printed += 1
 
     indent_level -= 1
 
     offs += print_user_attributes(data[offs:])
         
+
+
+def print_skelpose(data):
+    global indent_level 
+
+    offs = 0
+
+    pose_name = read_var_str(data, offs)
+    offs += (2 + len(pose_name))
+
+    num_joints = struct.unpack_from('>H', data, offs)[0]
+    offs += 2
+
+    printl('NAME: %s' % pose_name)
+    printl('NUM TRANSFORMS: %d' % num_joints)
+
+    offs += print_properties(data[offs:])
+
+    indent_level += 1
+    for j_idx in range(num_joints):
+        has_transform = struct.unpack_from('B', data, offs)[0]
+        printl('Transform')
+        indent_level += 1
+        offs += 1
+        if has_transform == 1:
+            mtx = struct.unpack_from('>16d', data, offs)
+            print_matrix(mtx)
+            offs += 128
+        indent_level -= 1
+            
+
+    indent_level -= 1
+
+    offs += print_user_attributes(data[offs:])
 
 
 def print_mesh_instance(data):
@@ -130,6 +177,10 @@ def print_mesh_instance(data):
     printl('DATA ID: %d' % data_id)
     printl('PARENT ID: %d' % parent)
     printl('TRANSFORM MATRIX:')
+    print_matrix(matrix)
+
+
+def print_matrix(matrix):
     for i in range(0, 15, 4):
         printl('%f %f %f %f' % (matrix[i], matrix[i+1], matrix[i+2], matrix[i+3]))
 
@@ -152,13 +203,11 @@ def print_mesh_data(data):
     subs_printed = 0
     indent_level += 1
     while offs < len(data) and subs_printed < num_subs:
-        mat_id = struct.unpack_from('>I', data, offs)[0]
-        length = struct.unpack_from('>I', data, offs+4)[0]
-        offs += 8
+        length = struct.unpack_from('>I', data, offs)[0]
+        offs += 4
 
         printl('SUB-MESH')
         indent_level += 1
-        printl('Material ID: %d' % mat_id)
         printl('Length:      %d' % length)
         indent_level -= 1
 
@@ -166,20 +215,20 @@ def print_mesh_data(data):
 
         indent_level += 1
         while offs < sub_end:
-            stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', '', '', '', 'WEIGHTS')
+            stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', 'VERTEX_NORMALS', 'VERTEX_TANGENTS', 'FACE_NORMALS', 'JOINT_INDICES', 'VERTEX_WEIGHTS')
             type, str_len = struct.unpack_from('>BI', data, offs)
             offs += 5
 
             if type < len(stream_types):
                 stream_type = stream_types[type]
-                if type == 1 or type == 3 or type==7:
+                if type == 1 or type == 3 or type==8:
                     elem_data_format = 'f'
                     elem_print_format = '%f'
-                elif type == 2:
+                elif type == 2 or type == 7:
                     elem_data_format = 'H'
                     elem_print_format = '%d'
             else:
-                stream_type = '<error>'
+                stream_type = '<error> %x' % type
             
             printl('STREAM (%s)' % stream_type)
             indent_level += 1
@@ -205,19 +254,20 @@ def print_mesh_data(data):
 def print_next_block(data):
     global indent_level
 
-    block_types = {
-        '3':    'MeshInst',
-        '4':    'MeshData',
-        '60':   'Skeleton',
-    }
+    block_types = {}
+    block_types[BT_MESH_DATA] = 'MeshData'
+    block_types[BT_MESH_INST] = 'MeshInst'
+    block_types[BT_SKELETON] =  'Skeleton'
+    block_types[BT_SKELPOSE] =  'SkeletonPose'
+    block_types[BT_SKELANIM] =  'SkeletonAnimation'
 
     block_header = struct.unpack_from('>IBBI', data, offset)
 
     type = block_header[2]
     length = block_header[3]
 
-    if str(type) in block_types:
-        block_type = block_types[str(type)]
+    if type in block_types:
+        block_type = block_types[type]
     else:
         block_type = '<error> %s' % hex(type)
 
@@ -226,15 +276,19 @@ def print_next_block(data):
     printl('NS: %d, ID: %d' % (block_header[1], block_header[0]))
     printl('Length: %d' % length)
 
-    if type == 3 and include&SCENE:
+    if type == BT_MESH_INST and include&SCENE:
         printl()
         print_mesh_instance(data[offset+10 : offset+10+length])
-    elif type == 4 and include&GEOMETRY:
+    elif type == BT_MESH_DATA and include&GEOMETRY:
         printl()
         print_mesh_data(data[offset+10 : offset+10+length])
-    elif type == 60 and include&ANIMATION:
+    elif type == BT_SKELETON and include&ANIMATION:
         printl()
         print_skeleton(data[offset+10 : offset+10+length])
+    elif type == BT_SKELPOSE and include&ANIMATION:
+        printl()
+        print_skelpose(data[offset+10 : offset+10+length])
+
 
     printl()
     indent_level -= 1
