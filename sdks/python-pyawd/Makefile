@@ -29,7 +29,7 @@ blender_install: build31
 	cp $(LIBPATH31)/$(SO) $(BLENSITE)/$(SO)
 
 maya_install: build26
-	cp $(LIBPATH26)/$(SO) $(MAYASITE)/$(SO)
+	cp -R $(LIBPATH26)/pyawd $(MAYASITE)/
 
 clean:
 	rm -rf build
