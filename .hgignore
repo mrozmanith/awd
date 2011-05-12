@@ -1,0 +1,3 @@
+syntax: glob
+*.pyc
+sdks/python-pyawd/build
