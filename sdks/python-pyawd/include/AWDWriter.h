@@ -5,6 +5,8 @@
 
 #include <awd/libawd.h>
 
+#include "bcache.h"
+
 
 extern PyTypeObject io_AWDWriterType;
 
@@ -13,7 +15,10 @@ typedef struct {
 } io_AWDWriter;
 
 
-void __prepare_blocks(PyObject *, const char *, AWD *, void (*)(PyObject*,AWD*));
-void __prepare_mesh_data(PyObject *, AWD *);
+
+
+void __prepare_blocks(PyObject *, const char *, AWD *, pyawd_bcache *, void (*)(PyObject*,AWD*,pyawd_bcache*));
+void __prepare_mesh_data(PyObject *, AWD *, pyawd_bcache *);
+void __prepare_mesh_inst(PyObject *, AWD *, pyawd_bcache *);
 
 #endif

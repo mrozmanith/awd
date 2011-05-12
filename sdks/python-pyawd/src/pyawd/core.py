@@ -24,7 +24,8 @@ class AWD:
         self.mesh_data_blocks.append(block)
 
     def add_mesh_inst(self, block):
-        pass
+        self.mesh_inst_blocks.append(block)
+
     def add_uv_anim(self, blocks):
         pass
 

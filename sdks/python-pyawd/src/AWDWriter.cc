@@ -72,7 +72,13 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
     lawd_awd = new AWD(UNCOMPRESSED,0);
 
     if (fd >= 0) {
-        __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, __prepare_mesh_data);
+        pyawd_bcache *bcache;
+
+        bcache = (pyawd_bcache *)malloc(sizeof(pyawd_bcache));
+        pyawd_bcache_init(bcache);
+
+        __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, bcache, __prepare_mesh_data);
+        __prepare_blocks(awd_obj, "mesh_inst_blocks", lawd_awd, bcache, __prepare_mesh_inst);
 
     /*
         int i;
@@ -262,7 +268,58 @@ PyTypeObject io_AWDWriterType = {
 
 
 void
-__prepare_mesh_data(PyObject *block, AWD *awd)
+__prepare_mesh_inst(PyObject *block, AWD *awd, pyawd_bcache *bcache)
+{
+    int i;
+    char *name;
+    int name_len;
+    awd_float64 *mtx;
+    int num_materials;
+
+    PyObject *name_attr;
+    PyObject *mtx_attr;
+    PyObject *md_attr;
+    PyObject *mat_attr;
+
+    AWDMeshInst *lawd_inst;
+    AWDMeshData *lawd_md;
+    
+    mtx_attr = PyObject_GetAttrString(block, "transform");
+    if (mtx_attr != Py_None) {
+        PyObject *mtx_list;
+        mtx_list = PyObject_GetAttrString(mtx_attr, "raw_data");
+        mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 16);
+    }
+    
+    lawd_md = NULL;
+    md_attr = PyObject_GetAttrString(block, "mesh_data");
+    if (md_attr != Py_None) {
+        lawd_md = (AWDMeshData *)pyawd_bcache_get(bcache, md_attr);
+    }
+    
+    name_attr = PyObject_GetAttrString(block, "name");
+    name = PyString_AsString(name_attr);
+    name_len = PyString_Size(name_attr);
+    
+    lawd_inst = new AWDMeshInst(name, name_len, lawd_md, mtx);
+
+    mat_attr = PyObject_GetAttrString(block, "materials");
+    num_materials = PyList_Size(mat_attr);
+    for (i=0; i<num_materials; i++) {
+        AWDSimpleMaterial *lawd_mat;
+
+        lawd_mat = (AWDSimpleMaterial *)pyawd_bcache_get(bcache, PyList_GetItem(mat_attr, i));
+        lawd_inst->add_material(lawd_mat);
+    }
+
+
+    awd->add_mesh_inst(lawd_inst);
+    pyawd_bcache_add(bcache, block, lawd_inst);
+}
+
+
+void
+__prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     int sub_i;
     int num_subs;
@@ -326,13 +383,15 @@ __prepare_mesh_data(PyObject *block, AWD *awd)
         lawd_md->add_sub_mesh(lawd_sub);
     }
 
-
     awd->add_mesh_data(lawd_md);
+
+    // Add to block cache so other blocks can reference it
+    pyawd_bcache_add(bcache, block, lawd_md);
 }
 
 
 void
-__prepare_blocks(PyObject *pyawd_AWD, const char *list_attr, AWD *awd, void (*prep_func)(PyObject*, AWD*))
+__prepare_blocks(PyObject *pyawd_AWD, const char *list_attr, AWD *awd, pyawd_bcache *bcache, void (*prep_func)(PyObject*, AWD*, pyawd_bcache *))
 {
     PyObject *list;
 
@@ -343,7 +402,7 @@ __prepare_blocks(PyObject *pyawd_AWD, const char *list_attr, AWD *awd, void (*pr
 
         len = PyList_Size(list);
         for (i=0; i<len; i++) {
-            prep_func(PyList_GetItem(list, i), awd);
+            prep_func(PyList_GetItem(list, i), awd, bcache);
         }
     }
 }
