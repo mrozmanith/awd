@@ -172,8 +172,10 @@ def print_mesh_instance(data):
 
     parent = struct.unpack_from('>I', data)[0]
     matrix = struct.unpack_from('>16d', data, 4)
-    data_id = struct.unpack_from('>I', data, 132)[0]
+    name = read_var_str(data, 132);
+    data_id = struct.unpack_from('>I', data, 132 + 2 + len(name))[0]
 
+    printl('NAME: %s' % name)
     printl('DATA ID: %d' % data_id)
     printl('PARENT ID: %d' % parent)
     printl('TRANSFORM MATRIX:')
