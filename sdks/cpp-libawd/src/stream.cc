@@ -48,7 +48,7 @@ AWDDataStream::write_stream(int fd, awd_bool wide)
     num = this->num_elements;
     // TODO: Consider making this nicer by storing 
     // data type in class somehow.
-    if (this->type == VERTICES || this->type == UVS || this->type == VERTEX_WEIGHTS) {
+    if (this->type == VERTICES || this->type == UVS || this->type == VERTEX_WEIGHTS || this->type == VERTEX_NORMALS) {
         for (e=0; e<num; e++) {
             awd_float64 *p = (this->data.f64 + e);
             if (wide) {
