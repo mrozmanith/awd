@@ -75,6 +75,25 @@ AWDBlockList::AWDBlockList()
     this->num_blocks = 0;
 }
 
+AWDBlockList::~AWDBlockList()
+{
+    list_block *cur;
+
+    cur = this->first_block;
+    while(cur) {
+        list_block *next = cur->next;
+        cur->next = NULL;
+        delete cur;
+        delete cur->block;
+        cur = next;
+    }
+
+    // Already deleted as part 
+    // of above loop
+    this->first_block = NULL;
+    this->last_block = NULL;
+}
+
 
 void 
 AWDBlockList::append(AWDBlock *block)

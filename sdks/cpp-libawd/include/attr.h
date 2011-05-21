@@ -60,6 +60,7 @@ class AWDUserAttr : public AWDAttr
         AWDUserAttr *next;
 
         AWDUserAttr();
+        ~AWDUserAttr();
 };
 
 
@@ -72,6 +73,8 @@ class AWDUserAttrList {
 
     public:
         AWDUserAttrList();
+        ~AWDUserAttrList();
+
         awd_uint32 calc_length();
         void write_attributes(int);
 
@@ -107,6 +110,7 @@ class AWDNumAttrList {
 
     public:
         AWDNumAttrList();
+        ~AWDNumAttrList();
         awd_uint32 calc_length();
         void write_attributes(int);
 
@@ -125,6 +129,8 @@ class AWDAttrElement
 {
     protected:
         AWDAttrElement();
+        ~AWDAttrElement();
+
         AWDNumAttrList *properties;
         AWDUserAttrList *user_attributes;
 

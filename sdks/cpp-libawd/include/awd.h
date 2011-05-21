@@ -45,6 +45,7 @@ class AWD
 
     public:
         AWD(AWD_compression, awd_uint16);
+        ~AWD();
         awd_uint32 flush(int);
 
         void add_texture(AWDTexture *);

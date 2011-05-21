@@ -20,6 +20,7 @@ class AWDBlock
         AWDBlock * next;
 
         AWDBlock(AWD_block_type);
+
         awd_baddr get_addr();
 
         size_t write_block(int, awd_bool, awd_baddr);
@@ -41,6 +42,7 @@ class AWDBlockList
         list_block *last_block;
 
         AWDBlockList();
+        ~AWDBlockList();
 
         void append(AWDBlock *);
         void force_append(AWDBlock *);
