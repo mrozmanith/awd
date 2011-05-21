@@ -39,6 +39,19 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 }
 
 
+AWD::~AWD()
+{
+    delete this->texture_blocks;
+    delete this->material_blocks;
+    delete this->mesh_data_blocks;
+    delete this->mesh_inst_blocks;
+    delete this->skeleton_blocks;
+    delete this->skelanim_blocks;
+    delete this->skelpose_blocks;
+    delete this->uvanim_blocks;
+}
+
+
 
 void
 AWD::add_material(AWDSimpleMaterial *block)
@@ -119,11 +132,10 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
 {
     size_t len;
     AWDBlock *block;
-    AWDBlockIterator *it;
 
     len = 0;
-    it = new AWDBlockIterator(blocks);
-    while ((block = it->next()) != NULL) {
+    AWDBlockIterator it(blocks);
+    while ((block = it.next()) != NULL) {
         //TODO: Check flags for wide boolean (hard-coded as false now)
         len += block->write_block(fd, AWD_FALSE, ++this->last_used_baddr);
     }
