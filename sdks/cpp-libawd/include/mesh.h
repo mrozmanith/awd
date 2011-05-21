@@ -10,8 +10,7 @@
 #include "awd_types.h"
 
 
-#define PROP_MD_SKELETON 1
-#define PROP_MD_BIND_MTX 2
+#define PROP_MD_BIND_MTX 1
 
 
 /**
@@ -57,7 +56,6 @@ class AWDMeshData :
         AWDSubMesh * last_sub;
 
         awd_float64 * bind_mtx;
-        AWDSkeleton * skeleton;
 
     protected:
         awd_uint32 calc_body_length(awd_bool);
@@ -71,9 +69,6 @@ class AWDMeshData :
         int get_num_subs();
         AWDSubMesh *get_sub_at(int);
         void add_sub_mesh(AWDSubMesh *);
-
-        AWDSkeleton *get_skeleton();
-        void set_skeleton(AWDSkeleton *skeleton);
 
         awd_float64 *get_bind_mtx();
         void set_bind_mtx(awd_float64 *bind_mtx);
