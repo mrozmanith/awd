@@ -19,6 +19,12 @@ AWDDataStream::AWDDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_el
     this->next = NULL;
 }
 
+AWDDataStream::~AWDDataStream()
+{
+    free(this->data.v);
+    this->num_elements = 0;
+}
+
 
 
 
