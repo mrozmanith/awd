@@ -37,6 +37,8 @@ class AWDSubMesh
 
     public:
         AWDSubMesh();
+        ~AWDSubMesh();
+
         AWDDataStream * first_stream;
         AWDSubMesh * next;
 
@@ -64,6 +66,7 @@ class AWDMeshData :
 
     public:
         AWDMeshData(const char *, awd_uint16);
+        ~AWDMeshData();
 
         int get_num_subs();
         AWDSubMesh *get_sub_at(int);
@@ -97,6 +100,7 @@ class AWDMeshInst :
     public:
         AWDMeshInst(const char *, awd_uint16, AWDMeshData *);
         AWDMeshInst(const char *, awd_uint16, AWDMeshData *, awd_float64 *);
+        ~AWDMeshInst();
 
         void set_transform(awd_float64 *);
 
