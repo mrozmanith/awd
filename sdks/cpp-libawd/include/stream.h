@@ -7,6 +7,7 @@
  * Data stream pointer
 */
 typedef union {
+    void *v;
     awd_uint32 *ui32;
     awd_float64 *f64;
 } AWD_str_ptr;
@@ -27,8 +28,9 @@ class AWDDataStream
 
         AWDDataStream * next;
         
-
         AWDDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
+        ~AWDDataStream();
+
         awd_uint32 get_length(awd_bool);
         void write_stream(int, awd_bool);
 };
