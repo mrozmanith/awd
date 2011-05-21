@@ -24,6 +24,7 @@ class AWDSimpleMaterial : public AWDBlock, public AWDNamedElement, public AWDAtt
 
     public:
         AWDSimpleMaterial(awd_uint8, const char *, awd_uint16);
+        ~AWDSimpleMaterial();
 
         void set_type(awd_uint8);
         awd_uint8 get_type();
