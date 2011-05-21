@@ -27,6 +27,7 @@ class AWDUVAnimation : public AWDNamedElement,
 
     public:
         AWDUVAnimation(const char *, awd_uint16);
+        ~AWDUVAnimation();
 
         void set_next_frame_tf(awd_float64 *);
 };

@@ -20,6 +20,29 @@ AWDUVAnimation::AWDUVAnimation(const char *name, awd_uint16 name_len) :
 }
 
 
+AWDUVAnimation::~AWDUVAnimation()
+{
+    AWD_uvanim_fr *cur;
+
+    cur = this->first_frame;
+    while (cur) {
+        AWD_uvanim_fr *next = cur->next;
+        cur->next = NULL;
+        if (cur->transform_mtx) {
+            free(cur->transform_mtx);
+            cur->transform_mtx = NULL;
+        }
+
+        free(cur);
+        cur = next;
+    }
+
+    this->num_frames = 0;
+    this->first_frame = NULL;
+    this->last_frame = NULL;
+}
+
+
 awd_uint32
 AWDUVAnimation::calc_body_length(awd_bool wide)
 {
