@@ -183,14 +183,14 @@ AWDSkeleton::calc_body_length(awd_bool wide)
 void
 AWDSkeleton::write_body(int fd, awd_bool wide)
 {
-    awd_uint32 num_joints_be;
+    awd_uint16 num_joints_be;
 
     num_joints_be = 0;
     if (this->root_joint != NULL)
-        num_joints_be = UI32(1 + this->root_joint->calc_num_children());
+        num_joints_be = UI16(1 + this->root_joint->calc_num_children());
 
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
-    write(fd, &num_joints_be, sizeof(awd_uint32));
+    write(fd, &num_joints_be, sizeof(awd_uint16));
 
     // Write optional properties
     this->properties->write_attributes(fd);
