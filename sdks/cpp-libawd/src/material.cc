@@ -16,6 +16,13 @@ AWDSimpleMaterial::AWDSimpleMaterial(awd_uint8 type, const char *name, awd_uint1
     this->texture = NULL;
 }
 
+AWDSimpleMaterial::~AWDSimpleMaterial()
+{
+    // Texture will be deleted 
+    // by the block list it's in
+    this->texture = NULL;
+}
+
 
 awd_uint8
 AWDSimpleMaterial::get_type()
