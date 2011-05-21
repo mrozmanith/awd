@@ -25,6 +25,29 @@ AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_fl
 }
 
 
+AWDSkeletonJoint::~AWDSkeletonJoint()
+{
+    AWDSkeletonJoint *cur;
+
+    cur = this->first_child;
+    while (cur) {
+        AWDSkeletonJoint *next = cur->next;
+        cur->next = NULL;
+        delete cur; // Will remove it's children too (recursively)
+        cur = next;
+    }
+
+    if (this->bind_mtx) {
+        free(this->bind_mtx);
+        this->bind_mtx = NULL;
+    }
+
+    this->num_children = 0;
+    this->first_child = NULL;
+    this->last_child = NULL;
+}
+
+
 awd_uint32
 AWDSkeletonJoint::get_id()
 {
@@ -162,6 +185,15 @@ AWDSkeleton::AWDSkeleton(const char *name, awd_uint16 name_len) :
     AWDAttrElement()
 {
     this->root_joint = NULL;
+}
+
+
+AWDSkeleton::~AWDSkeleton()
+{
+    if (this->root_joint) {
+        delete this->root_joint;
+        this->root_joint = NULL;
+    }
 }
 
 
