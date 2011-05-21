@@ -11,6 +11,7 @@ class AWDNamedElement
 
     public:
         AWDNamedElement(const char *, awd_uint16);
+        ~AWDNamedElement();
 
         char *get_name();
         void set_name(const char *, awd_uint16);
