@@ -22,6 +22,23 @@ AWDSubMesh::AWDSubMesh()
     this->next = NULL;
 }
 
+AWDSubMesh::~AWDSubMesh()
+{
+    AWDDataStream *cur;
+
+    cur = this->first_stream;
+    while (cur) {
+        AWDDataStream *next = cur->next;
+        cur->next = NULL;
+        delete cur;
+        cur = next;
+    }
+
+    this->first_stream = NULL;
+    this->last_stream = NULL;
+}
+
+
 void 
 AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
 {
@@ -56,6 +73,28 @@ AWDMeshData::AWDMeshData(const char *name, awd_uint16 name_len) :
     this->bind_mtx = NULL;
     this->num_subs = 0;
 }
+
+AWDMeshData::~AWDMeshData()
+{
+    AWDSubMesh *cur;
+
+    cur = this->first_sub;
+    while (cur) {
+        AWDSubMesh *next = cur->next;
+        cur->next = NULL;
+        delete cur;
+        cur = next;
+    }
+
+    if (this->bind_mtx) {
+        free(this->bind_mtx);
+        this->bind_mtx = NULL;
+    }
+
+    this->first_sub = NULL;
+    this->last_sub = NULL;
+}
+
 
 void 
 AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
@@ -259,6 +298,15 @@ AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *dat
     this->set_data(data);
     this->set_transform(mtx);
     this->materials = new AWDBlockList();
+}
+
+
+AWDMeshInst::~AWDMeshInst()
+{
+    if (this->transform_mtx) {
+        free(this->transform_mtx);
+        this->transform_mtx = NULL;
+    }
 }
 
 
