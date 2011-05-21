@@ -11,6 +11,7 @@
 #endif
 
 
+
 void
 AWDAttr::write_attr(int fd)
 {
@@ -86,6 +87,12 @@ AWDUserAttr::AWDUserAttr()
 }
 
 
+AWDUserAttr::~AWDUserAttr()
+{
+    free(key);
+}
+
+
 void
 AWDUserAttr::write_metadata(int fd)
 {
@@ -104,6 +111,25 @@ AWDUserAttr::write_metadata(int fd)
 
 AWDUserAttrList::AWDUserAttrList()
 {
+    this->first_attr = NULL;
+    this->last_attr = NULL;
+}
+
+
+AWDUserAttrList::~AWDUserAttrList()
+{
+    AWDUserAttr *cur;
+
+    cur = this->first_attr;
+    while (cur) {
+        AWDUserAttr *next = cur->next;
+        cur->next = NULL;
+        delete cur;
+        cur = next;
+    }
+
+    // These will have been destroyed as
+    // part of the above loop.
     this->first_attr = NULL;
     this->last_attr = NULL;
 }
@@ -229,6 +255,7 @@ AWDNumAttr::AWDNumAttr()
 }
 
 
+
 void
 AWDNumAttr::write_metadata(int fd)
 {
@@ -246,6 +273,25 @@ AWDNumAttr::write_metadata(int fd)
 
 AWDNumAttrList::AWDNumAttrList()
 {
+    this->first_attr = NULL;
+    this->last_attr = NULL;
+}
+
+
+AWDNumAttrList::~AWDNumAttrList()
+{
+    AWDNumAttr *cur;
+
+    cur = this->first_attr;
+    while (cur) {
+        AWDNumAttr *next = cur->next;
+        cur->next = NULL;
+        delete cur;
+        cur = next;
+    }
+
+    // Already deleted as part of
+    // the above loop.
     this->first_attr = NULL;
     this->last_attr = NULL;
 }
@@ -364,6 +410,12 @@ AWDAttrElement::AWDAttrElement()
 {
     this->properties = new AWDNumAttrList();
     this->user_attributes = new AWDUserAttrList();
+}
+
+AWDAttrElement::~AWDAttrElement()
+{
+    delete this->properties;
+    delete this->user_attributes;
 }
 
 
