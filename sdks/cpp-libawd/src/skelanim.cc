@@ -17,6 +17,28 @@ AWDSkeletonPose::AWDSkeletonPose(const char *name, awd_uint16 name_len) :
 }
 
 
+AWDSkeletonPose::~AWDSkeletonPose()
+{
+    AWD_joint_tf *cur;
+
+    cur = this->first_transform;
+    while (cur) {
+        AWD_joint_tf *next = cur->next;
+        cur->next = NULL;
+        if (cur->transform_mtx) {
+            free(cur->transform_mtx);
+            cur->transform_mtx = NULL;
+        }
+        free(cur);
+        cur = next;
+    }
+
+    this->num_transforms = 0;
+    this->first_transform = NULL;
+    this->last_transform = NULL;
+}
+
+
 void
 AWDSkeletonPose::set_next_transform(awd_float64 *mtx)
 {
@@ -101,6 +123,24 @@ AWDSkeletonAnimation::AWDSkeletonAnimation(const char *name, awd_uint16 name_len
 {
     this->frame_rate = frame_rate;
     this->num_frames = 0;
+    this->first_frame = NULL;
+    this->last_frame = NULL;
+}
+
+
+AWDSkeletonAnimation::~AWDSkeletonAnimation()
+{
+    AWD_skelanim_fr *cur;
+
+    cur = this->first_frame;
+    while (cur) {
+        AWD_skelanim_fr *next = cur->next;
+        cur->next = NULL;
+        delete cur->pose;
+        free(cur);
+        cur = next;
+    }
+
     this->first_frame = NULL;
     this->last_frame = NULL;
 }

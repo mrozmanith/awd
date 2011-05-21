@@ -26,6 +26,7 @@ class AWDSkeletonPose : public AWDNamedElement,
 
     public:
         AWDSkeletonPose(const char *, awd_uint16);
+        ~AWDSkeletonPose();
 
         void set_next_transform(awd_float64 *);
 };
@@ -54,6 +55,7 @@ class AWDSkeletonAnimation : public AWDNamedElement,
 
     public:
         AWDSkeletonAnimation(const char *, awd_uint16, awd_uint8);
+        ~AWDSkeletonAnimation();
 
         void set_next_frame_pose(AWDSkeletonPose *);
 };
