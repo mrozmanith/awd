@@ -23,6 +23,7 @@ class AWDSkeletonJoint :
         AWDSkeletonJoint *next;
 
         AWDSkeletonJoint(const char *, awd_uint16, awd_float64 *);
+        ~AWDSkeletonJoint();
 
         int write_joint(int, awd_uint32);
         int calc_length();
@@ -49,6 +50,7 @@ class AWDSkeleton :
 
     public:
         AWDSkeleton(const char *, awd_uint16);
+        ~AWDSkeleton();
 
         AWDSkeletonJoint *set_root_joint(AWDSkeletonJoint *);
         AWDSkeletonJoint *get_root_joint();
