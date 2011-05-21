@@ -11,6 +11,14 @@ AWDNamedElement::AWDNamedElement(const char *name, awd_uint16 name_len)
     this->set_name(name, name_len);
 }
 
+AWDNamedElement::~AWDNamedElement()
+{
+    if (this->name) {
+        free(this->name);
+        this->name = NULL;
+    }
+}
+
 
 char *
 AWDNamedElement::get_name()
