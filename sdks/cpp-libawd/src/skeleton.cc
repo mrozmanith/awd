@@ -202,7 +202,7 @@ AWDSkeleton::calc_body_length(awd_bool wide)
 {
     awd_uint32 len;
 
-    len = sizeof(awd_uint16) + this->get_name_length() + sizeof(awd_uint32);
+    len = sizeof(awd_uint16) + this->get_name_length() + sizeof(awd_uint16);
     len += this->calc_attr_length(true,true);
 
     if (this->root_joint != NULL)
