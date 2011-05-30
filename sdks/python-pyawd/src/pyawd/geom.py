@@ -1,3 +1,5 @@
+import core
+
 class AWDSubMesh:
     VERTICES = 1
     TRIANGLES = 2
@@ -16,7 +18,7 @@ class AWDSubMesh:
         self.__data_streams.append((type,data))
 
 
-class AWDMeshData:
+class AWDMeshData(core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.__sub_meshes = []

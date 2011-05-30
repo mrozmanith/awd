@@ -1,6 +1,7 @@
 import utils 
+import core
 
-class AWDSceneBlockBase(object):
+class AWDSceneBlockBase(core.AWDBlockBase):
     def __init__(self, name='', transform=None):
         self.__children = []
         self.__parent = None

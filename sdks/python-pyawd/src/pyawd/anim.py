@@ -1,12 +1,13 @@
 import utils 
+import core
 
-class AWDSkeleton:
+class AWDSkeleton(core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.root_joint = None
         
 
-class AWDSkeletonAnimation:
+class AWDSkeletonAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.frames = []
@@ -15,7 +16,7 @@ class AWDSkeletonAnimation:
         self.frames.append(pose)
 
 
-class AWDSkeletonJoint:
+class AWDSkeletonJoint(object):
     def __init__(self, name='', inv_bind_mtx=None):
         self.name = name
         self.inv_bind_mtx = inv_bind_mtx
@@ -37,7 +38,7 @@ class AWDSkeletonJoint:
         self.__children.append(child)
 
 
-class AWDSkeletonPose:
+class AWDSkeletonPose(core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.transforms = []
@@ -46,7 +47,7 @@ class AWDSkeletonPose:
         self.transforms.append(transform)
         
 
-class AWDUVAnimation:
+class AWDUVAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.frames = []

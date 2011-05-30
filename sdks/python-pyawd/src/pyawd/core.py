@@ -1,4 +1,17 @@
-class AWD:
+import struct
+
+class AWDBlockBase(object):
+    def __init__(self, type):
+        self.__type = type
+
+    def write_block(self, file, addr):
+        file.write(struct.pack('>IBBI', addr, 0, self.__type, 0))
+
+    def write_body(self, file):
+        pass # To be overridden
+
+
+class AWD(object):
     UNCOMPRESSED = 0
     DEFLATE = 1
     LZMA = 2
