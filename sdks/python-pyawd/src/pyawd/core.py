@@ -1,5 +1,3 @@
-from pyawd import io
-
 class AWD:
     UNCOMPRESSED = 0
     DEFLATE = 1
@@ -19,6 +17,11 @@ class AWD:
         self.scene_blocks = []
 
     def flush(self, file):
+        try:
+            from pyawd import cio as io
+        except:
+            from pyawd import pyio as io
+
         writer = io.AWDWriter()
         writer.write(self, file)
         

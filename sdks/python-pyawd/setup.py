@@ -2,6 +2,7 @@
 
 import os
 import sys
+import getopt
 from distutils.core import setup, Extension
 
 version_macro = ('PYTHON_VERSION', sys.version_info[0])
@@ -17,16 +18,31 @@ source_files = [
     'src/AWDWriter.cc'
 ]
 
-libawd_io = Extension('pyawd.io', 
-    libraries = [ 'awd' ],
-    include_dirs = [ 'include', '/usr/local/include' ],
-    define_macros = [ version_macro ],
-    sources = source_files )
+def parse_bool(str):
+    if str=='0' or str.lower()=='false':
+        return False
+    else:
+        return True
 
+use_libawd = True
+opts, args = getopt.getopt(sys.argv[1:], None, ['use-libawd='])
+for opt in opts:
+    if opt[0] == '--use-libawd':
+        use_libawd = parse_bool(opt[1])
+
+ext_modules = []
+if use_libawd:
+    ext_modules.append(Extension('pyawd.cio', 
+        libraries = [ 'awd' ],
+        include_dirs = [ 'include', '/usr/local/include' ],
+        define_macros = [ version_macro ],
+        sources = source_files ))
+
+sys.exit()
 setup(name = 'pyawd',
     version = '0.1.0',
     description = 'Python package for dealing with Away3D AWD files',
-    ext_modules = [ libawd_io ],
+    ext_modules = ext_modules,
     package_dir = { 'pyawd': 'src/pyawd' },
     packages = [ 'pyawd' ]
     )
