@@ -1,4 +1,6 @@
-class AWDTexture:
+import core
+
+class AWDTexture(core.AWDBlockBase):
     EXTERNAL = 0
 
     def __init__(self, type=0, name='', url=None):
@@ -6,7 +8,7 @@ class AWDTexture:
         self.name = name
         self.url = url
 
-class AWDMaterial:
+class AWDMaterial(core.AWDBlockBase):
     COLOR = 1
     BITMAP = 2
 
