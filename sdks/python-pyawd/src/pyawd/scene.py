@@ -30,8 +30,10 @@ class AWDSceneBlockBase(object):
 
 
     def remove_child(self, child):
-        # TODO: Implement
-        pass
+        child.set_parent(None)
+        while child in self.__children:
+            self.__children.remove(child)
+
 
 
 class AWDMeshInst(AWDSceneBlockBase):
@@ -39,6 +41,7 @@ class AWDMeshInst(AWDSceneBlockBase):
         self.mesh_data = data
         self.materials = []
         super(AWDMeshInst, self).__init__(name, transform)
+
 
 class AWDContainer(AWDSceneBlockBase):
     pass
