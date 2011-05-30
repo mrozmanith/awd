@@ -251,38 +251,23 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
 
 AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data) :
-    AWDBlock(MESH_INSTANCE),
-    AWDNamedElement(name, name_len),
-    AWDAttrElement()
+    AWDSceneBlock(MESH_INSTANCE, name, name_len, NULL)
 {
-    awd_float64 *mtx;
-
-    mtx = awdutil_id_mtx4(NULL);
-
-    this->materials = new AWDBlockList();
-
     this->set_data(data);
-    this->set_transform(mtx);
+    this->materials = new AWDBlockList();
 }
 
 
 AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data, awd_float64 *mtx) :
-    AWDBlock(MESH_INSTANCE),
-    AWDNamedElement(name, name_len),
-    AWDAttrElement() 
+    AWDSceneBlock(MESH_INSTANCE, name, name_len, mtx)
 {
     this->set_data(data);
-    this->set_transform(mtx);
     this->materials = new AWDBlockList();
 }
 
 
 AWDMeshInst::~AWDMeshInst()
 {
-    if (this->transform_mtx) {
-        free(this->transform_mtx);
-        this->transform_mtx = NULL;
-    }
 }
 
 
@@ -307,13 +292,6 @@ AWDMeshInst::set_data(AWDMeshData *data)
 }
 
 
-void
-AWDMeshInst::set_transform(awd_float64 *mtx)
-{
-    this->transform_mtx = mtx;
-}
-
-
 awd_uint32
 AWDMeshInst::calc_body_length(awd_bool wide)
 {
@@ -328,22 +306,13 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
 {
     AWDBlock *block;
     AWDBlockIterator *it;
-    awd_baddr parent_addr;
     awd_baddr data_addr;
     awd_uint16 num_materials;
 
-    // TODO: Use (and create) awd->scene_blocks instead
-    // Get IDs for references, verify byte-order
-    parent_addr = 0;
-    data_addr = UI32(this->data->get_addr());
-
-    // Write scene block common fields
-    // TODO: Move this to separate base class
-    write(fd, &parent_addr, sizeof(awd_baddr));
-    awdutil_write_mtx4(fd, this->transform_mtx);
-    awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
+    this->write_scene_common(fd);
 
     // Write mesh data address
+    data_addr = UI32(this->data->get_addr());
     write(fd, &data_addr, sizeof(awd_uint32));
 
     // Write materials list. First write material count, and then
