@@ -66,6 +66,13 @@ AWDBlock::get_addr()
 }
 
 
+AWD_block_type
+AWDBlock::get_type()
+{
+    return this->type;
+}
+
+
 
 
 AWDBlockList::AWDBlockList()

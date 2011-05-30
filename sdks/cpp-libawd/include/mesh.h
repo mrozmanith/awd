@@ -4,6 +4,7 @@
 #include "attr.h"
 #include "name.h"
 #include "block.h"
+#include "scene.h"
 #include "stream.h"
 #include "skeleton.h"
 #include "material.h"
@@ -77,13 +78,10 @@ class AWDMeshData :
 
 
 class AWDMeshInst : 
-    public AWDBlock, 
-    public AWDNamedElement,
-    public AWDAttrElement
+    public AWDSceneBlock
 {
     private:
         AWDMeshData * data;
-        awd_float64 * transform_mtx;
         AWDBlockList * materials;
 
         void init();
@@ -97,13 +95,10 @@ class AWDMeshInst :
         AWDMeshInst(const char *, awd_uint16, AWDMeshData *, awd_float64 *);
         ~AWDMeshInst();
 
-        void set_transform(awd_float64 *);
-
         void add_material(AWDSimpleMaterial *);
 
         AWDMeshData * get_data();
         void set_data(AWDMeshData *);
-
 };
 
 #endif

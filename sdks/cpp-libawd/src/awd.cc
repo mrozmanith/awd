@@ -28,11 +28,11 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->texture_blocks = new AWDBlockList();
     this->material_blocks = new AWDBlockList();
     this->mesh_data_blocks = new AWDBlockList();
-    this->mesh_inst_blocks = new AWDBlockList();
     this->skeleton_blocks = new AWDBlockList();
     this->skelanim_blocks = new AWDBlockList();
     this->skelpose_blocks = new AWDBlockList();
     this->uvanim_blocks = new AWDBlockList();
+    this->scene_blocks = new AWDBlockList();
 
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -44,11 +44,11 @@ AWD::~AWD()
     delete this->texture_blocks;
     delete this->material_blocks;
     delete this->mesh_data_blocks;
-    delete this->mesh_inst_blocks;
     delete this->skeleton_blocks;
     delete this->skelanim_blocks;
     delete this->skelpose_blocks;
     delete this->uvanim_blocks;
+    delete this->scene_blocks;
 }
 
 
@@ -75,9 +75,9 @@ AWD::add_mesh_data(AWDMeshData *block)
 
 
 void
-AWD::add_mesh_inst(AWDMeshInst *block)
+AWD::add_scene_block(AWDSceneBlock *block)
 {
-    this->mesh_inst_blocks->append(block);
+    this->scene_blocks->append(block);
 }
 
 
@@ -132,15 +132,46 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
 {
     size_t len;
     AWDBlock *block;
+    AWDBlockIterator it(blocks);
 
     len = 0;
-    AWDBlockIterator it(blocks);
     while ((block = it.next()) != NULL) {
         //TODO: Check flags for wide boolean (hard-coded as false now)
         len += block->write_block(fd, AWD_FALSE, ++this->last_used_baddr);
     }
 
     return len;
+}
+
+
+void
+AWD::flatten_scene(AWDSceneBlock *cur, AWDBlockList *flat_list)
+{
+    AWDBlock *child;
+    AWDBlockIterator *children;
+
+    flat_list->append(cur);
+
+    children = cur->child_iter();
+    while ((child = children->next()) != NULL) {
+        this->flatten_scene((AWDSceneBlock*)child, flat_list);
+    }
+}
+
+size_t
+AWD::write_scene(AWDBlockList *blocks, int fd)
+{
+    AWDBlock *block;
+    AWDBlockList *ordered;
+    AWDBlockIterator it(blocks);
+
+    ordered = new AWDBlockList();
+
+    while ((block = it.next()) != NULL) {
+        this->flatten_scene((AWDSceneBlock*)block, ordered);
+    }
+
+    return this->write_blocks(ordered, fd);
 }
 
 
@@ -170,8 +201,8 @@ AWD::flush(int out_fd)
     tmp_len += this->write_blocks(this->texture_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->material_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->mesh_data_blocks, tmp_fd);
-    tmp_len += this->write_blocks(this->mesh_inst_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->uvanim_blocks, tmp_fd);
+    tmp_len += this->write_scene(this->scene_blocks, tmp_fd);
 
     tmp_buf = (awd_uint8 *) malloc(tmp_len);
 	lseek(tmp_fd, 0, SEEK_SET);

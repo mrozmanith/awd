@@ -33,14 +33,16 @@ class AWD
         AWDBlockList * skelanim_blocks;
         AWDBlockList * skeleton_blocks;
         AWDBlockList * mesh_data_blocks;
-        AWDBlockList * mesh_inst_blocks;
         AWDBlockList * uvanim_blocks;
+        AWDBlockList * scene_blocks;
 
         // Flags and misc
         awd_baddr last_used_baddr;
         awd_bool header_written;
 
         void write_header(int, awd_uint32);
+        void flatten_scene(AWDSceneBlock *, AWDBlockList *);
+        size_t write_scene(AWDBlockList *, int);
         size_t write_blocks(AWDBlockList *, int);
 
     public:
@@ -51,11 +53,11 @@ class AWD
         void add_texture(AWDTexture *);
         void add_material(AWDSimpleMaterial *);
         void add_mesh_data(AWDMeshData *);
-        void add_mesh_inst(AWDMeshInst *);
         void add_skeleton(AWDSkeleton *);
         void add_skeleton_pose(AWDSkeletonPose *);
         void add_skeleton_anim(AWDSkeletonAnimation *);
         void add_uv_anim(AWDUVAnimation *);
+        void add_scene_block(AWDSceneBlock *);
 };
 
 #endif
