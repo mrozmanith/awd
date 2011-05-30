@@ -11,12 +11,12 @@ class AWD:
 
         self.texture_blocks = []
         self.material_blocks = []
-        self.mesh_inst_blocks = []
         self.mesh_data_blocks = []
         self.uvanim_blocks = []
         self.skelanim_blocks = []
         self.skelpose_blocks = []
         self.skeleton_blocks = []
+        self.scene_blocks = []
 
     def flush(self, file):
         writer = io.AWDWriter()
@@ -31,8 +31,8 @@ class AWD:
     def add_mesh_data(self, block):
         self.mesh_data_blocks.append(block)
 
-    def add_mesh_inst(self, block):
-        self.mesh_inst_blocks.append(block)
+    def add_scene_block(self, block):
+        self.scene_blocks.append(block)
 
     def add_uv_anim(self, block):
         self.uvanim_blocks.append(block)
