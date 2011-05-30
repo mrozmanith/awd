@@ -11,29 +11,17 @@
 #include "bcache.h"
 #include "util.h"
 
-void
-__prepare_mesh_inst(PyObject *block, AWD *awd, pyawd_bcache *bcache)
+static AWDSceneBlock *
+__prepare_mesh_inst(PyObject *block, pyawd_bcache *bcache)
 {
     int i;
-    char *name;
-    int name_len;
-    awd_float64 *mtx;
     int num_materials;
 
-    PyObject *name_attr;
-    PyObject *mtx_attr;
     PyObject *md_attr;
     PyObject *mat_attr;
 
     AWDMeshInst *lawd_inst;
     AWDMeshData *lawd_md;
-    
-    mtx_attr = PyObject_GetAttrString(block, "transform");
-    if (mtx_attr != Py_None) {
-        PyObject *mtx_list;
-        mtx_list = PyObject_GetAttrString(mtx_attr, "raw_data");
-        mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 16);
-    }
     
     lawd_md = NULL;
     md_attr = PyObject_GetAttrString(block, "mesh_data");
@@ -41,11 +29,7 @@ __prepare_mesh_inst(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         lawd_md = (AWDMeshData *)pyawd_bcache_get(bcache, md_attr);
     }
     
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
-    
-    lawd_inst = new AWDMeshInst(name, name_len, lawd_md, mtx);
+    lawd_inst = new AWDMeshInst(NULL, 0, lawd_md);
 
     mat_attr = PyObject_GetAttrString(block, "materials");
     num_materials = PyList_Size(mat_attr);
@@ -56,8 +40,83 @@ __prepare_mesh_inst(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         lawd_inst->add_material(lawd_mat);
     }
 
-
-    awd->add_mesh_inst(lawd_inst);
-    pyawd_bcache_add(bcache, block, lawd_inst);
+    return lawd_inst;
 }
 
+
+static AWDSceneBlock *
+__prepare_container(PyObject *block)
+{
+    AWDContainer *lawd_ctr;
+    lawd_ctr = new AWDContainer(NULL, 0);
+
+    return lawd_ctr;
+}
+
+
+
+void
+__prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
+{
+    char *name;
+    int name_len;
+    awd_float64 *mtx;
+    AWDSceneBlock *parent;
+
+    PyObject *name_attr;
+    PyObject *mtx_attr;
+    PyObject *par_attr;
+    PyObject *children_attr;
+
+    AWDSceneBlock *scene_block;
+    const char *type = block->ob_type->tp_name;
+
+    if (strcmp(type, "AWDMeshInst")>=0) {
+        scene_block = __prepare_mesh_inst(block, bcache);
+    }
+    else if (strcmp(type, "AWDContainer")>=0) {
+        scene_block = __prepare_container(block);
+    }
+    else {
+        // Unknown type
+        return;
+    }
+
+    mtx_attr = PyObject_GetAttrString(block, "transform");
+    if (mtx_attr != Py_None) {
+        PyObject *mtx_list;
+        mtx_list = PyObject_GetAttrString(mtx_attr, "raw_data");
+        mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 16);
+    }
+
+    name_attr = PyObject_GetAttrString(block, "name");
+    name = PyString_AsString(name_attr);
+    name_len = PyString_Size(name_attr);
+
+    scene_block->set_name(name, name_len);
+    scene_block->set_transform(mtx);
+
+    awd->add_scene_block(scene_block);
+    pyawd_bcache_add(bcache, block, scene_block);
+
+
+    // Add to parent if parent existed
+    par_attr = PyObject_GetAttrString(block, "_AWDSceneBlockBase__parent");
+    parent = (AWDSceneBlock *)pyawd_bcache_get(bcache, par_attr);
+    if (parent != NULL) {
+        parent->add_child(scene_block);
+    }
+
+    // Prepare all children
+    children_attr = PyObject_GetAttrString(block, "_AWDSceneBlockBase__children");
+    if (children_attr) {
+        int i;
+        int num_children;
+
+        num_children = PyList_Size(children_attr);
+        for (i=0; i<num_children; i++) {
+            PyObject *child = PyList_GetItem(children_attr, i);
+            __prepare_scene_block(child, awd, bcache);
+        }
+    }
+}

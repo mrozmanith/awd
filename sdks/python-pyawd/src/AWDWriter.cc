@@ -84,7 +84,7 @@ io_AWDWriter_flush(io_AWDWriter *self, PyObject *args)
         __prepare_blocks(awd_obj, "skelpose_blocks", lawd_awd, bcache, __prepare_skelpose);
         __prepare_blocks(awd_obj, "skelanim_blocks", lawd_awd, bcache, __prepare_skelanim);
         __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, bcache, __prepare_mesh_data);
-        __prepare_blocks(awd_obj, "mesh_inst_blocks", lawd_awd, bcache, __prepare_mesh_inst);
+        __prepare_blocks(awd_obj, "scene_blocks", lawd_awd, bcache, __prepare_scene_block);
 
         // Write buffer
         lawd_awd->flush(fd);
