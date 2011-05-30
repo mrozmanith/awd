@@ -38,7 +38,6 @@ if use_libawd:
         define_macros = [ version_macro ],
         sources = source_files ))
 
-sys.exit()
 setup(name = 'pyawd',
     version = '0.1.0',
     description = 'Python package for dealing with Away3D AWD files',
