@@ -14,7 +14,7 @@ source_files = [
     'src/prepscene.cc',
     'src/prepmaterial.cc',
     'src/prepanim.cc',
-    'src/io.cc',
+    'src/cio.cc',
     'src/AWDWriter.cc'
 ]
 

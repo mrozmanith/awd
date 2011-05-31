@@ -6,15 +6,15 @@
 
 
 #if PYTHON_VERSION == 3
-static PyModuleDef io_mod = {
+static PyModuleDef cio_mod = {
     PyModuleDef_HEAD_INIT,
-    "io",
+    "cio",
     "Module for reading/writing Away3D data format (AWD).",
     -1,
     NULL, NULL, NULL, NULL, NULL
 };
 #else // Python 2.6
-static PyMethodDef io_methods[] = {
+static PyMethodDef cio_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 #endif
@@ -31,14 +31,14 @@ _add_mod_type(PyObject *m, const char *name, PyTypeObject *type)
 
 
 /*
- * Python version-agnostic method to initialize io module.
+ * Python version-agnostic method to initialize C io module.
  * Invoked in different ways depending on whether this module
  * is compiled for Python 2.6 or 3.x.
 */
-PyObject *_init_io(PyObject *m)
+PyObject *_init_cio(PyObject *m)
 {
     // Add classes to module
-    _add_mod_type(m, "AWDWriter", &io_AWDWriterType);
+    _add_mod_type(m, "AWDWriter", &cio_AWDWriterType);
 
     return m;
 }
@@ -47,25 +47,25 @@ PyObject *_init_io(PyObject *m)
 
 #if PYTHON_VERSION == 3
 PyMODINIT_FUNC
-PyInit_io(void)
+PyInit_cio(void)
 {
     PyObject *m;
 
-    m = PyModule_Create(&io_mod);
+    m = PyModule_Create(&cio_mod);
     if (m == NULL)
         return NULL;
 
-    return _init_io(m);
+    return _init_cio(m);
 }
 #else // Python 2.6
 PyMODINIT_FUNC
-initio(void)
+initcio(void)
 {
     PyObject *m;
 
-    m = Py_InitModule("io", io_methods);
+    m = Py_InitModule("cio", cio_methods);
 
-    _init_io(m);
+    _init_cio(m);
 }
 #endif
 
