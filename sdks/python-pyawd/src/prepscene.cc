@@ -82,6 +82,7 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         return;
     }
 
+    mtx = NULL;
     mtx_attr = PyObject_GetAttrString(block, "transform");
     if (mtx_attr != Py_None) {
         PyObject *mtx_list;

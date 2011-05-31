@@ -1,4 +1,5 @@
 import struct
+import sys
 
 class AWDBlockBase(object):
     def __init__(self, type):
@@ -29,10 +30,12 @@ class AWD(object):
         self.skeleton_blocks = []
         self.scene_blocks = []
 
-    def flush(self, file):
+    def flush(self, file=sys.stdout):
         try:
             from pyawd import cio as io
         except:
+            print("Using pure python for writing. Build PyAWD with --use-libawd=true")
+            print("to build using libawd for optimized writing performance.")
             from pyawd import pyio as io
 
         writer = io.AWDWriter()

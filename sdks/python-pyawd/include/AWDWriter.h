@@ -8,11 +8,11 @@
 #include "bcache.h"
 
 
-extern PyTypeObject io_AWDWriterType;
+extern PyTypeObject cio_AWDWriterType;
 
 typedef struct {
     PyObject_HEAD
-} io_AWDWriter;
+} cio_AWDWriter;
 
 
 void __prepare_blocks(PyObject *, const char *, AWD *, pyawd_bcache *, void (*)(PyObject*,AWD*,pyawd_bcache*));
