@@ -14,7 +14,7 @@
 void
 __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
-    char *name;
+    const char *name;
     int name_len;
     awd_uint8 type;
     PyObject *name_attr;
@@ -24,11 +24,11 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDSimpleMaterial *lawd_mat;
 
     type_attr = PyObject_GetAttrString(block, "type");
-    type = (awd_uint8)PyInt_AsLong(type_attr);
+    type = (awd_uint8)PyLong_AsLong(type_attr);
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_mat = new AWDSimpleMaterial(type, name, name_len);
 
@@ -47,7 +47,7 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 void
 __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
-    char *name;
+    const char *name;
     int name_len;
     awd_uint8 type;
     PyObject *url_attr;
@@ -57,21 +57,21 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDTexture *lawd_tex;
 
     type_attr = PyObject_GetAttrString(block, "type");
-    type = (awd_uint8)PyInt_AsLong(type_attr);
+    type = (awd_uint8)PyLong_AsLong(type_attr);
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_tex = new AWDTexture(type, name, name_len);
 
     url_attr = PyObject_GetAttrString(block, "url");
     if (url_attr != Py_None) {
-        char *url;
+        const char *url;
         int url_len;
 
-        url = PyString_AsString(url_attr);
-        url_len = PyString_Size(url_attr);
+        url = PyUnicode_AS_DATA(url_attr);
+        url_len = PyUnicode_GET_DATA_SIZE(url_attr);
         lawd_tex->set_url(url, url_len);
     }
 
