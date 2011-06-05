@@ -1,4 +1,4 @@
-import core
+from pyawd import core
 
 class AWDTexture(core.AWDBlockBase):
     EXTERNAL = 0

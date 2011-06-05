@@ -1,5 +1,5 @@
-import utils 
-import core
+from pyawd import utils 
+from pyawd import core
 
 class AWDSkeleton(core.AWDBlockBase):
     def __init__(self, name=''):
