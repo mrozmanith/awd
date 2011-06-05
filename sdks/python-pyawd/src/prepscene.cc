@@ -63,7 +63,6 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     awd_float64 *mtx;
     AWDSceneBlock *parent;
 
-    PyObject *name_attr;
     PyObject *mtx_attr;
     PyObject *par_attr;
     PyObject *children_attr;
@@ -90,9 +89,7 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 16);
     }
 
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     scene_block->set_name(name, name_len);
     scene_block->set_transform(mtx);
