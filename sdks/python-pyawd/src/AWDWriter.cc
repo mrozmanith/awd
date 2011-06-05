@@ -117,7 +117,7 @@ PyMethodDef cio_AWDWriter_methods[] = {
 */
 PyTypeObject cio_AWDWriterType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pyawd.AWDWriter",                      // tp_name
+    "pyawd.cio.AWDWriter",                      // tp_name
     sizeof(cio_AWDWriter),                // tp_basicsize
     0,                                      // tp_itemsize
     (destructor)cio_AWDWriter_dealloc,    // tp_dealloc
