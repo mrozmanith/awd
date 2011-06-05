@@ -22,13 +22,10 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
 
     AWDSkeletonJoint *lawd_joint;
 
-    PyObject *name_attr;
     PyObject *bind_mtx_attr;
     PyObject *children_attr;
 
-    name_attr = PyObject_GetAttrString(py_joint, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(py_joint, "name", &name, &name_len);
 
     bind_mtx_attr = PyObject_GetAttrString(py_joint, "inv_bind_mtx");
     if (bind_mtx_attr && bind_mtx_attr != Py_None) {
@@ -64,12 +61,9 @@ __prepare_skeleton(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     const char *name;
     int name_len;
     AWDSkeleton *lawd_skel;
-    PyObject *name_attr;
     PyObject *root_attr;
 
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     lawd_skel = new AWDSkeleton(name, name_len);
 
@@ -93,12 +87,9 @@ __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     int name_len;
     int num_frames;
     PyObject *frames_attr;
-    PyObject *name_attr;
     AWDSkeletonAnimation *lawd_anim;
 
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     frames_attr = PyObject_GetAttrString(block, "frames");
     num_frames = PyList_Size(frames_attr);
@@ -127,12 +118,9 @@ __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     int num_jtf;
 
     PyObject *tfs_attr;
-    PyObject *name_attr;
     AWDSkeletonPose *lawd_pose;
     
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     lawd_pose = new AWDSkeletonPose(name, name_len);
     
@@ -169,12 +157,9 @@ __prepare_uvanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     const char *name;
     int name_len;
     PyObject *frames_attr;
-    PyObject *name_attr;
     AWDUVAnimation *lawd_anim;
 
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     lawd_anim = new AWDUVAnimation(name, name_len);
 

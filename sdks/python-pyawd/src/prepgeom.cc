@@ -1,3 +1,4 @@
+#include <cstdio>
 /**
  * This file contains reparation functions for all blocks belonging in the pyawd.geom
  * module. 
@@ -18,12 +19,9 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDMeshData *lawd_md;
     const char *name;
     int name_len;
-    PyObject *name_attr;
     PyObject *subs_list;
 
-    name_attr = PyObject_GetAttrString(block, "name");
-    name = PyUnicode_AS_DATA(name_attr);
-    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
+    pyawdutil_get_strattr(block, "name", &name, &name_len);
 
     lawd_md = new AWDMeshData(name, name_len);
 

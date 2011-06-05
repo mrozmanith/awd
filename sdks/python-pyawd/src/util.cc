@@ -2,6 +2,21 @@
 
 #include <awd/libawd.h>
 
+void
+pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
+{
+    PyObject *a;
+
+    a = PyObject_GetAttrString(o, attr);
+#if PYTHON_VERSION == 3
+    *str = PyUnicode_AS_DATA(a);
+    *len = PyUnicode_GET_DATA_SIZE(a);
+#else
+    *str = PyString_AsString(a);
+    *len = PyString_Size(a);
+#endif
+}
+
 awd_float64 *
 pyawdutil_pylist_to_float64(PyObject *list, awd_float64 *buf, unsigned int num_items)
 {
