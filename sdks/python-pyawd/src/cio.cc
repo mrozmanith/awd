@@ -6,7 +6,7 @@
 
 
 #if PYTHON_VERSION == 3
-static PyModuleDef cio_mod = {
+static struct PyModuleDef cio_mod = {
     PyModuleDef_HEAD_INIT,
     "cio",
     "Module for reading/writing Away3D data format (AWD).",
@@ -24,9 +24,8 @@ void
 _add_mod_type(PyObject *m, const char *name, PyTypeObject *type)
 {
     Py_INCREF(type);
-    PyModule_AddObject(m, name, (PyObject *)type);
-
     PyType_Ready(type);
+    PyModule_AddObject(m, name, (PyObject *)type);
 }
 
 
