@@ -16,7 +16,7 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
 {
     int i;
     int num_children;
-    char *name;
+    const char *name;
     int name_len;
     awd_float64 *mtx;
 
@@ -27,8 +27,8 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
     PyObject *children_attr;
 
     name_attr = PyObject_GetAttrString(py_joint, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     bind_mtx_attr = PyObject_GetAttrString(py_joint, "inv_bind_mtx");
     if (bind_mtx_attr && bind_mtx_attr != Py_None) {
@@ -61,15 +61,15 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
 void
 __prepare_skeleton(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
-    char *name;
+    const char *name;
     int name_len;
     AWDSkeleton *lawd_skel;
     PyObject *name_attr;
     PyObject *root_attr;
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_skel = new AWDSkeleton(name, name_len);
 
@@ -89,7 +89,7 @@ void
 __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     int i;
-    char *name;
+    const char *name;
     int name_len;
     int num_frames;
     PyObject *frames_attr;
@@ -97,8 +97,8 @@ __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDSkeletonAnimation *lawd_anim;
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     frames_attr = PyObject_GetAttrString(block, "frames");
     num_frames = PyList_Size(frames_attr);
@@ -122,7 +122,7 @@ void
 __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     int i;
-    char *name;
+    const char *name;
     int name_len;
     int num_jtf;
 
@@ -131,8 +131,8 @@ __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDSkeletonPose *lawd_pose;
     
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_pose = new AWDSkeletonPose(name, name_len);
     
@@ -166,15 +166,15 @@ __prepare_uvanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     int i;
     int len;
-    char *name;
+    const char *name;
     int name_len;
     PyObject *frames_attr;
     PyObject *name_attr;
     AWDUVAnimation *lawd_anim;
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_anim = new AWDUVAnimation(name, name_len);
 

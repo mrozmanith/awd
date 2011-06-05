@@ -58,7 +58,7 @@ __prepare_container(PyObject *block)
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
-    char *name;
+    const char *name;
     int name_len;
     awd_float64 *mtx;
     AWDSceneBlock *parent;
@@ -91,8 +91,8 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     }
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     scene_block->set_name(name, name_len);
     scene_block->set_transform(mtx);

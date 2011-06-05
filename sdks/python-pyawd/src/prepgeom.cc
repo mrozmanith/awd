@@ -16,14 +16,14 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     int sub_i;
     int num_subs;
     AWDMeshData *lawd_md;
-    char *name;
+    const char *name;
     int name_len;
     PyObject *name_attr;
     PyObject *subs_list;
 
     name_attr = PyObject_GetAttrString(block, "name");
-    name = PyString_AsString(name_attr);
-    name_len = PyString_Size(name_attr);
+    name = PyUnicode_AS_DATA(name_attr);
+    name_len = PyUnicode_GET_DATA_SIZE(name_attr);
 
     lawd_md = new AWDMeshData(name, name_len);
 
@@ -59,7 +59,7 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
             // Read stream type and treat data differently depending on whether it
             // should be float or integer data.
-            str_type = (AWD_mesh_str_type)PyInt_AsLong(type);
+            str_type = (AWD_mesh_str_type)PyLong_AsLong(type);
             if (str_type == TRIANGLES || str_type == JOINT_INDICES) {
                 lawd_data.ui32 = pyawdutil_pylist_to_uint32(data, NULL, data_len);
             }
