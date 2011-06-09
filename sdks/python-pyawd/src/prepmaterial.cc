@@ -44,6 +44,8 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 void
 __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
+    const char *url;
+    int url_len;
     const char *name;
     int name_len;
     awd_uint8 type;
@@ -56,16 +58,11 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     type = (awd_uint8)PyLong_AsLong(type_attr);
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
+    pyawdutil_get_strattr(block, "url", &url, &url_len);
 
     lawd_tex = new AWDTexture(type, name, name_len);
 
-    url_attr = PyObject_GetAttrString(block, "url");
-    if (url_attr != Py_None) {
-        const char *url;
-        int url_len;
-
-        url = PyUnicode_AS_DATA(url_attr);
-        url_len = PyUnicode_GET_DATA_SIZE(url_attr);
+    if (url) {
         lawd_tex->set_url(url, url_len);
     }
 
