@@ -50,12 +50,14 @@ cio_AWDWriter_init(cio_AWDWriter *self, PyObject *args, PyObject *kwds)
  * AWDWriter.write(awd, file)
 */
 PyObject *
-cio_AWDWriter_flush(cio_AWDWriter *self, PyObject *args)
+cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
 {
     AWD *lawd_awd;
     PyObject *awd_obj;
     PyObject *fobj;
     int fd;
+
+    printf("Writing using libawd.\n");
 
 #if PYTHON_VERSION == 3
     extern PyTypeObject PyIOBase_Type;
@@ -103,7 +105,7 @@ cio_AWDWriter_flush(cio_AWDWriter *self, PyObject *args)
  * Method dictionary
 */
 PyMethodDef cio_AWDWriter_methods[] = {
-    { "write", (PyCFunction)cio_AWDWriter_flush, METH_VARARGS,
+    { "write", (PyCFunction)cio_AWDWriter_write, METH_VARARGS,
         "Write everything in an AWD object to an output stream." },
 
     { NULL }
