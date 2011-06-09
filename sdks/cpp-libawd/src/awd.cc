@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <string.h>
+#include <zlib.h>
 
 #ifdef WIN32
 #include "awdw32.h"
@@ -14,6 +15,7 @@
 #include "skelanim.h"
 #include "util.h"
 #include "awdlzma.h"
+#include "awdzlib.h"
 
 #include "Types.h"
 #include "LzmaEnc.h"
@@ -220,8 +222,46 @@ AWD::flush(int out_fd)
         body_buf = tmp_buf;
     }
     else if (this->compression == DEFLATE) {
-        // TODO: Implement deflate
-        printf("DEFLATE compression not implemented in LibAWD!\n");
+        int stat;
+        z_streamp zstrm;
+        int zlib_len;
+        awd_uint8 *zlib_buf;
+        bool done;
+
+        zlib_len = tmp_len;
+        zlib_buf = (awd_uint8*)malloc(zlib_len);
+
+        zstrm = (z_streamp)malloc(sizeof(z_stream_s));
+        zstrm->zalloc = awd_zalloc;
+        zstrm->zfree = awd_zfree;
+        zstrm->opaque = NULL;
+        zstrm->next_in = tmp_buf;
+        zstrm->avail_in = tmp_len;
+        zstrm->next_out = zlib_buf;
+        zstrm->avail_out = zlib_len;
+
+        stat = deflateInit(zstrm, 9);
+
+        done = false;
+        while (!done) {
+            stat = deflate(zstrm, Z_NO_FLUSH);
+
+            switch (stat) {
+                case Z_STREAM_END:
+                case Z_BUF_ERROR:
+                    done = true;
+                    break;
+            }
+        }
+
+        deflate(zstrm, Z_FINISH);
+        deflateEnd(zstrm);
+
+        body_len = zstrm->total_out;
+        body_buf = (awd_uint8*)malloc(sizeof(body_len));
+        memcpy(body_buf, zlib_buf, body_len);
+
+        free(zlib_buf);
     }
     else if (this->compression == LZMA) {
         Byte *lzma_buf;
