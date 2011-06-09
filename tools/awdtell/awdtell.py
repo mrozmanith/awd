@@ -3,6 +3,9 @@
 import sys
 import getopt
 import struct
+import zlib
+
+from pyawd import core
 
 
 BLOCKS      = 0x1
@@ -43,7 +46,7 @@ def print_header(data):
     printl('body size:    %d (%s)' % (header[4], hex(header[4])))
     printl()
 
-    return 12
+    return header[3]
 
 def read_var_str(data, offs=0):
     len = struct.unpack_from('>H', data, offs)
@@ -319,9 +322,22 @@ if __name__ == '__main__':
         printl(file)
 
         indent_level += 1
-        offset = print_header(data)
+        compression = print_header(data)
 
+        uncompressed_data = None
+        if compression == 0:
+            offset = 12
+            uncompressed_data = data
+        elif compression == core.AWD.DEFLATE:
+            offset = 0
+            data = data[12:]
+            print('raw body len=%d' % len(data));
+            uncompressed_data = zlib.decompress(data)
+        else:
+            print('unknown compression: %d' % compression)
+            sys.exit(-1)
+            
         if include & BLOCKS:
-            while offset < len(data):
-                offset += print_next_block(data)
+            while offset < len(uncompressed_data):
+                offset += print_next_block(uncompressed_data)
 
