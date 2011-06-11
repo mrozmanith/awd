@@ -17,7 +17,7 @@ class AWD(object):
     DEFLATE = 1
     LZMA = 2
 
-    def __init__(self, flags=0, compression=0):
+    def __init__(self, compression=0, flags=0):
         self.compression = compression
         self.flags = flags
 
