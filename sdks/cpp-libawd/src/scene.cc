@@ -34,7 +34,7 @@ AWDSceneBlock::~AWDSceneBlock()
 
 
 void
-AWDSceneBlock::write_scene_common(int fd)
+AWDSceneBlock::write_scene_common(int fd, bool wide_mtx)
 {
     awd_baddr parent_addr;
 
@@ -46,15 +46,15 @@ AWDSceneBlock::write_scene_common(int fd)
     // Write scene block common fields
     // TODO: Move this to separate base class
     write(fd, &parent_addr, sizeof(awd_baddr));
-    awdutil_write_mtx4(fd, this->transform_mtx);
+    awdutil_write_mtx4(fd, this->transform_mtx, wide_mtx);
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
 }
 
 
 awd_uint32
-AWDSceneBlock::calc_common_length()
+AWDSceneBlock::calc_common_length(bool wide_mtx)
 {
-    return 132 + sizeof(awd_uint16) + this->get_name_length();
+    return 4 + MTX4_SIZE(wide_mtx) + sizeof(awd_uint16) + this->get_name_length();
 }
 
 
@@ -126,18 +126,18 @@ AWDContainer::~AWDContainer()
 
 
 awd_uint32
-AWDContainer::calc_body_length(awd_bool wide)
+AWDContainer::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return this->calc_common_length() + this->calc_attr_length(true,true);
+    return this->calc_common_length(wide_mtx) + this->calc_attr_length(true,true, wide_geom, wide_mtx);
 }
 
 
 void
-AWDContainer::write_body(int fd, awd_bool wide)
+AWDContainer::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
-    this->write_scene_common(fd);
-    this->properties->write_attributes(fd);
-    this->user_attributes->write_attributes(fd);
+    this->write_scene_common(fd, wide_mtx);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 
 

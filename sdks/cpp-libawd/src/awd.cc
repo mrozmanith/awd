@@ -139,7 +139,7 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
     len = 0;
     while ((block = it.next()) != NULL) {
         //TODO: Check flags for wide boolean (hard-coded as false now)
-        len += block->write_block(fd, AWD_FALSE, ++this->last_used_baddr);
+        len += block->write_block(fd, AWD_FALSE, AWD_FALSE, ++this->last_used_baddr);
     }
 
     return len;

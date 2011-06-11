@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "uvanim.h"
 #include "util.h"
 
@@ -44,14 +45,16 @@ AWDUVAnimation::~AWDUVAnimation()
 
 
 awd_uint32
-AWDUVAnimation::calc_body_length(awd_bool wide)
+AWDUVAnimation::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return 2 + this->get_name_length() + 2 + this->num_frames * 48 + this->calc_attr_length(true,true);
+    return 2 + this->get_name_length() + 2 + 
+        (this->num_frames * MTX32_SIZE(wide_mtx)) + 
+        this->calc_attr_length(true,true, wide_geom, wide_mtx);
 }
 
 
 void
-AWDUVAnimation::write_body(int fd, awd_bool wide)
+AWDUVAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     AWD_uvanim_fr *cur_fr;
 
@@ -61,15 +64,15 @@ AWDUVAnimation::write_body(int fd, awd_bool wide)
     num_frames = UI16(this->num_frames);
     write(fd, &num_frames, sizeof(awd_uint16));
 
-    this->properties->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
 
     cur_fr = this->first_frame;
     while (cur_fr) {
-        awdutil_write_mtx3x2(fd, cur_fr->transform_mtx);
+        awdutil_write_mtx3x2(fd, cur_fr->transform_mtx, wide_mtx);
         cur_fr = cur_fr->next;
     }
 
-    this->user_attributes->write_attributes(fd);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 
 

@@ -24,7 +24,7 @@ AWDBlock::prepare_write()
 }
 
 size_t
-AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
+AWDBlock::write_block(int fd, bool wide_geom, bool wide_mtx, awd_baddr addr)
 {
     awd_uint8 ns_addr;
     awd_uint32 length;
@@ -34,7 +34,7 @@ AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
     this->addr = addr;
 
     this->prepare_write();
-    length = this->calc_body_length(wide);
+    length = this->calc_body_length(wide_geom, wide_mtx);
 
     //TODO: Get addr of actual namespace
     ns_addr = 0;
@@ -51,7 +51,7 @@ AWDBlock::write_block(int fd, awd_bool wide, awd_baddr addr)
 
     // Write body using concrete implementation
     // in block sub-classes
-    this->write_body(fd, wide);
+    this->write_body(fd, wide_geom, wide_mtx);
 
 
     return (size_t)length + 10;

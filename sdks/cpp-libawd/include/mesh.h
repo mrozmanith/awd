@@ -59,9 +59,9 @@ class AWDMeshData :
         awd_float64 * bind_mtx;
 
     protected:
-        awd_uint32 calc_body_length(awd_bool);
+        awd_uint32 calc_body_length(bool, bool);
         void prepare_write();
-        void write_body(int, awd_bool);
+        void write_body(int, bool, bool);
 
     public:
         AWDMeshData(const char *, awd_uint16);
@@ -87,8 +87,8 @@ class AWDMeshInst :
         void init();
 
     protected:
-        awd_uint32 calc_body_length(awd_bool);
-        void write_body(int, awd_bool);
+        awd_uint32 calc_body_length(bool, bool);
+        void write_body(int, bool, bool);
 
     public:
         AWDMeshInst(const char *, awd_uint16, AWDMeshData *);

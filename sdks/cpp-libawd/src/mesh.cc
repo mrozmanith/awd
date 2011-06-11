@@ -155,7 +155,7 @@ AWDMeshData::set_bind_mtx(awd_float64 *bind_mtx)
 
 
 awd_uint32
-AWDMeshData::calc_body_length(awd_bool wide)
+AWDMeshData::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     AWDSubMesh *sub;
     awd_uint32 mesh_len;
@@ -164,7 +164,7 @@ AWDMeshData::calc_body_length(awd_bool wide)
     // data (not block header)
     mesh_len = sizeof(awd_uint16); // Num subs
     mesh_len += sizeof(awd_uint16) + this->get_name_length();
-    mesh_len += this->calc_attr_length(true,true);
+    mesh_len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
     sub = this->first_sub;
     while (sub) {
         AWDDataStream *str;
@@ -174,7 +174,7 @@ AWDMeshData::calc_body_length(awd_bool wide)
 
         str = sub->first_stream;
         while (str) {
-            mesh_len += 5 + str->get_length(wide);
+            mesh_len += 5 + str->get_length(wide_geom);
 
             str = str->next;
         }
@@ -199,7 +199,7 @@ AWDMeshData::prepare_write()
 
 
 void
-AWDMeshData::write_body(int fd, awd_bool wide)
+AWDMeshData::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awd_uint16 num_subs_be;
     AWDSubMesh *sub;
@@ -210,7 +210,7 @@ AWDMeshData::write_body(int fd, awd_bool wide)
     write(fd, &num_subs_be, sizeof(awd_uint16));
 
     // Write list of optional properties
-    this->properties->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
 
     // Write all sub-meshes
     sub = this->first_sub;
@@ -221,7 +221,7 @@ AWDMeshData::write_body(int fd, awd_bool wide)
         sub_len = 0;
         str = sub->first_stream;
         while (str) {
-            sub_len += (str->get_length(wide) + 5);
+            sub_len += (str->get_length(wide_geom) + 5);
 
             str = str->next;
         }
@@ -234,7 +234,7 @@ AWDMeshData::write_body(int fd, awd_bool wide)
 
         str = sub->first_stream;
         while(str) {
-            str->write_stream(fd, wide);
+            str->write_stream(fd, wide_geom);
 
             str = str->next;
         }
@@ -243,7 +243,7 @@ AWDMeshData::write_body(int fd, awd_bool wide)
     }
     
     // Write list of user attributes
-    this->user_attributes->write_attributes(fd);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 
 
@@ -293,23 +293,23 @@ AWDMeshInst::set_data(AWDMeshData *data)
 
 
 awd_uint32
-AWDMeshInst::calc_body_length(awd_bool wide)
+AWDMeshInst::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     return 136 + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
-        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true);
+        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_geom,wide_mtx);
 }
 
 
 
 void
-AWDMeshInst::write_body(int fd, awd_bool wide)
+AWDMeshInst::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     AWDBlock *block;
     AWDBlockIterator *it;
     awd_baddr data_addr;
     awd_uint16 num_materials;
 
-    this->write_scene_common(fd);
+    this->write_scene_common(fd, wide_mtx);
 
     // Write mesh data address
     data_addr = UI32(this->data->get_addr());
@@ -326,6 +326,6 @@ AWDMeshInst::write_body(int fd, awd_bool wide)
         write(fd, &addr, sizeof(awd_baddr));
     }
 
-    this->properties->write_attributes(fd);
-    this->user_attributes->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }

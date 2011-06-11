@@ -22,8 +22,8 @@ class AWDUVAnimation : public AWDNamedElement,
         AWD_uvanim_fr *last_frame;
 
     protected:
-        awd_uint32 calc_body_length(awd_bool);
-        void write_body(int, awd_bool);
+        awd_uint32 calc_body_length(bool,bool);
+        void write_body(int, bool,bool);
 
     public:
         AWDUVAnimation(const char *, awd_uint16);
