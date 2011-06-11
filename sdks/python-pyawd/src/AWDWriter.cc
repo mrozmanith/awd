@@ -55,6 +55,8 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
     AWD *lawd_awd;
     PyObject *awd_obj;
     PyObject *fobj;
+    PyObject *compression_attr;
+    AWD_compression compression;
     int fd;
 
     printf("Writing using libawd.\n");
@@ -71,7 +73,13 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
 
     fd = PyObject_AsFileDescriptor(fobj);
 
-    lawd_awd = new AWD(UNCOMPRESSED,0);
+    compression = UNCOMPRESSED; // Default
+    compression_attr = PyObject_GetAttrString(awd_obj, "compression");
+    if (compression_attr!=NULL) {
+        compression = (AWD_compression)PyLong_AsLong(compression_attr);
+    }
+
+    lawd_awd = new AWD(compression,0);
 
     if (fd >= 0) {
         pyawd_bcache *bcache;
