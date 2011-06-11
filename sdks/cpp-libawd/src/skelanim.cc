@@ -73,7 +73,7 @@ AWDSkeletonPose::calc_body_length(bool wide_geom, bool wide_mtx)
     while (cur) {
         len += sizeof(awd_bool);
         if (cur->transform_mtx != NULL)
-            len += 128;
+            len += MTX4_SIZE(wide_mtx);
 
         cur = cur->next;
     }
