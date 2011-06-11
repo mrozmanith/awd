@@ -12,8 +12,8 @@
 #endif
 
 // Macros to calculate matrix size depending on width (optimized for size or accuracy)
-#define MTX4_SIZE(wide) (wide? 16*sizeof(awd_float64):16*sizeof(awd_float32))
-#define MTX32_SIZE(wide) (wide? 6*sizeof(awd_float64):6*sizeof(awd_float32))
+#define MTX4_SIZE(wide) (wide? (16*sizeof(awd_float64)):(16*sizeof(awd_float32)))
+#define MTX32_SIZE(wide) (wide? (6*sizeof(awd_float64)):(6*sizeof(awd_float32)))
 
 
 // Utility functions

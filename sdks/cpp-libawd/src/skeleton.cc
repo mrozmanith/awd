@@ -103,7 +103,11 @@ AWDSkeletonJoint::calc_length(bool wide_mtx)
     int len;
     AWDSkeletonJoint *child;
     
-    len = sizeof(awd_uint16) + this->get_name_length() + MTX4_SIZE(wide_mtx);
+    // id + parent + name varstr + matrix
+    len = sizeof(awd_uint32) + sizeof(awd_uint32) + 
+        sizeof(awd_uint16) + this->get_name_length() + 
+        MTX4_SIZE(wide_mtx);
+
     child = this->first_child;
     while (child) {
         len += child->calc_length(wide_mtx);
