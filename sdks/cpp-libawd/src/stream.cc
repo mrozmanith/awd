@@ -29,7 +29,7 @@ AWDDataStream::~AWDDataStream()
 
 
 awd_uint32
-AWDDataStream::get_length(awd_bool wide)
+AWDDataStream::get_length(bool wide)
 {
     size_t elem_size;
 
@@ -40,7 +40,7 @@ AWDDataStream::get_length(awd_bool wide)
 
 
 void
-AWDDataStream::write_stream(int fd, awd_bool wide)
+AWDDataStream::write_stream(int fd, bool wide)
 {
     unsigned int e;
     awd_uint32 num;

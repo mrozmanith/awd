@@ -39,7 +39,7 @@ AWDTexture::set_url(const char *url, awd_uint16 url_len)
 
 
 awd_uint32
-AWDTexture::calc_body_length(awd_bool wide)
+AWDTexture::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     awd_uint32 len;
 
@@ -47,7 +47,7 @@ AWDTexture::calc_body_length(awd_bool wide)
     len += this->get_name_length();
     len += this->url_len;
 
-    len += this->calc_attr_length(true, true);
+    len += this->calc_attr_length(true, true, wide_geom, wide_mtx);
 
     return len;
 }
@@ -61,7 +61,7 @@ AWDTexture::prepare_write()
 
 
 void
-AWDTexture::write_body(int fd, awd_bool wide)
+AWDTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awd_uint32 data_len;
 
@@ -72,7 +72,7 @@ AWDTexture::write_body(int fd, awd_bool wide)
     write(fd, &data_len, sizeof(awd_uint32));
     write(fd, this->url, this->url_len);
 
-    this->properties->write_attributes(fd);
-    this->user_attributes->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 

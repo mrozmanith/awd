@@ -18,8 +18,8 @@ class AWDSceneBlock :
         AWDBlockList *children;
 
     protected:
-        void write_scene_common(int);
-        awd_uint32 calc_common_length();
+        void write_scene_common(int, bool);
+        awd_uint32 calc_common_length(bool);
 
     public:
         AWDSceneBlock(AWD_block_type, const char *, awd_uint16, awd_float64 *);
@@ -43,8 +43,8 @@ class AWDContainer :
     private:
 
     protected:
-        awd_uint32 calc_body_length(awd_bool);
-        void write_body(int, awd_bool);
+        awd_uint32 calc_body_length(bool, bool);
+        void write_body(int, bool, bool);
 
     public:
         AWDContainer(const char *, awd_uint16);

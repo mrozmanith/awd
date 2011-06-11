@@ -18,9 +18,9 @@ class AWDSimpleMaterial : public AWDBlock, public AWDNamedElement, public AWDAtt
         AWDTexture *texture;
 
     protected:
-        awd_uint32 calc_body_length(awd_bool);
+        awd_uint32 calc_body_length(bool, bool);
         void prepare_write();
-        void write_body(int, awd_bool);
+        void write_body(int, bool, bool);
 
     public:
         AWDSimpleMaterial(awd_uint8, const char *, awd_uint16);

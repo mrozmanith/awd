@@ -61,13 +61,13 @@ AWDSkeletonPose::set_next_transform(awd_float64 *mtx)
 
 
 awd_uint32
-AWDSkeletonPose::calc_body_length(awd_bool wide)
+AWDSkeletonPose::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     awd_uint32 len;
     AWD_joint_tf *cur;
 
     len = this->get_name_length() + 4; // strlen field + num transforms
-    len += this->calc_attr_length(true,true);
+    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
 
     cur = this->first_transform;
     while (cur) {
@@ -83,7 +83,7 @@ AWDSkeletonPose::calc_body_length(awd_bool wide)
 
 
 void
-AWDSkeletonPose::write_body(int fd, awd_bool wide)
+AWDSkeletonPose::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awd_bool bt;
     awd_bool bf;
@@ -94,7 +94,7 @@ AWDSkeletonPose::write_body(int fd, awd_bool wide)
     num_joints_be = UI16(this->num_transforms);
     write(fd, &num_joints_be, sizeof(awd_uint16));
 
-    this->properties->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
 
     bt = AWD_TRUE;
     bf = AWD_FALSE;
@@ -102,7 +102,7 @@ AWDSkeletonPose::write_body(int fd, awd_bool wide)
     while (cur) {
         if (cur->transform_mtx) {
             write(fd, &bt, 1);
-            awdutil_write_mtx4(fd, cur->transform_mtx);
+            awdutil_write_mtx4(fd, cur->transform_mtx, wide_mtx);
         }
         else {
             write(fd, &bf, 1);
@@ -111,7 +111,7 @@ AWDSkeletonPose::write_body(int fd, awd_bool wide)
         cur = cur->next;
     }
 
-    this->user_attributes->write_attributes(fd);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 
 
@@ -168,21 +168,21 @@ AWDSkeletonAnimation::set_next_frame_pose(AWDSkeletonPose *pose)
 
 
 awd_uint32
-AWDSkeletonAnimation::calc_body_length(awd_bool wide)
+AWDSkeletonAnimation::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     awd_uint32 len;
 
-    len = 2 + this->get_name_length();              // Name varstr
-    len += 3;                                       // num frames + frame rate
-    len += (this->num_frames * sizeof(awd_baddr));  // Pose list
-    len += this->calc_attr_length(true,true);       // Props and attributes
+    len = 2 + this->get_name_length();                                  // Name varstr
+    len += 3;                                                           // num frames + frame rate
+    len += (this->num_frames * sizeof(awd_baddr));                      // Pose list
+    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);      // Props and attributes
     
     return len;
 }
 
 
 void
-AWDSkeletonAnimation::write_body(int fd, awd_bool wide)
+AWDSkeletonAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     AWD_skelanim_fr *frame;
     awd_uint16 num_frames_be;
@@ -193,7 +193,7 @@ AWDSkeletonAnimation::write_body(int fd, awd_bool wide)
     write(fd, &num_frames_be, sizeof(awd_uint16));
     write(fd, &this->frame_rate, sizeof(awd_uint8));
 
-    this->properties->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
 
     frame = this->first_frame;
     while (frame) {
@@ -203,5 +203,5 @@ AWDSkeletonAnimation::write_body(int fd, awd_bool wide)
         frame = frame->next;
     }
 
-    this->user_attributes->write_attributes(fd);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }

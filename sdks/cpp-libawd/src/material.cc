@@ -53,9 +53,9 @@ AWDSimpleMaterial::set_texture(AWDTexture *texture)
 
 
 awd_uint32
-AWDSimpleMaterial::calc_body_length(awd_bool wide)
+AWDSimpleMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return 3 + this->get_name_length() + this->calc_attr_length(true,true);
+    return 3 + this->get_name_length() + this->calc_attr_length(true,true, wide_geom, wide_mtx);
 }
 
 
@@ -72,12 +72,12 @@ AWDSimpleMaterial::prepare_write()
 
 
 void
-AWDSimpleMaterial::write_body(int fd, awd_bool wide)
+AWDSimpleMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     // Write type
     write(fd, &this->type, sizeof(awd_uint8));
 
-    this->properties->write_attributes(fd);
-    this->user_attributes->write_attributes(fd);
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }

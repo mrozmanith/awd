@@ -13,9 +13,9 @@ class AWDTexture : public AWDBlock, public AWDNamedElement, public AWDAttrElemen
         awd_uint16 url_len;
     
     protected:
-        awd_uint32 calc_body_length(awd_bool);
+        awd_uint32 calc_body_length(bool, bool);
         void prepare_write();
-        void write_body(int, awd_bool);
+        void write_body(int, bool, bool);
 
     public:
         AWDTexture(awd_uint8, const char *, awd_uint16);
