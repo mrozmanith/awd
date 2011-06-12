@@ -3,6 +3,7 @@ from pyawd import core
 
 class AWDSceneBlockBase(core.AWDBlockBase):
     def __init__(self, name='', transform=None):
+        super(AWDSceneBlockBase, self).__init__()
         self.__children = []
         self.__parent = None
         self.name = name
@@ -45,4 +46,5 @@ class AWDMeshInst(AWDSceneBlockBase):
 
 
 class AWDContainer(AWDSceneBlockBase):
-    pass
+    def __init__(self, name='', transform=None):
+        super(AWDContainer, self).__init__(name, transform)

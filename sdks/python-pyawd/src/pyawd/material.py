@@ -4,6 +4,7 @@ class AWDTexture(core.AWDBlockBase):
     EXTERNAL = 0
 
     def __init__(self, type=0, name='', url=None):
+        super(AWDTexture, self).__init__()
         self.type = type
         self.name = name
         self.url = url
@@ -13,6 +14,7 @@ class AWDMaterial(core.AWDBlockBase):
     BITMAP = 2
 
     def __init__(self, type=0, name='', texture=None):
+        super(AWDMaterial, self).__init__()
         self.type = type
         self.name = name
         self.texture = texture

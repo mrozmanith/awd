@@ -18,8 +18,10 @@ class AWDSubMesh:
         self.__data_streams.append((type,data))
 
 
-class AWDMeshData(core.AWDBlockBase):
+class AWDMeshData(core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name=''):
+        super(AWDMeshData, self).__init__()
+
         self.name = name
         self.__sub_meshes = []
 
