@@ -1,8 +1,12 @@
 class AWDWriter(object):
+    def __init__(self):
+        self.__block_addr = 1
+
     def write(self, awd, file):
         def write_blocks(blocks):
             for b in blocks:
-                b.write_block(file)
+                b.write_block(file, self.__block_addr)
+                self.__block_addr += 1
         
         write_blocks(awd.texture_blocks)
         write_blocks(awd.material_blocks)

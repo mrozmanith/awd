@@ -3,12 +3,14 @@ from pyawd import core
 
 class AWDSkeleton(core.AWDBlockBase):
     def __init__(self, name=''):
+        super(AWDSkeleton, self).__init__()
         self.name = name
         self.root_joint = None
         
 
 class AWDSkeletonAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
+        super(AWDSkeletonAnimation, self).__init__()
         self.name = name
         self.frames = []
 
@@ -18,6 +20,7 @@ class AWDSkeletonAnimation(core.AWDBlockBase):
 
 class AWDSkeletonJoint(object):
     def __init__(self, name='', inv_bind_mtx=None):
+        super(AWDSkeletonJoint, self).__init__()
         self.name = name
         self.inv_bind_mtx = inv_bind_mtx
 
@@ -40,6 +43,7 @@ class AWDSkeletonJoint(object):
 
 class AWDSkeletonPose(core.AWDBlockBase):
     def __init__(self, name=''):
+        super(AWDSkeletonPose, self).__init__()
         self.name = name
         self.transforms = []
 
@@ -49,5 +53,6 @@ class AWDSkeletonPose(core.AWDBlockBase):
 
 class AWDUVAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
+        super(AWDUVAnimation, self).__init__()
         self.name = name
         self.frames = []

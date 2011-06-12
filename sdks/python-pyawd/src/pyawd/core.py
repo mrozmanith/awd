@@ -2,14 +2,42 @@ import struct
 import sys
 
 class AWDBlockBase(object):
-    def __init__(self, type):
-        self.__type = type
+    def __init__(self, type=0):
+        super(AWDBlockBase, self).__init__()
+        self.__type = 0
 
     def write_block(self, file, addr):
         file.write(struct.pack('>IBBI', addr, 0, self.__type, 0))
 
     def write_body(self, file):
         pass # To be overridden
+
+
+
+class AWDNamespace(object):
+    def __init__(self, handle):
+        self.__handle = handle
+
+    def get_handle(self):
+        return self.__handle
+
+
+class AWDAttrElement(object):
+    class AWDAttrDict(object):
+        def __init__(self):
+            self.__nsdict = {}
+
+        def __getitem__(self, ns):
+            handle = ns.get_handle()
+            if handle not in self.__nsdict:
+                self.__nsdict[handle] = {}
+
+            return self.__nsdict[handle]
+            
+        
+    def __init__(self):
+        super(AWDAttrElement, self).__init__()
+        self.attributes = self.AWDAttrDict()
 
 
 class AWD(object):
