@@ -1,16 +1,15 @@
 from pyawd import core
 
+STR_VERTICES = 1
+STR_TRIANGLES = 2
+STR_UVS = 3
+STR_VERTEX_NORMALS = 4
+STR_VERTEX_TANGENTS = 5
+STR_FACE_NORMALS = 6
+STR_JOINT_INDICES = 7
+STR_JOINT_WEIGHTS = 8
+
 class AWDSubMesh:
-    VERTICES = 1
-    TRIANGLES = 2
-    UVS = 3
-    VERTEX_NORMALS = 4
-    VERTEX_TANGENTS = 5
-    FACE_NORMALS = 6
-    JOINT_INDICES = 7
-    JOINT_WEIGHTS = 8
-
-
     def __init__(self):
         self.__data_streams = []
 
