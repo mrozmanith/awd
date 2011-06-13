@@ -295,7 +295,7 @@ AWDMeshInst::set_data(AWDMeshData *data)
 awd_uint32
 AWDMeshInst::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return 136 + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
+    return 8 + MTX4_SIZE(wide_mtx) + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
         + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_geom,wide_mtx);
 }
 
