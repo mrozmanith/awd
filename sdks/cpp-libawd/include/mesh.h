@@ -1,14 +1,13 @@
 #ifndef _LIBAWD_MESH_H
 #define _LIBAWD_MESH_H
 
-#include "attr.h"
-#include "name.h"
-#include "block.h"
+#include "awd_types.h"
+#include "material.h"
 #include "scene.h"
 #include "stream.h"
-#include "skeleton.h"
-#include "material.h"
-#include "awd_types.h"
+#include "block.h"
+#include "name.h"
+#include "attr.h"
 
 
 #define PROP_MD_BIND_MTX 1

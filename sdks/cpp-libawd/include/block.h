@@ -1,8 +1,9 @@
-#ifndef _LIBAWD_BLOCKS_H
-#define _LIBAWD_BLOCKS_H
+#ifndef _LIBAWD_BLOCK_H
+#define _LIBAWD_BLOCK_H
 
 #include <stdlib.h>
 
+//#include "awd.h"
 #include "awd_types.h"
 
 class AWDBlock
@@ -23,6 +24,8 @@ class AWDBlock
 
         awd_baddr get_addr();
         AWD_block_type get_type();
+
+        //virtual void add_dependencies(AWD *);
 
         size_t write_block(int, bool, bool, awd_baddr);
 };
@@ -45,9 +48,9 @@ class AWDBlockList
         AWDBlockList();
         ~AWDBlockList();
 
-        void append(AWDBlock *);
+        bool append(AWDBlock *);
         void force_append(AWDBlock *);
-        awd_bool contains(AWDBlock *);
+        bool contains(AWDBlock *);
 
         int get_num_blocks();
 };
@@ -64,4 +67,17 @@ class AWDBlockIterator
         void reset();
 };
 
+
+/*
+#include "attr.h"
+
+class AWDAttrBlock :
+    public AWDAttrElement,
+    public AWDBlock
+{
+    public:
+        //void add_dependencies(AWD *);
+}
+
+*/
 #endif

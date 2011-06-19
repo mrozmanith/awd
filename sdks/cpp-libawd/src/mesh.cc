@@ -2,9 +2,6 @@
 #include <cstdio>
 
 #include "mesh.h"
-#include "block.h"
-#include "name.h"
-#include "attr.h"
 #include "util.h"
 
 #ifdef WIN32

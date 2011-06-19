@@ -1,5 +1,5 @@
-#ifndef _AWDW32_H
-#define _AWDW32_H
+#ifndef _LIBAWD_AWDW32_H
+#define _LIBAWD_AWDW32_H
 
 #include <io.h>
 #include <windows.h>

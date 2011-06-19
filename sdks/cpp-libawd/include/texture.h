@@ -1,11 +1,15 @@
 #ifndef LIBAWD_TEXTURE_H
 #define LIBAWD_TEXTURE_H
 
-#include "name.h"
+#include "awd_types.h"
 #include "block.h"
+#include "name.h"
 #include "attr.h"
 
-class AWDTexture : public AWDBlock, public AWDNamedElement, public AWDAttrElement
+class AWDTexture : 
+    public AWDBlock, 
+    public AWDNamedElement, 
+    public AWDAttrElement
 {
     private:
         awd_uint8 type;
