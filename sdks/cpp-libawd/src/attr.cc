@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <cstring>
 
-#include "awd_types.h"
 #include "attr.h"
+#include "awd_types.h"
 #include "util.h"
 
 #ifdef WIN32
@@ -79,18 +79,67 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
 
 
 
-
-
-AWDUserAttr::AWDUserAttr()
+void
+AWDAttr::set_val(AWD_attr_val_ptr val, awd_uint16 val_len, AWD_attr_type val_type)
 {
+    this->value = val;
+    this->value_len = val_len;
+    this->type = val_type;
+}
+
+
+AWD_attr_val_ptr 
+AWDAttr::get_val(awd_uint16 *val_len, AWD_attr_type *val_type)
+{
+    *val_len = this->value_len;
+    *val_type = this->type;
+    return this->value;
+}
+
+
+awd_uint16
+AWDAttr::get_val_len()
+{
+    return this->value_len;
+}
+
+
+
+
+AWDUserAttr::AWDUserAttr(AWDNamespace *ns, const char *key, awd_uint16 key_len)
+{
+    this->ns = ns;
+    this->key = key;
+    this->key_len = key_len;
     this->next = NULL;
 }
 
 
 AWDUserAttr::~AWDUserAttr()
 {
-    free(key);
 }
+
+
+AWDNamespace *
+AWDUserAttr::get_ns()
+{
+    return this->ns;
+}
+
+
+const char *
+AWDUserAttr::get_key()
+{
+    return this->key;
+}
+
+
+awd_uint16
+AWDUserAttr::get_key_len()
+{
+    return this->key_len;
+}
+
 
 
 void
@@ -98,11 +147,13 @@ AWDUserAttr::write_metadata(int fd)
 {
     awd_uint8 type;
     awd_uint16 len_be;
+    awd_nsid ns_handle;
 
     len_be = UI16(this->value_len);
     type = (awd_uint8)this->type;
+    ns_handle = this->ns->get_handle();
 
-    write(fd, &this->ns_addr, sizeof(awd_uint8));
+    write(fd, &ns_handle, sizeof(awd_uint8));
     awdutil_write_varstr(fd, this->key, this->key_len);
     write(fd, &type, sizeof(awd_uint8));
     write(fd, &len_be, sizeof(awd_uint16));
@@ -148,7 +199,7 @@ AWDUserAttrList::calc_length(bool wide_geom, bool wide_mtx)
     cur = this->first_attr;
     while (cur) {
         // Meta-data takes up 6 bytes
-        len += (6 + cur->key_len + cur->value_len);
+        len += (6 + (awd_uint32)cur->get_key_len() + (awd_uint32)cur->get_val_len());
         cur = cur->next;
     }
 
@@ -174,14 +225,18 @@ AWDUserAttrList::write_attributes(int fd, bool wide_geom, bool wide_mtx)
 
 
 AWDUserAttr *
-AWDUserAttrList::find(char *key, awd_uint16 key_len)
+AWDUserAttrList::find(AWDNamespace *ns, const char *key, awd_uint16 key_len)
 {
     if (this->first_attr) {
         AWDUserAttr *cur;
         cur = this->first_attr;
         while (cur) {
-            if (key_len == cur->key_len) {
-                if (strncmp(key, cur->key, key_len)==0)
+            // Move on if not in the same namespace
+            if (cur->get_ns() != ns)
+                continue;
+
+            if (key_len == cur->get_key_len()) {
+                if (strncmp(key, cur->get_key(), key_len)==0)
                     return cur;
             }
 
@@ -193,39 +248,36 @@ AWDUserAttrList::find(char *key, awd_uint16 key_len)
 }
 
 
-AWD_attr_val_ptr
-AWDUserAttrList::get(char *key, awd_uint16 key_len)
+bool
+AWDUserAttrList::get(AWDNamespace *ns, const char *key, awd_uint16 key_len,
+    AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
 {
     AWDUserAttr *attr;
 
-    attr = this->find(key, key_len);
-    if (attr) 
-        return attr->value;
+    attr = this->find(ns, key, key_len);
+    if (attr) {
+        *val = attr->get_val(val_len, val_type);
+        return true;
+    }
 
-    // Return null if reached
-    ATTR_RETURN_NULL
+    return false;
 }
 
 
 void
-AWDUserAttrList::set(char *key, awd_uint16 key_len, AWD_attr_val_ptr value, awd_uint16 value_length, AWD_attr_type type)
+AWDUserAttrList::set(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
+    AWD_attr_val_ptr value, awd_uint16 value_length, AWD_attr_type type)
 {
     bool created;
     AWDUserAttr *attr;
 
-    attr = this->find(key, key_len);
+    attr = this->find(ns, key, key_len);
     if (attr == NULL) {
-        attr = new AWDUserAttr();
-        attr->key = (char *)malloc(key_len);
-        attr->key_len = key_len;
-        strncpy(attr->key, key, key_len);
-
+        attr = new AWDUserAttr(ns, key, key_len);
         created = true;
     }
 
-    attr->type = type;
-    attr->value = value;
-    attr->value_len = value_length;
+    attr->set_val(value, value_length, type);
 
     // Add to internal list if the attribute wasn't
     // originally found there.
@@ -241,6 +293,19 @@ AWDUserAttrList::set(char *key, awd_uint16 key_len, AWD_attr_val_ptr value, awd_
         this->last_attr->next = NULL;
     }
 }
+
+
+/*
+void
+AWDUserAttrList::add_namespaces(AWD *awd)
+{
+    AWDUserAttr *cur = this->first_attr;
+    while (cur) {
+        awd->add_namespace(cur->get_ns());
+        cur = cur->next;
+    }
+}
+*/
 
 
 
@@ -309,7 +374,7 @@ AWDNumAttrList::calc_length(bool wide_geom, bool wide_mtx)
     cur = this->first_attr;
     while (cur) {
         // Meta-data is always four bytes
-        len += (4 + cur->value_len);
+        len += (4 + cur->get_val_len());
         cur = cur->next;
     }
 
@@ -354,17 +419,19 @@ AWDNumAttrList::find(awd_propkey key)
 }
 
 
-AWD_attr_val_ptr
-AWDNumAttrList::get(awd_propkey key)
+bool
+AWDNumAttrList::get(awd_propkey key, AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
 {
     AWDNumAttr *attr;
 
     attr = this->find(key);
-    if (attr) 
-        return attr->value;
+    if (attr) {
+        *val = attr->get_val(val_len, val_type);
+        return true;
+    }
 
     // Return null if reached
-    ATTR_RETURN_NULL
+    return false;
 }
 
 
@@ -383,9 +450,7 @@ AWDNumAttrList::set(awd_propkey key, AWD_attr_val_ptr value, awd_uint16 value_le
         created = true;
     }
 
-    attr->type = type;
-    attr->value = value;
-    attr->value_len = value_length;
+    attr->set_val(value, value_length, type);
 
     // Add to internal list if the attribute wasn't
     // originally found there.
@@ -419,6 +484,15 @@ AWDAttrElement::~AWDAttrElement()
 }
 
 
+/*
+void
+AWDAttrElement::add_dependencies(AWD *awd)
+{
+    this->user_attributes->add_namespaces(awd);
+}
+*/
+
+
 awd_uint32 
 AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide_geom, bool wide_mtx)
 {
@@ -431,5 +505,21 @@ AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide
     return len;
 }
 
+
+
+bool
+AWDAttrElement::get_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
+    AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
+{
+    return this->user_attributes->get(ns, key, key_len, val, val_len, val_type);
+}
+
+
+void
+AWDAttrElement::set_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
+    AWD_attr_val_ptr val, awd_uint16 val_len, AWD_attr_type val_type)
+{
+    this->user_attributes->set(ns, key, key_len, val, val_len, val_type);
+}
 
 

@@ -1,14 +1,17 @@
 #ifndef _LIBAWD_AWD_H
 #define _LIBAWD_AWD_H
 
-#include "mesh.h"
+#include "awd_types.h"
+#include "ns.h"
 #include "block.h"
+#include "attr.h"
+#include "material.h"
+#include "mesh.h"
 #include "skeleton.h"
 #include "skelanim.h"
 #include "texture.h"
-#include "material.h"
-#include "awd_types.h"
 #include "uvanim.h"
+#include "scene.h"
 
 
 #define AWD_MAJOR_VERSION 0
@@ -16,7 +19,6 @@
 
 #define AWD_STREAMING               0x1
 #define AWD_OPTIMIZE_FOR_ACCURACY   0x2
-
 
 class AWD
 {
@@ -27,6 +29,7 @@ class AWD
         awd_uint16 flags;
         AWD_compression compression;
 
+        AWDBlockList * namespace_blocks;
         AWDBlockList * texture_blocks;
         AWDBlockList * material_blocks;
         AWDBlockList * skelpose_blocks;
@@ -38,6 +41,7 @@ class AWD
 
         // Flags and misc
         awd_baddr last_used_baddr;
+        awd_nsid last_used_nsid;
         awd_bool header_written;
 
         void write_header(int, awd_uint32);
@@ -58,6 +62,8 @@ class AWD
         void add_skeleton_anim(AWDSkeletonAnimation *);
         void add_uv_anim(AWDUVAnimation *);
         void add_scene_block(AWDSceneBlock *);
+        void add_namespace(AWDNamespace *);
 };
+
 
 #endif

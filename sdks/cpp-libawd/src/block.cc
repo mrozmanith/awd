@@ -102,7 +102,7 @@ AWDBlockList::~AWDBlockList()
 }
 
 
-void 
+bool
 AWDBlockList::append(AWDBlock *block)
 {
     if (!this->contains(block)) {
@@ -118,6 +118,11 @@ AWDBlockList::append(AWDBlock *block)
         this->last_block = ctr;
         this->last_block->next = NULL;
         this->num_blocks++;
+
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
@@ -140,7 +145,7 @@ AWDBlockList::force_append(AWDBlock *block)
 }
 
 
-awd_bool
+bool
 AWDBlockList::contains(AWDBlock *block)
 {
     list_block *cur;
@@ -148,12 +153,12 @@ AWDBlockList::contains(AWDBlock *block)
     cur = this->first_block;
     while (cur) {
         if (cur->block == block)
-            return AWD_TRUE;
+            return true;
 
         cur = cur->next;
     }
 
-    return AWD_FALSE;
+    return false;
 }
 
 

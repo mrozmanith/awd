@@ -1,5 +1,5 @@
-#ifndef _AWDUTIL_H
-#define _AWDUTIL_H
+#ifndef _LIBAWD_AWDUTIL_H
+#define _LIBAWD_AWDUTIL_H
 
 #include "awd.h"
 #include "awd_types.h"

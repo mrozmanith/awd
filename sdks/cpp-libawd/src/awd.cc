@@ -10,9 +10,6 @@
 #endif
 
 #include "awd.h"
-#include "mesh.h"
-#include "skeleton.h"
-#include "skelanim.h"
 #include "util.h"
 #include "awdlzma.h"
 #include "awdzlib.h"
@@ -36,6 +33,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->uvanim_blocks = new AWDBlockList();
     this->scene_blocks = new AWDBlockList();
 
+    this->last_used_nsid = 0;
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
 }
@@ -59,6 +57,16 @@ void
 AWD::add_material(AWDSimpleMaterial *block)
 {
     this->material_blocks->append(block);
+}
+
+
+void
+AWD::add_namespace(AWDNamespace *block)
+{
+    if (this->namespace_blocks->append(block)) {
+        this->last_used_nsid++;
+        block->set_handle(this->last_used_nsid);
+    }
 }
 
 
@@ -138,6 +146,7 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
 
     len = 0;
     while ((block = it.next()) != NULL) {
+        //block->add_dependencies(this);
         //TODO: Check flags for wide boolean (hard-coded as false now)
         len += block->write_block(fd, AWD_FALSE, AWD_FALSE, ++this->last_used_baddr);
     }

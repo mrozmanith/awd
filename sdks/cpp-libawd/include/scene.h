@@ -1,10 +1,10 @@
 #ifndef _LIBAWD_SCENE_H
 #define _LIBAWD_SCENE_H
 
-#include "attr.h"
 #include "name.h"
 #include "block.h"
 #include "awd_types.h"
+#include "attr.h"
 
 
 class AWDSceneBlock : 

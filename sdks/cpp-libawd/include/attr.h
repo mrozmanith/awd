@@ -1,6 +1,7 @@
 #ifndef _LIBAWD_ATTR_H
 #define _LIBAWD_ATTR_H
 
+#include "ns.h"
 #include "awd_types.h"
 
 #define ATTR_RETURN_NULL AWD_attr_val_ptr _ptr; _ptr.str = NULL; return _ptr;
@@ -33,34 +34,44 @@ typedef union {
 class AWDAttr
 {
     protected:
-        virtual void write_metadata(int)=0;
-
-    public:
         AWD_attr_type type;
         AWD_attr_val_ptr value;
         awd_uint16 value_len;
 
+        virtual void write_metadata(int)=0;
+
+    public:
         void write_attr(int, bool, bool);
+
+        void set_val(AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+        AWD_attr_val_ptr get_val(awd_uint16 *, AWD_attr_type *);
+        awd_uint16 get_val_len();
 };
 
 
 /**
  * User attributes.
 */
-class AWDUserAttr : public AWDAttr
+class AWDUserAttr : 
+    public AWDAttr
 {
+    private:
+        const char *key;
+        awd_uint16 key_len;
+        AWDNamespace *ns;
+        
     protected:
         void write_metadata(int);
 
     public:
-        char *key;
-        awd_uint16 key_len;
-        awd_uint8 ns_addr;
-
         AWDUserAttr *next;
 
-        AWDUserAttr();
+        AWDUserAttr(AWDNamespace *, const char*, awd_uint16);
         ~AWDUserAttr();
+
+        AWDNamespace *get_ns();
+        const char *get_key();
+        awd_uint16 get_key_len();
 };
 
 
@@ -69,7 +80,7 @@ class AWDUserAttrList {
         AWDUserAttr *first_attr;
         AWDUserAttr *last_attr;
 
-        AWDUserAttr *find(char *, awd_uint16);
+        AWDUserAttr *find(AWDNamespace *, const char *, awd_uint16);
 
     public:
         AWDUserAttrList();
@@ -78,8 +89,11 @@ class AWDUserAttrList {
         awd_uint32 calc_length(bool, bool);
         void write_attributes(int, bool, bool);
 
-        AWD_attr_val_ptr get(char *, awd_uint16);
-        void set(char *, awd_uint16, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+        AWD_attr_val_ptr get_val_ptr(AWDNamespace *ns, const char *, awd_uint16);
+        bool get(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
+        void set(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+
+        //void add_namespaces(AWD *);
 };
 
 
@@ -87,7 +101,8 @@ class AWDUserAttrList {
 /**
  * Numeric attributes ("properties")
 */
-class AWDNumAttr : public AWDAttr
+class AWDNumAttr : 
+    public AWDAttr
 {
     protected:
         void write_metadata(int);
@@ -114,7 +129,8 @@ class AWDNumAttrList {
         awd_uint32 calc_length(bool, bool);
         void write_attributes(int, bool, bool);
 
-        AWD_attr_val_ptr get(awd_propkey);
+        AWD_attr_val_ptr get_val_ptr(awd_propkey);
+        bool get(awd_propkey, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
         void set(awd_propkey, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
 };
 
@@ -135,6 +151,10 @@ class AWDAttrElement
         AWDUserAttrList *user_attributes;
 
         awd_uint32 calc_attr_length(bool, bool, bool, bool);
+
+    public:
+        bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
+        void set_attr(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
 };
 
 #endif

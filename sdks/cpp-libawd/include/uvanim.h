@@ -12,8 +12,10 @@ typedef struct _AWD_uvanim_fr {
 } AWD_uvanim_fr;
 
 
-class AWDUVAnimation : public AWDNamedElement, 
-    public AWDAttrElement, public AWDBlock
+class AWDUVAnimation : 
+    public AWDNamedElement, 
+    public AWDAttrElement, 
+    public AWDBlock
 {
     private:
         awd_uint16 num_frames;
