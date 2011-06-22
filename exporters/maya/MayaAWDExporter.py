@@ -42,8 +42,8 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
         with open(file_path, 'wb') as file:
             exporter = MayaAWDExporter(file)
             exporter.export(None, 
-                include_animation=int(o('animation', False)),
-                include_skeletons=int(o('skeletons', False)),
+                include_animation=int(o('animation', True)),
+                include_skeletons=int(o('skeletons', True)),
                 sequences=sequences)
 
     def defaultExtension(self):
@@ -132,21 +132,24 @@ class MayaAWDExporter:
         # Assume that bind pose is on frame 1
         om.MGlobal.viewFrame(0)
   
-        #transforms = mc.ls(sl=True, tr=True, l=True)
-        #if not transforms:
-        #    mc.error('Nothing selected!')
-        #    return
-  
+        self.export_scene()
+
+        if include_skeletons:
+            self.export_skeletons()
+
+        if include_animation:
+            self.export_animation(sequences)
+ 
+        self.awd.flush(self.file)
+
+    def export_scene(self):
         dag_it = om.MItDag(om.MItDag.kDepthFirst)
         while not dag_it.isDone():
             visible = False
             try:
                 attr0 = '%s.visibility' % dag_it.partialPathName()
                 attr1 = '%s.ovv' % dag_it.partialPathName()
-                print('attr: %s' % attr0)
-                print('attr: %s' % attr1)
                 visible = mc.getAttr(attr0) and mc.getAttr(attr1)
-                print(visible)
             except:
                 pass
 
@@ -189,166 +192,166 @@ class MayaAWDExporter:
             dag_it.next()
 
 
-        # TODO: Only do this if exporting rigs
-        if include_skeletons:
-            dag_it = om.MItDependencyNodes(om.MFn.kSkinClusterFilter)
-            while not dag_it.isDone():
-                obj = dag_it.thisNode()
-                joints = om.MDagPathArray()
+    def export_skeletons(self):
+        dag_it = om.MItDependencyNodes(om.MFn.kSkinClusterFilter)
+        while not dag_it.isDone():
+            obj = dag_it.thisNode()
+            joints = om.MDagPathArray()
  
-                skin_fn = omanim.MFnSkinCluster(obj)
-                num_joints = skin_fn.influenceObjects(joints)
+            skin_fn = omanim.MFnSkinCluster(obj)
+            num_joints = skin_fn.influenceObjects(joints)
  
  
-                # Loop through joints and look in block cache whether
-                # a skeleton for this joint has been exported. If not,
-                # we will ignore this binding altogether.
-                skel = None
-                #print('found skin cluster for %s!' % skel)
-                for i in range(num_joints):
-                    #print('affected joint: %s' % joints[i].fullPathName())
-                    skel = self.block_cache.get(self.get_skeleton_root(joints[i].fullPathName()))
-                    if skel is not None:
-                        break
- 
-                # Skeleton was found
+            # Loop through joints and look in block cache whether
+            # a skeleton for this joint has been exported. If not,
+            # we will ignore this binding altogether.
+            skel = None
+            #print('found skin cluster for %s!' % skel)
+            for i in range(num_joints):
+                #print('affected joint: %s' % joints[i].fullPathName())
+                skel = self.block_cache.get(self.get_skeleton_root(joints[i].fullPathName()))
                 if skel is not None:
-                    #print('found skeleton in cache!')
-                    #print('num joints: %d' % num_joints)
+                    break
  
-                    # Loop through meshes that are influenced by this
-                    # skeleton, and add weight stream to their mesh data
-                    num_geoms = skin_fn.numOutputConnections()
-                    #print('num geoms: %d' % num_geoms)
-                    for i in range(num_geoms):
-                        skin_path = om.MDagPath()
-                        skin_fn.getPathAtIndex(i, skin_path)
-                        vert_it = om.MItMeshVertex(skin_path)
+            # Skeleton was found
+            if skel is not None:
+                #print('found skeleton in cache!')
+                #print('num joints: %d' % num_joints)
  
-                        #print('skin obj: %s' % skin_path.fullPathName())
+                # Loop through meshes that are influenced by this
+                # skeleton, and add weight stream to their mesh data
+                num_geoms = skin_fn.numOutputConnections()
+                #print('num geoms: %d' % num_geoms)
+                for i in range(num_geoms):
+                    skin_path = om.MDagPath()
+                    skin_fn.getPathAtIndex(i, skin_path)
+                    vert_it = om.MItMeshVertex(skin_path)
  
-                        # Check whether a mesh data for this geometry has
-                        # been added to the block cache. If not, bindings
-                        # for this mesh can be ignored.
-                        md = self.block_cache.get(self.get_name(skin_path.fullPathName()))
-                        if md is not None:
-                            #print('found mesh in cache!')
-                            weight_data = []
-                            index_data = []
+                    #print('skin obj: %s' % skin_path.fullPathName())
  
-                            #md.skeleton = skel
+                    # Check whether a mesh data for this geometry has
+                    # been added to the block cache. If not, bindings
+                    # for this mesh can be ignored.
+                    md = self.block_cache.get(self.get_name(skin_path.fullPathName()))
+                    if md is not None:
+                        #print('found mesh in cache!')
+                        weight_data = []
+                        index_data = []
  
-                            # TODO: Don't hardcode this
-                            joints_per_vert = 3
+                        #md.skeleton = skel
  
-                            while not vert_it.isDone():
-                                comp = vert_it.currentItem()
-                                weights = om.MDoubleArray()
-                                weight_objs = []
+                        # TODO: Don't hardcode this
+                        joints_per_vert = 3
  
-                                #script_util = om.MScriptUtil()
-                                for ii in range(num_joints):
-                                    skin_fn.getWeights(skin_path, comp, ii, weights)
-                                    joint_name = joints[ii].fullPathName()
-                                    joint_idx = self.joint_indices[joint_name.split('|')[-1]]
-                                    weight_objs.append( (joint_idx, weights[0]) )
+                        while not vert_it.isDone():
+                            comp = vert_it.currentItem()
+                            weights = om.MDoubleArray()
+                            weight_objs = []
  
-                                def comp_weight_objs(wo0, wo1):
-                                    if wo0[1] > wo1[1]: return -1
-                                    else: return 1
+                            #script_util = om.MScriptUtil()
+                            for ii in range(num_joints):
+                                skin_fn.getWeights(skin_path, comp, ii, weights)
+                                joint_name = joints[ii].fullPathName()
+                                joint_idx = self.joint_indices[joint_name.split('|')[-1]]
+                                weight_objs.append( (joint_idx, weights[0]) )
  
-                                weight_objs.sort(comp_weight_objs)
+                            def comp_weight_objs(wo0, wo1):
+                                if wo0[1] > wo1[1]: return -1
+                                else: return 1
  
-                                # Normalize top weights
-                                weight_objs = weight_objs[0:joints_per_vert]
-                                sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
-                                weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
+                            weight_objs.sort(comp_weight_objs)
  
-                                # Add more empty weight objects if too few
-                                if len(weight_objs) != joints_per_vert:
-                                    weight_objs.extend([(0,0)] * (joints_per_vert - len(weight_objs)))
+                            # Normalize top weights
+                            weight_objs = weight_objs[0:joints_per_vert]
+                            sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
+                            weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
  
-                                for w_obj in weight_objs:
-                                    index_data.append(w_obj[0])
-                                    weight_data.append(w_obj[1])
+                            # Add more empty weight objects if too few
+                            if len(weight_objs) != joints_per_vert:
+                                weight_objs.extend([(0,0)] * (joints_per_vert - len(weight_objs)))
  
-                                vert_it.next()
+                            for w_obj in weight_objs:
+                                index_data.append(w_obj[0])
+                                weight_data.append(w_obj[1])
  
-                            weight_stream = []
-                            index_stream = []
+                            vert_it.next()
  
-                            # This list contains the old-index of each vertex in the AWD vertex stream
-                            vert_indices = self.mesh_vert_indices[skin_path.fullPathName()]
-                            for idx in vert_indices:
-                                start_idx = idx*joints_per_vert
-                                end_idx = start_idx + joints_per_vert
-                                w_tuple = weight_data[start_idx:end_idx]
-                                i_tuple = index_data[start_idx:end_idx]
-                                weight_stream.extend(w_tuple)
-                                index_stream.extend(i_tuple)
+                        weight_stream = []
+                        index_stream = []
  
-                            if len(md) == 1:
-                                print('Setting streams!')
-                                sub = md[0]
-                                sub.add_stream(AWDSubMesh.JOINT_WEIGHTS, weight_stream)
-                                sub.add_stream(AWDSubMesh.JOINT_INDICES, index_stream)
-                            else:
-                                print('skinning not implemented for meshes with <> 1 sub-mesh')
+                        # This list contains the old-index of each vertex in the AWD vertex stream
+                        vert_indices = self.mesh_vert_indices[skin_path.fullPathName()]
+                        for idx in vert_indices:
+                            start_idx = idx*joints_per_vert
+                            end_idx = start_idx + joints_per_vert
+                            w_tuple = weight_data[start_idx:end_idx]
+                            i_tuple = index_data[start_idx:end_idx]
+                            weight_stream.extend(w_tuple)
+                            index_stream.extend(i_tuple)
  
-                dag_it.next()
+                        if len(md) == 1:
+                            print('Setting streams!')
+                            sub = md[0]
+                            sub.add_stream(pyawd.geom.STR_JOINT_WEIGHTS, weight_stream)
+                            sub.add_stream(pyawd.geom.STR_JOINT_INDICES, index_stream)
+                        else:
+                            print('skinning not implemented for meshes with <> 1 sub-mesh')
+ 
+            dag_it.next()
+        
 
-        if include_animation:
-            #animated_materials = [ 'MAT_BlueEye_L', 'MAT_BlueEye_R' ]
-            animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
-            #animated_materials = []
- 
-            for seq in sequences:
-                frame_idx = seq[1]
-                end_frame = seq[2]
- 
-                print('exporting sequence "%s" (%d-%d)' % seq)
- 
-                if len(self.skeleton_paths) > 0:
-                    anim = AWDSkeletonAnimation(seq[0])
-                    self.awd.add_skeleton_anim(anim)
- 
-                uvanims = []
-                for mat in animated_materials:
-                    uvanim = AWDUVAnimation(mat.replace('MAT', 'UVANIM')+'_'+seq[0])
-                    uvanims.append(uvanim)
-                    self.awd.add_uv_anim(uvanim)
- 
-                while frame_idx <= end_frame:
-                    om.MGlobal.viewFrame(frame_idx)
- 
-                    self.sample_materials(animated_materials, uvanims)
- 
-                    for skeleton_path in self.skeleton_paths:
-                        def get_all_transforms(joint_path, list):
-                            mtx_list = mc.xform(joint_path, q=True, m=True)
-                            list.append( self.mtx_list2awd(mtx_list))
- 
-                            children = mc.listRelatives(joint_path, type='joint')
-                            if children is not None:
-                                for child in children:
-                                    get_all_transforms(child, list)
- 
-                        skel_pose = AWDSkeletonPose()
- 
-                        all_transforms = []
-                        get_all_transforms(skeleton_path, all_transforms)
-                        for tf in all_transforms:
-                            skel_pose.add_joint_transform(tf)
- 
-                        anim.add_frame(skel_pose)
-                        self.awd.add_skeleton_pose(skel_pose)
- 
-                    # Move to next frame
-                    frame_idx += 1
- 
- 
-        self.awd.flush(self.file)
 
+    def export_animation(self, sequences):
+        #TODO: Don't hard-code these.
+        #animated_materials = [ 'MAT_BlueEye_L', 'MAT_BlueEye_R' ]
+        animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
+        #animated_materials = []
+ 
+        for seq in sequences:
+            frame_idx = seq[1]
+            end_frame = seq[2]
+ 
+            print('exporting sequence "%s" (%d-%d)' % seq)
+ 
+            if len(self.skeleton_paths) > 0:
+                anim = AWDSkeletonAnimation(seq[0])
+                self.awd.add_skeleton_anim(anim)
+ 
+            uvanims = []
+            for mat in animated_materials:
+                uvanim = AWDUVAnimation(mat.replace('MAT', 'UVANIM')+'_'+seq[0])
+                uvanims.append(uvanim)
+                self.awd.add_uv_anim(uvanim)
+ 
+            while frame_idx <= end_frame:
+                om.MGlobal.viewFrame(frame_idx)
+ 
+                self.sample_materials(animated_materials, uvanims)
+ 
+                for skeleton_path in self.skeleton_paths:
+                    def get_all_transforms(joint_path, list):
+                        mtx_list = mc.xform(joint_path, q=True, m=True)
+                        list.append( self.mtx_list2awd(mtx_list))
+ 
+                        children = mc.listRelatives(joint_path, type='joint')
+                        if children is not None:
+                            for child in children:
+                                get_all_transforms(child, list)
+ 
+                    skel_pose = AWDSkeletonPose()
+ 
+                    all_transforms = []
+                    get_all_transforms(skeleton_path, all_transforms)
+                    for tf in all_transforms:
+                        skel_pose.add_joint_transform(tf)
+ 
+                    anim.add_frame(skel_pose)
+                    self.awd.add_skeleton_pose(skel_pose)
+ 
+                # Move to next frame
+                frame_idx += 1
+ 
+        
 
     def export_mesh(self, transform, shape, awd_ctr):
         try:
@@ -656,10 +659,10 @@ class MayaAWDExporter:
     
             print('- Creating sub-mesh')
             sub = AWDSubMesh()
-            sub.add_stream(AWDSubMesh.VERTICES, vertices)
-            sub.add_stream(AWDSubMesh.TRIANGLES, indices)
-            sub.add_stream(AWDSubMesh.UVS, uvs)
-            sub.add_stream(AWDSubMesh.VERTEX_NORMALS, normals)
+            sub.add_stream(pyawd.geom.STR_VERTICES, vertices)
+            sub.add_stream(pyawd.geom.STR_TRIANGLES, indices)
+            sub.add_stream(pyawd.geom.STR_UVS, uvs)
+            sub.add_stream(pyawd.geom.STR_VERTEX_NORMALS, normals)
     
             print('- Adding sub-mesh')
     
