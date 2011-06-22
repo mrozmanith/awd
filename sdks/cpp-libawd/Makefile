@@ -25,7 +25,8 @@ test:
 install: dynamic 
 	cp $(BUILDDIR)/$(DYLIB) $(LIBDIR)/$(DYLIB)
 	rm -rf $(INCDIR)/awd
-	cp -Rf $(BUILDDIR)/awd $(INCDIR)/
+	mkdir -p $(INCDIR)/awd
+	cp -f $(BUILDDIR)/awd/* $(INCDIR)/awd/
     
 
 dynamic: $(OBJ) 
