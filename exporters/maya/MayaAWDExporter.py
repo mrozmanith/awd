@@ -1,5 +1,7 @@
+import re
 import sys
 import math
+import os.path
 
 import maya.OpenMaya as om
 import maya.cmds as mc
@@ -22,17 +24,56 @@ from pyawd.utils import *
 
 class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
     def writer(self, file, options, mode):
-        print('options: %s' % options)
-        path = file.resolvedFullName()
-        with open(path, 'wb') as file:
+        file_path = file.resolvedFullName()
+        base_path = os.path.dirname(file_path)
+
+        opts = self.parse_opts(options)
+        print(opts)
+
+        def o(key, defval=None):
+            'Get option or default value'
+            if key in opts:
+                return opts[key]
+            else:
+                return defval
+
+        sequences = self.read_sequences(o('seqsrc'), base_path)
+
+        with open(file_path, 'wb') as file:
             exporter = MayaAWDExporter(file)
-            exporter.export(None)
+            exporter.export(None, 
+                include_animation=int(o('animation', False)),
+                include_skeletons=int(o('skeletons', False)),
+                sequences=sequences)
 
     def defaultExtension(self):
         return 'awd'
 
     def haveWriteMethod(self):
         return True
+
+    def parse_opts(self, opt_str):
+        if opt_str[0]==';':
+            opt_str=opt_str[1:]
+
+        fields = re.split('(?<!\\\)&', str(opt_str))
+        return dict([ re.split('(?<!\\\)=', pair) for pair in fields ])
+
+    def read_sequences(self, seq_path, base_path):
+        sequences = []
+        if seq_path is not None:
+            if not os.path.isabs(seq_path):
+                seq_path = os.path.join(base_path, seq_path)
+            try:
+                with open(seq_path, 'r') as seqf:
+                    lines = seqf.readlines()
+                    for line in lines:
+                        line_fields = re.split('[^a-zA-Z0-9]', line.strip())
+                        sequences.append((line_fields[0], int(line_fields[1]), int(line_fields[2])))
+            except:
+                pass
+
+        return sequences
 
 def ftCreator():
     return OpenMayaMPx.asMPxPtr( MayaAWDFileTranslator() )
@@ -87,7 +128,7 @@ class MayaAWDExporter:
         self.awd = AWD(compression=AWD.UNCOMPRESSED)
 
 
-    def export(self, selection):
+    def export(self, selection, include_skeletons=False, include_animation=False, sequences=[]):
         # Assume that bind pose is on frame 1
         om.MGlobal.viewFrame(0)
   
@@ -149,191 +190,161 @@ class MayaAWDExporter:
 
 
         # TODO: Only do this if exporting rigs
-        dag_it = om.MItDependencyNodes(om.MFn.kSkinClusterFilter)
-        while not dag_it.isDone():
-            obj = dag_it.thisNode()
-            joints = om.MDagPathArray()
+        if include_skeletons:
+            dag_it = om.MItDependencyNodes(om.MFn.kSkinClusterFilter)
+            while not dag_it.isDone():
+                obj = dag_it.thisNode()
+                joints = om.MDagPathArray()
  
-            skin_fn = omanim.MFnSkinCluster(obj)
-            num_joints = skin_fn.influenceObjects(joints)
+                skin_fn = omanim.MFnSkinCluster(obj)
+                num_joints = skin_fn.influenceObjects(joints)
  
  
-            # Loop through joints and look in block cache whether
-            # a skeleton for this joint has been exported. If not,
-            # we will ignore this binding altogether.
-            skel = None
-            #print('found skin cluster for %s!' % skel)
-            for i in range(num_joints):
-                #print('affected joint: %s' % joints[i].fullPathName())
-                skel = self.block_cache.get(self.get_skeleton_root(joints[i].fullPathName()))
+                # Loop through joints and look in block cache whether
+                # a skeleton for this joint has been exported. If not,
+                # we will ignore this binding altogether.
+                skel = None
+                #print('found skin cluster for %s!' % skel)
+                for i in range(num_joints):
+                    #print('affected joint: %s' % joints[i].fullPathName())
+                    skel = self.block_cache.get(self.get_skeleton_root(joints[i].fullPathName()))
+                    if skel is not None:
+                        break
+ 
+                # Skeleton was found
                 if skel is not None:
-                    break
+                    #print('found skeleton in cache!')
+                    #print('num joints: %d' % num_joints)
  
-            # Skeleton was found
-            if skel is not None:
-                #print('found skeleton in cache!')
-                #print('num joints: %d' % num_joints)
+                    # Loop through meshes that are influenced by this
+                    # skeleton, and add weight stream to their mesh data
+                    num_geoms = skin_fn.numOutputConnections()
+                    #print('num geoms: %d' % num_geoms)
+                    for i in range(num_geoms):
+                        skin_path = om.MDagPath()
+                        skin_fn.getPathAtIndex(i, skin_path)
+                        vert_it = om.MItMeshVertex(skin_path)
  
-                # Loop through meshes that are influenced by this
-                # skeleton, and add weight stream to their mesh data
-                num_geoms = skin_fn.numOutputConnections()
-                #print('num geoms: %d' % num_geoms)
-                for i in range(num_geoms):
-                    skin_path = om.MDagPath()
-                    skin_fn.getPathAtIndex(i, skin_path)
-                    vert_it = om.MItMeshVertex(skin_path)
+                        #print('skin obj: %s' % skin_path.fullPathName())
  
-                    #print('skin obj: %s' % skin_path.fullPathName())
+                        # Check whether a mesh data for this geometry has
+                        # been added to the block cache. If not, bindings
+                        # for this mesh can be ignored.
+                        md = self.block_cache.get(self.get_name(skin_path.fullPathName()))
+                        if md is not None:
+                            #print('found mesh in cache!')
+                            weight_data = []
+                            index_data = []
  
-                    # Check whether a mesh data for this geometry has
-                    # been added to the block cache. If not, bindings
-                    # for this mesh can be ignored.
-                    md = self.block_cache.get(self.get_name(skin_path.fullPathName()))
-                    if md is not None:
-                        #print('found mesh in cache!')
-                        weight_data = []
-                        index_data = []
+                            #md.skeleton = skel
  
-                        #md.skeleton = skel
+                            # TODO: Don't hardcode this
+                            joints_per_vert = 3
  
-                        # TODO: Don't hardcode this
-                        joints_per_vert = 3
+                            while not vert_it.isDone():
+                                comp = vert_it.currentItem()
+                                weights = om.MDoubleArray()
+                                weight_objs = []
  
-                        while not vert_it.isDone():
-                            comp = vert_it.currentItem()
-                            weights = om.MDoubleArray()
-                            weight_objs = []
+                                #script_util = om.MScriptUtil()
+                                for ii in range(num_joints):
+                                    skin_fn.getWeights(skin_path, comp, ii, weights)
+                                    joint_name = joints[ii].fullPathName()
+                                    joint_idx = self.joint_indices[joint_name.split('|')[-1]]
+                                    weight_objs.append( (joint_idx, weights[0]) )
  
-                            #script_util = om.MScriptUtil()
-                            for ii in range(num_joints):
-                                skin_fn.getWeights(skin_path, comp, ii, weights)
-                                joint_name = joints[ii].fullPathName()
-                                joint_idx = self.joint_indices[joint_name.split('|')[-1]]
-                                weight_objs.append( (joint_idx, weights[0]) )
+                                def comp_weight_objs(wo0, wo1):
+                                    if wo0[1] > wo1[1]: return -1
+                                    else: return 1
  
-                            def comp_weight_objs(wo0, wo1):
-                                if wo0[1] > wo1[1]: return -1
-                                else: return 1
+                                weight_objs.sort(comp_weight_objs)
  
-                            weight_objs.sort(comp_weight_objs)
+                                # Normalize top weights
+                                weight_objs = weight_objs[0:joints_per_vert]
+                                sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
+                                weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
  
-                            # Normalize top weights
-                            weight_objs = weight_objs[0:joints_per_vert]
-                            sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
-                            weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
+                                # Add more empty weight objects if too few
+                                if len(weight_objs) != joints_per_vert:
+                                    weight_objs.extend([(0,0)] * (joints_per_vert - len(weight_objs)))
  
-                            # Add more empty weight objects if too few
-                            if len(weight_objs) != joints_per_vert:
-                                weight_objs.extend([(0,0)] * (joints_per_vert - len(weight_objs)))
+                                for w_obj in weight_objs:
+                                    index_data.append(w_obj[0])
+                                    weight_data.append(w_obj[1])
  
-                            for w_obj in weight_objs:
-                                index_data.append(w_obj[0])
-                                weight_data.append(w_obj[1])
+                                vert_it.next()
  
-                            vert_it.next()
+                            weight_stream = []
+                            index_stream = []
  
-                        weight_stream = []
-                        index_stream = []
+                            # This list contains the old-index of each vertex in the AWD vertex stream
+                            vert_indices = self.mesh_vert_indices[skin_path.fullPathName()]
+                            for idx in vert_indices:
+                                start_idx = idx*joints_per_vert
+                                end_idx = start_idx + joints_per_vert
+                                w_tuple = weight_data[start_idx:end_idx]
+                                i_tuple = index_data[start_idx:end_idx]
+                                weight_stream.extend(w_tuple)
+                                index_stream.extend(i_tuple)
  
-                        # This list contains the old-index of each vertex in the AWD vertex stream
-                        vert_indices = self.mesh_vert_indices[skin_path.fullPathName()]
-                        for idx in vert_indices:
-                            start_idx = idx*joints_per_vert
-                            end_idx = start_idx + joints_per_vert
-                            w_tuple = weight_data[start_idx:end_idx]
-                            i_tuple = index_data[start_idx:end_idx]
-                            weight_stream.extend(w_tuple)
-                            index_stream.extend(i_tuple)
+                            if len(md) == 1:
+                                print('Setting streams!')
+                                sub = md[0]
+                                sub.add_stream(AWDSubMesh.JOINT_WEIGHTS, weight_stream)
+                                sub.add_stream(AWDSubMesh.JOINT_INDICES, index_stream)
+                            else:
+                                print('skinning not implemented for meshes with <> 1 sub-mesh')
  
-                        if len(md) == 1:
-                            print('Setting streams!')
-                            sub = md[0]
-                            sub.add_stream(AWDSubMesh.JOINT_WEIGHTS, weight_stream)
-                            sub.add_stream(AWDSubMesh.JOINT_INDICES, index_stream)
-                        else:
-                            print('skinning not implemented for meshes with <> 1 sub-mesh')
- 
-            dag_it.next()
+                dag_it.next()
 
-        #TODO: Don't hard code these
-        sequences = [
-            ('breath', 1, 24),
-            ('walk', 25, 48),
-            ('waveOtt', 49, 64),
-            ('wavenormal', 65, 88),
-            ('nodhead', 89, 118),
-            ('shakehead', 119, 138),
-            ('laugh', 139, 178),
-            ('sad', 179, 208),
-            ('puzzled', 209, 238),
-            ('dance', 239, 268),
-            ('clap', 269, 298),
-            ('talk01', 299, 417),
-            ('talk02', 419, 540),
-            ('talk03', 541, 661),
-            ('talkLong01', 662, 1148),
-            ('happy', 1149, 1178),
-            ('thinking', 1179, 1208),
-            ('worried', 1209, 1238)
-        ]
+        if include_animation:
+            #animated_materials = [ 'MAT_BlueEye_L', 'MAT_BlueEye_R' ]
+            animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
+            #animated_materials = []
  
-        #TODO:Remove this
-        #sequences = sequences[0:2]
-        sequences = []
-        #sequences = [ ('walk', 0, 30) ]
+            for seq in sequences:
+                frame_idx = seq[1]
+                end_frame = seq[2]
  
-        #animated_materials = [ 'MAT_BlueEye_L', 'MAT_BlueEye_R' ]
-        animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
-        #animated_materials = []
+                print('exporting sequence "%s" (%d-%d)' % seq)
  
-        # TODO: Remove this
-        #sequences = [ ('uvtest', 1, 20) ]
-        #animated_materials = [ 'lambert1' ]
+                if len(self.skeleton_paths) > 0:
+                    anim = AWDSkeletonAnimation(seq[0])
+                    self.awd.add_skeleton_anim(anim)
  
+                uvanims = []
+                for mat in animated_materials:
+                    uvanim = AWDUVAnimation(mat.replace('MAT', 'UVANIM')+'_'+seq[0])
+                    uvanims.append(uvanim)
+                    self.awd.add_uv_anim(uvanim)
  
-        for seq in sequences:
-            frame_idx = seq[1]
-            end_frame = seq[2]
+                while frame_idx <= end_frame:
+                    om.MGlobal.viewFrame(frame_idx)
  
-            print('exporting sequence "%s" (%d-%d)' % seq)
+                    self.sample_materials(animated_materials, uvanims)
  
-            if len(self.skeleton_paths) > 0:
-                anim = AWDSkeletonAnimation(seq[0])
-                self.awd.add_skeleton_anim(anim)
+                    for skeleton_path in self.skeleton_paths:
+                        def get_all_transforms(joint_path, list):
+                            mtx_list = mc.xform(joint_path, q=True, m=True)
+                            list.append( self.mtx_list2awd(mtx_list))
  
-            uvanims = []
-            for mat in animated_materials:
-                uvanim = AWDUVAnimation(mat.replace('MAT', 'UVANIM')+'_'+seq[0])
-                uvanims.append(uvanim)
-                self.awd.add_uv_anim(uvanim)
+                            children = mc.listRelatives(joint_path, type='joint')
+                            if children is not None:
+                                for child in children:
+                                    get_all_transforms(child, list)
  
-            while frame_idx <= end_frame:
-                om.MGlobal.viewFrame(frame_idx)
+                        skel_pose = AWDSkeletonPose()
  
-                self.sample_materials(animated_materials, uvanims)
+                        all_transforms = []
+                        get_all_transforms(skeleton_path, all_transforms)
+                        for tf in all_transforms:
+                            skel_pose.add_joint_transform(tf)
  
-                for skeleton_path in self.skeleton_paths:
-                    def get_all_transforms(joint_path, list):
-                        mtx_list = mc.xform(joint_path, q=True, m=True)
-                        list.append( self.mtx_list2awd(mtx_list))
+                        anim.add_frame(skel_pose)
+                        self.awd.add_skeleton_pose(skel_pose)
  
-                        children = mc.listRelatives(joint_path, type='joint')
-                        if children is not None:
-                            for child in children:
-                                get_all_transforms(child, list)
- 
-                    skel_pose = AWDSkeletonPose()
- 
-                    all_transforms = []
-                    get_all_transforms(skeleton_path, all_transforms)
-                    for tf in all_transforms:
-                        skel_pose.add_joint_transform(tf)
- 
-                    anim.add_frame(skel_pose)
-                    self.awd.add_skeleton_pose(skel_pose)
- 
-                # Move to next frame
-                frame_idx += 1
+                    # Move to next frame
+                    frame_idx += 1
  
  
         self.awd.flush(self.file)
