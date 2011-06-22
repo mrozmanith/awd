@@ -304,8 +304,8 @@ class MayaAWDExporter:
     def export_animation(self, sequences):
         #TODO: Don't hard-code these.
         #animated_materials = [ 'MAT_BlueEye_L', 'MAT_BlueEye_R' ]
-        animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
-        #animated_materials = []
+        #animated_materials = [ 'MAT_BrownEye_L', 'MAT_BrownEye_R' ]
+        animated_materials = []
  
         for seq in sequences:
             frame_idx = seq[1]
