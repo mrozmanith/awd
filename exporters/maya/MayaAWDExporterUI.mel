@@ -1,0 +1,39 @@
+/*
+    Tutorial available at:
+    http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/research/maya/exp_plugin.htm
+*/
+
+global proc int MayaAWDExporterUI(string $parent,
+                                    string $action,
+                                    string $settings,
+                                    string $callback )
+{
+    if ($action == "post") {
+        /* This code is executed when the GUI should be built, so load the 
+           UI here and display it. You can also use the settings string to
+           interpret any previous defined options to "remember last settings"
+           for the user.
+        */
+        setParent $parent;
+
+        text -label "Just a dummy control";
+    }
+    else if ($action == "query") { 
+        /* This code is executed when the user clicks the standard Maya export
+           button, and should build a string defining all the options according
+           to what has been put into the UI by the user. That string will then
+           be passed by Maya to the exporter back-end, when the callback is
+           evaluated.
+        */
+
+        string $options="";
+
+        // Build options string and call back
+        $options = "-seqsrc sequences.txt";
+        eval( $callback + " \"" + $options + "\"");
+    }
+
+    return 1;
+}
+
+
