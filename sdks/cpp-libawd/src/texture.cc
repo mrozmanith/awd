@@ -48,7 +48,13 @@ AWDTexture::calc_body_length(bool wide_geom, bool wide_mtx)
 
     len = 7;
     len += this->get_name_length();
-    len += this->url_len;
+
+    if (this->type == EXTERNAL) {
+        len += this->url_len;
+    }
+    else {
+        len += this->embed_data_len;
+    }
 
     len += this->calc_attr_length(true, true, wide_geom, wide_mtx);
 
