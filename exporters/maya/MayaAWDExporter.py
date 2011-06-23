@@ -68,6 +68,10 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
                 with open(seq_path, 'r') as seqf:
                     lines = seqf.readlines()
                     for line in lines:
+                        # Skip comments
+                        if line[0] == '#':
+                            continue
+
                         line_fields = re.split('[^a-zA-Z0-9]', line.strip())
                         sequences.append((line_fields[0], int(line_fields[1]), int(line_fields[2])))
             except:
@@ -531,21 +535,12 @@ class MayaAWDExporter:
                 print('NO UV FOUND!!!!! WHY!!!!!??')
                 return (0,0)
     
-            def get_vnormal(vert_it, face_idx):
+            def get_vnormal(shape, vert_itx, face_idx):
                 vec = om.MVector()
-                try:
-                    vert_it.getNormal(vec, face_idx)
-                except:
-                    vert_it.getNormal(vec)
-    
+                attr = '%s.vtxFace[%d][%d]' % (shape, vert_itx, face_idx)
+                vec = mc.polyNormalPerVertex(attr, q=True, xyz=True)
                 return vec
     
-            def get_fnormal(poly_it):
-                vec = om.MVector()
-                poly_it.getNormal(vec)
-    
-                return vec
-                
     
             print('getting mesh data for %s' % dag_path.fullPathName())
             print('type: %s' % dag_path.node().apiTypeStr())
@@ -566,12 +561,11 @@ class MayaAWDExporter:
                     vert_it.setIndex(vert_index, pidx_util.asIntPtr())
     
                     u,v = get_uvs(vert_it, poly_index)
-                    #normal = get_vnormal(vert_it, poly_index)
-                    normal = get_fnormal(poly_it)
+                    normal = get_vnormal(shape_path, vert_index, poly_index)
                     pos = vert_it.position()
     
                     exp_vert_list.append(
-                        [ vert_index, poly_index, pos[0], pos[1], pos[2], u, v, normal, [normal] ])
+                        [ vert_index, poly_index, pos[0], pos[1], pos[2], u, v, normal[0], normal[1], normal[2] ])
                     
                 poly_it.next()
     
@@ -594,19 +588,10 @@ class MayaAWDExporter:
                 normal_threshold *= (3.141592636/180)
                 for v in haystack:
                     correct = True
-                    for prop in range(2, 7):
+                    for prop in range(2, 10):
                         if needle[prop] != v[prop]:
                             correct = False
                             break
-    
-                    # Get angle between normals and compare
-                    if correct:
-                        angle = needle[7].angle(v[7])
-                        if angle > normal_threshold:
-                            correct = False
-    
-                    if correct:
-                        return idx
     
                     idx += 1
     
@@ -619,16 +604,6 @@ class MayaAWDExporter:
             for v in exp_vert_list:
                 idx = has_vert(merged_vertices, v)
                 if idx >= 0:
-                    # Since this vertex already existed, add it's
-                    # normal to the list of influential ones, and
-                    # calculate a new average normal for these
-                    old_v = merged_vertices[idx]
-                    old_v[8].append(v[7])               # add to normals list (8)
-                    accum = om.MVector()
-                    for n in old_v[8]:
-                        accum += n
-                    old_v[7] = accum / len(old_v[8])    # calculate avg normal (7)
-    
                     # Already has vertex
                     indices.append(idx)
                 else:
@@ -645,9 +620,9 @@ class MayaAWDExporter:
                 vertices.append(-v[4])  # Z (inverted)
                 uvs.append(v[5])        # U
                 uvs.append(1-v[6])      # V
-                normals.append(v[7][0])    # Normal X
-                normals.append(v[7][1])    # Normal Y
-                normals.append(-v[7][2])   # Normal Z (inverted)
+                normals.append(v[7])    # Normal X
+                normals.append(v[8])    # Normal Y
+                normals.append(-v[9])   # Normal Z (inverted)
     
             print('- DONE! Flipping windings')
     
