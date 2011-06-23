@@ -1,5 +1,6 @@
 #include "util.h"
 #include "texture.h"
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include "awdw32.h"
@@ -7,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-AWDTexture::AWDTexture(awd_uint8 type, const char *name, awd_uint16 name_len) :
+AWDTexture::AWDTexture(AWD_tex_type type, const char *name, awd_uint16 name_len) :
     AWDBlock(TEXTURE),
     AWDNamedElement(name, name_len),
     AWDAttrElement()
@@ -15,6 +16,8 @@ AWDTexture::AWDTexture(awd_uint8 type, const char *name, awd_uint16 name_len) :
     this->type = type;
     this->url = NULL;
     this->url_len = 0;
+    this->embed_data = NULL;
+    this->embed_data_len = 0;
 }
 
 
@@ -53,10 +56,32 @@ AWDTexture::calc_body_length(bool wide_geom, bool wide_mtx)
 }
 
 
+void
+AWDTexture::set_embed_data(awd_uint8 *buf, awd_uint32 buf_len)
+{
+    this->embed_data = buf;
+    this->embed_data_len = buf_len;
+}
+
+
+void
+AWDTexture::set_embed_file_data(int fd)
+{
+    struct stat *s;
+
+    s = (struct stat *)malloc(sizeof(struct stat));
+    fstat(fd, s);
+    this->embed_data_len = s->st_size;
+    this->embed_data = (awd_uint8 *)malloc(this->embed_data_len);
+
+    pread(fd, this->embed_data, this->embed_data_len, 0);
+}
+
+
 void 
 AWDTexture::prepare_write()
 {
-    // Nothing to do here
+    // Do nothing
 }
 
 
@@ -67,10 +92,17 @@ AWDTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
 
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
 
-    data_len = UI32(this->url_len);
     write(fd, &this->type, sizeof(awd_uint8));
-    write(fd, &data_len, sizeof(awd_uint32));
-    write(fd, this->url, this->url_len);
+    if (this->type == EXTERNAL) {
+        data_len = UI32(this->url_len);
+        write(fd, &data_len, sizeof(awd_uint32));
+        write(fd, this->url, this->url_len);
+    }
+    else {
+        data_len = UI32(this->embed_data_len);
+        write(fd, &data_len, sizeof(awd_uint32));
+        write(fd, this->embed_data, this->embed_data_len);
+    }
 
     this->properties->write_attributes(fd, wide_geom, wide_mtx);
     this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
