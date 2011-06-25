@@ -138,11 +138,15 @@ class MayaAWDExporter:
         self.joint_indices = {}
         self.mesh_vert_indices = {}
 
-        self.include_materials = False
+        self.include_geom = False
+        self.include_scene = False
+        self.flatten_untransformed = False
+        self.include_uvanim = False
+        self.include_skelanim = False
         self.include_skeletons = False
-        self.include_animation = False
-        self.animation_sequences = []
+        self.include_materials = False
         self.embed_textures = False
+        self.animation_sequences = []
 
         self.awd = AWD(compression=AWD.UNCOMPRESSED)
 
@@ -156,7 +160,7 @@ class MayaAWDExporter:
         if self.include_skeletons:
             self.export_skeletons()
 
-        if self.include_animation:
+        if self.include_skelanim:
             self.export_animation(self.animation_sequences)
  
         self.awd.flush(self.file)
@@ -394,7 +398,7 @@ class MayaAWDExporter:
  
         # Look for materials
         if self.include_materials:
-            self.export_materials(transform)
+            self.export_materials(transform, inst)
  
         self.block_cache.add(transform, inst)
         if awd_ctr is not None:
@@ -415,7 +419,7 @@ class MayaAWDExporter:
                 if self.block_cache.get(skel_path) is None:
                     self.export_skeleton(skel_path)
  
-    def export_materials(self, transform):
+    def export_materials(self, transform, awd_inst):
         sets = mc.listSets(object=transform, t=1, ets=True)
         print('======')
         if sets is not None:
@@ -433,7 +437,7 @@ class MayaAWDExporter:
                                 self.block_cache.add(state, mat)
                                 print('created material')
  
-                            inst.materials.append(mat)
+                            awd_inst.materials.append(mat)
                             print('adding material ' + state)
                             
                         elif state_type == 'file':
