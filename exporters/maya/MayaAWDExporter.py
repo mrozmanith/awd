@@ -38,13 +38,21 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
             else:
                 return defval
 
-        sequences = self.read_sequences(o('seqsrc'), base_path)
 
         with open(file_path, 'wb') as file:
             exporter = MayaAWDExporter(file)
-            exporter.include_animation = int(o('animation', True))
-            exporter.include_skeletons = int(o('skeletons', True))
-            exporter.animation_sequences = sequences
+            exporter.include_geom = bool(o('inc_geom', False))
+            exporter.include_scene = bool(o('inc_scene', False))
+            exporter.flatten_untransformed = bool(o('flatten_untransformed', False))
+            exporter.include_uvanim = bool(o('inc_uvanim', False))
+            exporter.include_skelanim = bool(o('inc_skelanim', False))
+            exporter.include_skeletons = bool(o('inc_skeletons', False))
+            exporter.include_materials = bool(o('inc_materials', False))
+            exporter.embed_textures = bool(o('embed_textures', False))
+
+            if exporter.include_skelanim:
+                exporter.animation_sequences = self.read_sequences(o('seqsrc'), base_path)
+
             exporter.export(None)
 
     def defaultExtension(self):
