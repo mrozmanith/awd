@@ -94,7 +94,7 @@ global proc int MayaAWDExporterUI(string $parent,
         }
 
         if (`checkBox -q -v chkFlatten`) {
-            $options[$oi] = "flatten=1";
+            $options[$oi] = "flatten_untransformed=1";
             $oi++;
         }
 
@@ -123,7 +123,6 @@ global proc int MayaAWDExporterUI(string $parent,
             $oi++;
         }
 
-        $oi++;
         $options[$oi] = "seqsrc="+`textField -q -tx tfSequences`;
 
 
