@@ -35,29 +35,29 @@ global proc int MayaAWDExporterUI(string $parent,
         frameLayout -l "Scene & geometries"
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include mesh data" -align "left" chkIncludeGeom;
-            checkBox -label "Include scenegraph" -align "left" chkIncludeScene;
+            checkBox -label "Include mesh data" -v 1 -align "left" chkIncludeGeom;
+            checkBox -label "Include scenegraph" -v 1 -align "left" chkIncludeScene;
             checkBox -label "Flatten untransformed containers" -align "left" chkFlatten;
         
         setParent $parent;
         frameLayout -l "Materials"
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include materials"  -align "left" chkIncludeMat;
-            checkBox -label "Embed textures"  -align "left" chkEmbedTex;
+            checkBox -label "Include materials" -v 1 -align "left" chkIncludeMat;
+            checkBox -label "Embed textures" -align "left" chkEmbedTex;
         
         setParent $parent;
         frameLayout -l "Skeletons"
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include skeletons"  -align "left" chkIncludeSkel;
+            checkBox -label "Include skeletons" -v 1 -align "left" chkIncludeSkel;
         
         setParent $parent;
         frameLayout -l "Animation"
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include UV animation"  -align "left" chkIncludeUVAnim;
-            checkBox -label "Include skeletal animation"  -align "left" chkIncludeSkelAnim;
+            checkBox -label "Include skeletal animation" -v 1 -align "left" chkIncludeSkelAnim;
+            checkBox -label "Include UV animation" -align "left" chkIncludeUVAnim;
         
             text -label "Sequence file path" -align "left";
             textField -tx "sequences.txt" tfSequences;
