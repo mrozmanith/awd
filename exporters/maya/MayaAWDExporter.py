@@ -27,6 +27,7 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
         file_path = file.resolvedFullName()
         base_path = os.path.dirname(file_path)
 
+        print(options)
         opts = self.parse_opts(options)
         print(opts)
 
