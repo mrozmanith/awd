@@ -1,6 +1,12 @@
 import struct
 import sys
 
+# Compression constants
+UNCOMPRESSED = 0
+DEFLATE = 1
+LZMA = 2
+
+
 class AWDBlockBase(object):
     def __init__(self, type=0):
         super(AWDBlockBase, self).__init__()
@@ -41,9 +47,6 @@ class AWDAttrElement(object):
 
 
 class AWD(object):
-    UNCOMPRESSED = 0
-    DEFLATE = 1
-    LZMA = 2
 
     def __init__(self, compression=0, flags=0):
         self.compression = compression
