@@ -28,7 +28,7 @@ global proc int MayaAWDExporterUI(string $parent,
             optionMenu -l "Compression" optCompression;
                 menuItem -l "Uncompressed (None)";
                 menuItem -l "ZLIB/Deflate (Good)";
-                //menuItem -l "LZMA (Best)"; Not supported yet
+                menuItem -l "LZMA (Best)"; 
         
         
         setParent $parent;
@@ -82,7 +82,10 @@ global proc int MayaAWDExporterUI(string $parent,
             $options[$oi] = "compression=none";
         else if (`optionMenu -q -sl optCompression` == 2)
             $options[$oi] = "compression=deflate";
+        else if (`optionMenu -q -sl optCompression` == 3)
+            $options[$oi] = "compression=lzma";
 
+        $oi++;
         if (`checkBox -q -v chkIncludeGeom`) {
             $options[$oi] = "inc_geom=1";
             $oi++;
