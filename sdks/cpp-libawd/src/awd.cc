@@ -267,10 +267,11 @@ AWD::flush(int out_fd)
         deflateEnd(zstrm);
 
         body_len = zstrm->total_out;
-        body_buf = (awd_uint8*)malloc(sizeof(body_len));
+        body_buf = (awd_uint8*)malloc(body_len);
         memcpy(body_buf, zlib_buf, body_len);
 
         free(zlib_buf);
+        free(zstrm);
     }
     else if (this->compression == LZMA) {
         Byte *lzma_buf;
