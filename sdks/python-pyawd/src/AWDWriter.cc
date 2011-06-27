@@ -101,6 +101,7 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
         Py_RETURN_NONE;
     }
     else {
+        PyErr_SetString(PyExc_TypeError, "Unable to open file descriptor from Python file object");
         return NULL;
     }
 }
