@@ -40,7 +40,14 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
 
 
         with open(file_path, 'wb') as file:
-            exporter = MayaAWDExporter(file)
+            comp_str = o('compression', 'none')
+            compression = UNCOMPRESSED
+            if comp_str == 'deflate':
+                compression = DEFLATE
+            elif comp_str == 'lzma':
+                compression = LZMA
+                
+            exporter = MayaAWDExporter(file, compression)
             exporter.include_geom = bool(o('inc_geom', False))
             exporter.include_scene = bool(o('inc_scene', False))
             exporter.flatten_untransformed = bool(o('flatten_untransformed', False))
@@ -72,7 +79,28 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
         sequences = []
         if seq_path is not None:
             if not os.path.isabs(seq_path):
-                seq_path = os.path.join(base_path, seq_path)
+                # Look for this file in a list of different locations,
+                # and use the first one in which it exists.
+                existed = False
+                bases = [
+                    mc.workspace(q=True, rd=True),
+                    os.path.join(mc.workspace(q=True, rd=True), mc.workspace('mayaAscii', q=True, fre=True)),
+                    os.path.join(mc.workspace(q=True, rd=True), mc.workspace('AWD2', q=True, fre=True)),
+                    base_path
+                ]
+
+                for base in bases:
+                    new_path = os.path.join(base, seq_path)
+                    print('Looking for sequence file in %s' % new_path)
+                    if os.path.exists(new_path) and os.path.isfile(new_path):
+                        existed = True
+                        seq_path = new_path
+                        break
+
+                if not existed:
+                    mc.error('Could not find sequence file "%s"' % seq_path)
+                    sys.exit()
+
             try:
                 with open(seq_path, 'r') as seqf:
                     lines = seqf.readlines()
@@ -131,7 +159,7 @@ class MayaAWDBlockCache:
 
 
 class MayaAWDExporter:
-    def __init__(self, file):
+    def __init__(self, file, compression):
         self.file = file
         self.block_cache = MayaAWDBlockCache()
         self.skeleton_paths = []
@@ -148,7 +176,7 @@ class MayaAWDExporter:
         self.embed_textures = False
         self.animation_sequences = []
 
-        self.awd = AWD(compression=AWD.UNCOMPRESSED)
+        self.awd = AWD(compression=compression)
 
 
     def export(self, selection):
@@ -421,7 +449,6 @@ class MayaAWDExporter:
  
     def export_materials(self, transform, awd_inst):
         sets = mc.listSets(object=transform, t=1, ets=True)
-        print('======')
         if sets is not None:
             for set in sets:
                 if mc.nodeType(set)=='shadingEngine':
@@ -456,7 +483,6 @@ class MayaAWDExporter:
  
                             if mat is not None:
                                 mat.texture = tex
-                            print('adding texture '+state)
  
  
  
