@@ -51,6 +51,7 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
             exporter.include_geom = bool(o('inc_geom', False))
             exporter.include_scene = bool(o('inc_scene', False))
             exporter.flatten_untransformed = bool(o('flatten_untransformed', False))
+            exporter.replace_exrefs = bool(o('replace_exrefs', False))
             exporter.include_uvanim = bool(o('inc_uvanim', False))
             exporter.include_skelanim = bool(o('inc_skelanim', False))
             exporter.include_skeletons = bool(o('inc_skeletons', False))
@@ -169,12 +170,15 @@ class MayaAWDExporter:
         self.include_geom = False
         self.include_scene = False
         self.flatten_untransformed = False
+        self.replace_exrefs = False
         self.include_uvanim = False
         self.include_skelanim = False
         self.include_skeletons = False
         self.include_materials = False
         self.embed_textures = False
         self.animation_sequences = []
+
+        self.has_skelanim = False
 
         self.awd = AWD(compression=compression)
 
@@ -188,7 +192,7 @@ class MayaAWDExporter:
         if self.include_skeletons:
             self.export_skeletons()
 
-        if self.include_skelanim:
+        if self.include_skelanim and self.has_skelanim:
             self.export_animation(self.animation_sequences)
  
         self.awd.flush(self.file)
@@ -288,8 +292,8 @@ class MayaAWDExporter:
                         #print('found mesh in cache!')
                         weight_data = []
                         index_data = []
- 
-                        #md.skeleton = skel
+
+                        self.has_skelanim = True
  
                         # TODO: Don't hardcode this
                         joints_per_vert = 3
@@ -412,40 +416,53 @@ class MayaAWDExporter:
  
         tf_name = self.get_name(transform)
         sh_name = self.get_name(shape)
- 
-        md = self.block_cache.get(sh_name)
-        if md is None:
-            print('Creating mesh data %s' % sh_name)
-            md = AWDMeshData(sh_name)
-            md.bind_matrix = AWDMatrix4x4(mtx)
-            self.export_mesh_data(md, shape)
-            self.awd.add_mesh_data(md)
-            self.block_cache.add(sh_name, md)
- 
-        inst = AWDMeshInst(md, tf_name, self.mtx_list2awd(mtx))
- 
-        # Look for materials
-        if self.include_materials:
-            self.export_materials(transform, inst)
- 
-        self.block_cache.add(transform, inst)
-        if awd_ctr is not None:
-            awd_ctr.add_child(inst)
+
+        tf_is_ref = mc.referenceQuery(transform, inr=True)
+        sh_is_ref = mc.referenceQuery(shape, inr=True)
+        if (tf_is_ref or sh_is_ref) and self.replace_exrefs:
+            # This is an external reference, and it should be
+            # replaced with an empty container in the AWD file
+            ctr = AWDContainer(name=tf_name, transform=AWDMatrix4x4(mtx))
+            self.block_cache.add(transform, ctr)
+            if awd_ctr is not None:
+                awd_ctr.add_child(ctr)
+            else:
+                self.awd.add_scene_block(ctr)
+
         else:
-            self.awd.add_scene_block(inst)
+            md = self.block_cache.get(sh_name)
+            if md is None:
+                print('Creating mesh data %s' % sh_name)
+                md = AWDMeshData(sh_name)
+                md.bind_matrix = AWDMatrix4x4(mtx)
+                self.export_mesh_data(md, shape)
+                self.awd.add_mesh_data(md)
+                self.block_cache.add(sh_name, md)
  
-        history = mc.listHistory(transform)
-        clusters = mc.ls(history, type='skinCluster')
-        if len(clusters) > 0:
-            #TODO: Deal with multiple clusters?
-            sc = clusters[0]
+            inst = AWDMeshInst(md, tf_name, self.mtx_list2awd(mtx))
  
-            influences = mc.skinCluster(sc, q=True, inf=True)
-            if len(influences) > 0:
-                skel_path = self.get_skeleton_root(influences[0])
+            # Look for materials
+            if self.include_materials:
+                self.export_materials(transform, inst)
  
-                if self.block_cache.get(skel_path) is None:
-                    self.export_skeleton(skel_path)
+            self.block_cache.add(transform, inst)
+            if awd_ctr is not None:
+                awd_ctr.add_child(inst)
+            else:
+                self.awd.add_scene_block(inst)
+ 
+            history = mc.listHistory(transform)
+            clusters = mc.ls(history, type='skinCluster')
+            if len(clusters) > 0:
+                #TODO: Deal with multiple clusters?
+                sc = clusters[0]
+ 
+                influences = mc.skinCluster(sc, q=True, inf=True)
+                if len(influences) > 0:
+                    skel_path = self.get_skeleton_root(influences[0])
+ 
+                    if self.block_cache.get(skel_path) is None:
+                        self.export_skeleton(skel_path)
  
     def export_materials(self, transform, awd_inst):
         sets = mc.listSets(object=transform, t=1, ets=True)

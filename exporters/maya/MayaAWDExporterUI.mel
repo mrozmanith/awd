@@ -38,6 +38,7 @@ global proc int MayaAWDExporterUI(string $parent,
             checkBox -label "Include mesh data" -v 1 -align "left" chkIncludeGeom;
             checkBox -label "Include scenegraph" -v 1 -align "left" chkIncludeScene;
             checkBox -label "Flatten untransformed containers" -align "left" chkFlatten;
+            checkBox -label "Replace external references with empty placeholders" -align "left" chkReplaceExRefs;
         
         setParent $parent;
         frameLayout -l "Materials"
@@ -98,6 +99,11 @@ global proc int MayaAWDExporterUI(string $parent,
 
         if (`checkBox -q -v chkFlatten`) {
             $options[$oi] = "flatten_untransformed=1";
+            $oi++;
+        }
+
+        if (`checkBox -q -v chkReplaceExRefs`) {
+            $options[$oi] = "replace_exrefs=1";
             $oi++;
         }
 
