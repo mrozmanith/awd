@@ -24,6 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="rmdir /S /Q build\pyawd;&#x0D;&#x0A;mkdir build\pyawd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -40,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\c-libawd\build;Python\Include;Python\PC"
+				AdditionalIncludeDirectories="include;..\cpp-libawd\build;Python\Include;Python\PC"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYAWD_EXPORTS;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="python26_d.lib"
-				OutputFile="build\pyawd_d.pyd"
+				OutputFile="build\pyawd\cio_d.pyd"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Python\PCbuild"
 				GenerateDebugInformation="true"
@@ -89,6 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y /I src\pyawd build\pyawd"
 			/>
 		</Configuration>
 		<Configuration
@@ -99,6 +101,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="rmdir /S /Q build\pyawd;&#x0D;&#x0A;mkdir build\pyawd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -114,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\cpp-libawd\build;Python\Include;Python\PC"
+				AdditionalIncludeDirectories="include;..\cpp-libawd\build;Python\Include;Python\PC"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYAWD_EXPORTS;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -134,7 +137,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="python26.lib"
-				OutputFile="build\pyawd.pyd"
+				OutputFile="build\pyawd\cio.pyd"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Python\PCbuild"
 				GenerateDebugInformation="true"
@@ -163,6 +166,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y /I src\pyawd build\pyawd"
 			/>
 		</Configuration>
 	</Configurations>
@@ -175,35 +179,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\src\AWD.h"
+				RelativePath=".\include\AWDWriter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDAttrBlock.h"
+				RelativePath=".\include\bcache.h"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshData.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\AWDMeshInst.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\AWDSkeleton.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\AWDSkeletonJoint.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\AWDSubMesh.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\util.h"
+				RelativePath=".\include\util.h"
 				>
 			</File>
 		</Filter>
@@ -219,35 +203,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\AWD.cc"
+				RelativePath=".\src\AWDWriter.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDAttrBlock.cc"
+				RelativePath=".\src\bcache.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshData.cc"
+				RelativePath=".\src\cio.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDMeshInst.cc"
+				RelativePath=".\src\prepanim.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDSkeleton.cc"
+				RelativePath=".\src\prepgeom.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDSkeletonJoint.cc"
+				RelativePath=".\src\prepmaterial.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\src\AWDSubMesh.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\src\pyawd.cc"
+				RelativePath=".\src\prepscene.cc"
 				>
 			</File>
 			<File
