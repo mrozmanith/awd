@@ -143,12 +143,13 @@ AWDSkeletonAnimation::~AWDSkeletonAnimation()
 
 
 void
-AWDSkeletonAnimation::set_next_frame_pose(AWDSkeletonPose *pose)
+AWDSkeletonAnimation::set_next_frame_pose(AWDSkeletonPose *pose, awd_uint16 duration)
 {
     AWD_skelanim_fr *fr;
 
     fr = (AWD_skelanim_fr *)malloc(sizeof(AWD_skelanim_fr));
     fr->pose = pose;
+    fr->duration = duration;
 
     if (this->first_frame == NULL) {
         this->first_frame = fr;
@@ -167,11 +168,14 @@ awd_uint32
 AWDSkeletonAnimation::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     awd_uint32 len;
+    awd_uint8 pose_len;
 
-    len = 2 + this->get_name_length();                                  // Name varstr
-    len += 3;                                                           // num frames + frame rate
-    len += (this->num_frames * sizeof(awd_baddr));                      // Pose list
-    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);      // Props and attributes
+    pose_len = sizeof(awd_baddr)+sizeof(awd_uint16);
+
+    len = 2 + this->get_name_length();                              // Name varstr
+    len += 3;                                                       // num frames + frame rate
+    len += (this->num_frames * pose_len);                           // Pose list
+    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);  // Props and attributes
     
     return len;
 }
@@ -194,7 +198,10 @@ AWDSkeletonAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
     frame = this->first_frame;
     while (frame) {
         awd_baddr addr_be = UI32(frame->pose->get_addr());
+        awd_uint16 dur_be = UI16(frame->duration);
+
         write(fd, &addr_be, sizeof(awd_baddr));
+        write(fd, &dur_be, sizeof(awd_uint16));
 
         frame = frame->next;
     }

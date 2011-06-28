@@ -35,6 +35,7 @@ class AWDSkeletonPose : public AWDNamedElement,
 
 typedef struct _AWD_skelanim_fr {
     AWDSkeletonPose *pose;
+    awd_uint16 duration;
     struct _AWD_skelanim_fr *next;
 } AWD_skelanim_fr;
 
@@ -57,7 +58,7 @@ class AWDSkeletonAnimation : public AWDNamedElement,
         AWDSkeletonAnimation(const char *, awd_uint16, awd_uint8);
         ~AWDSkeletonAnimation();
 
-        void set_next_frame_pose(AWDSkeletonPose *);
+        void set_next_frame_pose(AWDSkeletonPose *, awd_uint16);
 };
 
 #endif

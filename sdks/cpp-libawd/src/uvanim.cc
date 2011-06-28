@@ -44,7 +44,7 @@ awd_uint32
 AWDUVAnimation::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     return 2 + this->get_name_length() + 2 + 
-        (this->num_frames * MTX32_SIZE(wide_mtx)) + 
+        (this->num_frames * (sizeof(awd_uint16) + MTX32_SIZE(wide_mtx))) + 
         this->calc_attr_length(true,true, wide_geom, wide_mtx);
 }
 
@@ -64,7 +64,11 @@ AWDUVAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
 
     cur_fr = this->first_frame;
     while (cur_fr) {
+        awd_uint16 dur_be = UI16(cur_fr->duration);
+
         awdutil_write_mtx3x2(fd, cur_fr->transform_mtx, wide_mtx);
+        write(fd, &dur_be, sizeof(awd_uint16));
+
         cur_fr = cur_fr->next;
     }
 
@@ -73,10 +77,11 @@ AWDUVAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
 
 
 void
-AWDUVAnimation::set_next_frame_tf(awd_float64 *mtx)
+AWDUVAnimation::set_next_frame_tf(awd_float64 *mtx, awd_uint16 duration)
 {
     AWD_uvanim_fr *frame = (AWD_uvanim_fr *)malloc(sizeof(AWD_uvanim_fr));
     frame->transform_mtx = mtx;
+    frame->duration = duration;
 
     if (this->first_frame == NULL) {
         this->first_frame = frame;
