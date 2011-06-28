@@ -1,6 +1,12 @@
 from pyawd import utils 
 from pyawd import core
 
+class GenericAnimFrame(object):
+    def __init__(self, data=None, duration=0):
+        self.duration = duration
+        self.data = data
+
+
 class AWDSkeleton(core.AWDBlockBase):
     def __init__(self, name=''):
         super(AWDSkeleton, self).__init__()
@@ -12,10 +18,11 @@ class AWDSkeletonAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
         super(AWDSkeletonAnimation, self).__init__()
         self.name = name
-        self.frames = []
+        self.__frames = []
 
-    def add_frame(self, pose):
-        self.frames.append(pose)
+    def add_frame(self, pose, duration):
+        dur = int(duration)
+        self.__frames.append(GenericAnimFrame(data=pose, duration=dur))
 
 
 class AWDSkeletonJoint(object):
@@ -55,4 +62,8 @@ class AWDUVAnimation(core.AWDBlockBase):
     def __init__(self, name=''):
         super(AWDUVAnimation, self).__init__()
         self.name = name
-        self.frames = []
+        self.__frames = []
+
+    def add_frame(self, transform, duration):
+        dur = int(duration)
+        self.__frames.append(GenericAnimFrame(data=transform, duration=dur))

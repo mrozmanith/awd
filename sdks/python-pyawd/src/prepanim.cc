@@ -91,18 +91,26 @@ __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
 
-    frames_attr = PyObject_GetAttrString(block, "frames");
+    frames_attr = PyObject_GetAttrString(block, "_AWDSkeletonAnimation__frames");
     num_frames = PyList_Size(frames_attr);
     
     lawd_anim = new AWDSkeletonAnimation(name, name_len, num_frames);
     
     for (i=0; i<num_frames; i++) {
         AWDSkeletonPose *lawd_pose;
-        PyObject *pose;
+        PyObject *pose_attr;
+        PyObject *dur_attr;
+        PyObject *frame;
+        awd_uint16 dur;
 
-        pose = PyList_GetItem(frames_attr, i);
-        lawd_pose = (AWDSkeletonPose *)pyawd_bcache_get(bcache, pose);
-        lawd_anim->set_next_frame_pose(lawd_pose);
+        frame = PyList_GetItem(frames_attr, i);
+        pose_attr = PyObject_GetAttrString(frame, "data");
+        dur_attr = PyObject_GetAttrString(frame, "duration");
+
+        lawd_pose = (AWDSkeletonPose *)pyawd_bcache_get(bcache, pose_attr);
+        dur = (awd_uint16)PyLong_AsLong(dur_attr);
+
+        lawd_anim->set_next_frame_pose(lawd_pose, dur);
     }
 
     awd->add_skeleton_anim(lawd_anim);
@@ -163,18 +171,25 @@ __prepare_uvanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
     lawd_anim = new AWDUVAnimation(name, name_len);
 
-    frames_attr = PyObject_GetAttrString(block, "frames");
+    frames_attr = PyObject_GetAttrString(block, "_AWDUVAnimation__frames");
     len = PyList_Size(frames_attr);
     for (i=0; i<len; i++) {
-        PyObject *py_mtx;
+        PyObject *frame;
+        PyObject *dur_attr;
+        PyObject *data_attr;
         PyObject *raw_data_attr;
         awd_float64 *mtx;
+        awd_uint16 dur;
 
-        py_mtx = PyList_GetItem(frames_attr, i);
-        raw_data_attr = PyObject_GetAttrString(py_mtx, "raw_data");
+        frame = PyList_GetItem(frames_attr, i);
+        data_attr = PyObject_GetAttrString(frame, "data");
+        dur_attr = PyObject_GetAttrString(frame, "duration");
+        raw_data_attr = PyObject_GetAttrString(data_attr, "raw_data");
+
         mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 6);
+        dur = (awd_uint16)PyLong_AsLong(dur_attr);
 
-        lawd_anim->set_next_frame_tf(mtx);
+        lawd_anim->set_next_frame_tf(mtx, dur);
     }
 
     awd->add_uv_anim(lawd_anim);
