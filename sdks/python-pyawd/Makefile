@@ -1,12 +1,12 @@
 BLENPATH=/Applications/blender.app/Contents/MacOS/2.57/python/lib/python3.2
-LIBPATH32=./build/lib.macosx-10.4-x86_64-3.2
+LIBPATH32=./build/lib.macosx-10.4-intel-3.2
 LIBPATH26=./build/lib.macosx-10.4-x86_64-2.6
 
 #DIST_CFLAGS=-g -arch ppc -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -fno-strict-aliasing -fno-common -dynamic -I/usr/local/include/
 DIST_CFLAGS=-Wall -g -arch i386 -arch x86_64 -fno-strict-aliasing -fno-common -dynamic -I/usr/include
 CFLAGS=-c -O0 $(DIST_FLAGS)
 
-BLENSITE=$(BLENPATH)/site-packages
+BLENSITE=$(BLENPATH)
 MAYASITE=/Applications/Autodesk/maya2011/Maya.app/Contents/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages
 
 
@@ -25,7 +25,7 @@ dist_install32: build32
 	python3 setup.py install
     
 blender_install: build32
-	cp -R $(LIBPATH32)/pyawd $(BLENSITE)/
+	cp -Rf $(LIBPATH32)/pyawd $(BLENSITE)/
 
 maya_install: build26
 	cp -R $(LIBPATH26)/pyawd $(MAYASITE)/

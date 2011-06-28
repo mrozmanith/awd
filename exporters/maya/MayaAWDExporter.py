@@ -398,7 +398,8 @@ class MayaAWDExporter:
                     for tf in all_transforms:
                         skel_pose.add_joint_transform(tf)
  
-                    anim.add_frame(skel_pose)
+                    #TODO: Don't hard-code duration
+                    anim.add_frame(skel_pose, 40)
                     self.awd.add_skeleton_pose(skel_pose)
  
                 # Move to next frame
@@ -517,7 +518,8 @@ class MayaAWDExporter:
                     break
  
             t = mc.getAttr(pt+'.tf')[0]
-            uvanim.frames.append( AWDMatrix2x3([ 1, 0, 0, 1, -t[0], t[1] ]) )
+            #TODO: Don't hard-code duration
+            uvanim.add_frame( AWDMatrix2x3([ 1, 0, 0, 1, -t[0], t[1] ]), 40)
  
             idx += 1
  
