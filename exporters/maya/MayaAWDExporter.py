@@ -60,6 +60,7 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
 
             if exporter.include_skelanim:
                 exporter.animation_sequences = self.read_sequences(o('seqsrc'), base_path)
+                exporter.joints_per_vert = int(o('jointspervert', 3))
 
             exporter.export(None)
 
@@ -295,9 +296,6 @@ class MayaAWDExporter:
 
                         self.has_skelanim = True
  
-                        # TODO: Don't hardcode this
-                        joints_per_vert = 3
- 
                         while not vert_it.isDone():
                             comp = vert_it.currentItem()
                             weights = om.MDoubleArray()
@@ -317,13 +315,13 @@ class MayaAWDExporter:
                             weight_objs.sort(comp_weight_objs)
  
                             # Normalize top weights
-                            weight_objs = weight_objs[0:joints_per_vert]
+                            weight_objs = weight_objs[0:self.joints_per_vert]
                             sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
                             weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
  
                             # Add more empty weight objects if too few
-                            if len(weight_objs) != joints_per_vert:
-                                weight_objs.extend([(0,0)] * (joints_per_vert - len(weight_objs)))
+                            if len(weight_objs) != self.joints_per_vert:
+                                weight_objs.extend([(0,0)] * (self.joints_per_vert - len(weight_objs)))
  
                             for w_obj in weight_objs:
                                 index_data.append(w_obj[0])
@@ -337,8 +335,8 @@ class MayaAWDExporter:
                         # This list contains the old-index of each vertex in the AWD vertex stream
                         vert_indices = self.mesh_vert_indices[skin_path.fullPathName()]
                         for idx in vert_indices:
-                            start_idx = idx*joints_per_vert
-                            end_idx = start_idx + joints_per_vert
+                            start_idx = idx*self.joints_per_vert
+                            end_idx = start_idx + self.joints_per_vert
                             w_tuple = weight_data[start_idx:end_idx]
                             i_tuple = index_data[start_idx:end_idx]
                             weight_stream.extend(w_tuple)

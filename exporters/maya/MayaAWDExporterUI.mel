@@ -54,10 +54,13 @@ global proc int MayaAWDExporterUI(string $parent,
             checkBox -label "Include skeletons" -v 1 -align "left" chkIncludeSkel;
         
         setParent $parent;
-        frameLayout -l "Animation"
+        frameLayout -l "Animation" 
             -mw 20 -mh 20
             -bs "etchedIn";
             checkBox -label "Include skeletal animation" -v 1 -align "left" chkIncludeSkelAnim;
+            flowLayout -h 30;
+                intSliderGrp -cl3 "left" "left" "left" -cw3 140 25 70 -f true -l "Max joints per vertex:" -h 20 -min 1 -max 5 -v 3 -step 1 inpJointsPerVert;
+            setParent "..";
             checkBox -label "Include UV animation" -align "left" chkIncludeUVAnim;
         
             text -label "Sequence file path" -align "left";
@@ -129,6 +132,9 @@ global proc int MayaAWDExporterUI(string $parent,
 
         if (`checkBox -q -v chkIncludeSkelAnim`) {
             $options[$oi] = "inc_skelanim=1";
+            $oi++;
+            
+            $options[$oi] = "jointspervert="+`intSliderGrp -q -v inpJointsPerVert`;
             $oi++;
         }
 
