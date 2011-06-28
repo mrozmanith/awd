@@ -1,14 +1,11 @@
 #include <stdlib.h>
 #include <cstdio>
 
+#include "platform.h"
+
 #include "mesh.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
 
 
 

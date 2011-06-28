@@ -6,11 +6,7 @@
 #include "awd_types.h"
 
 // Get mkstemp replacement
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 awd_float64 *
 awdutil_id_mtx4(awd_float64 *mtx)

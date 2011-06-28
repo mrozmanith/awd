@@ -76,6 +76,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="xcopy /Y /I include build\awd"
 			/>
 		</Configuration>
 		<Configuration
@@ -168,7 +169,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\awdw32.h"
+				RelativePath=".\include\awdzlib.h"
 				>
 			</File>
 			<File
@@ -177,6 +178,10 @@
 			</File>
 			<File
 				RelativePath=".\lib\lzma\Bra.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\crc32.h"
 				>
 			</File>
 			<File
@@ -228,7 +233,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\material.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\mesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\name.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\ns.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\platform.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\scene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\skelanim.h"
 				>
 			</File>
 			<File
@@ -240,11 +269,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\texture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\trees.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lib\lzma\Types.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\uvanim.h"
 				>
 			</File>
 			<File
@@ -272,6 +313,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\lib\zlib\adler32.c"
+				>
+			</File>
+			<File
 				RelativePath=".\lib\lzma\Alloc.c"
 				>
 			</File>
@@ -288,11 +333,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\awdzlib.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\src\block.cc"
 				>
 			</File>
 			<File
 				RelativePath=".\lib\lzma\Bra.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\crc32.c"
 				>
 			</File>
 			<File
@@ -324,7 +377,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\material.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\src\mesh.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\name.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ns.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\scene.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\skelanim.cc"
 				>
 			</File>
 			<File
@@ -336,7 +409,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\texture.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\lib\zlib\trees.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\util.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\uvanim.cc"
 				>
 			</File>
 			<File
@@ -344,6 +429,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\lib\lzma\README"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

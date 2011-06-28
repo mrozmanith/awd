@@ -2,11 +2,7 @@
 #include "texture.h"
 #include <sys/stat.h>
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 AWDTexture::AWDTexture(AWD_tex_type type, const char *name, awd_uint16 name_len) :
     AWDBlock(TEXTURE),
@@ -80,7 +76,8 @@ AWDTexture::set_embed_file_data(int fd)
     this->embed_data_len = s->st_size;
     this->embed_data = (awd_uint8 *)malloc(this->embed_data_len);
 
-    pread(fd, this->embed_data, this->embed_data_len, 0);
+    lseek(fd, 0, SEEK_SET);
+    read(fd, this->embed_data, this->embed_data_len);
 }
 
 

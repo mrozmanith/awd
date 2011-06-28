@@ -2,11 +2,7 @@
 #include "block.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 
 AWDBlock::AWDBlock(AWD_block_type type) 

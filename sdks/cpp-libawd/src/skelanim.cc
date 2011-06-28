@@ -1,11 +1,7 @@
 #include "util.h"
 #include "skelanim.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include "unistd.h"
-#endif
+#include "platform.h"
 
 
 AWDSkeletonPose::AWDSkeletonPose(const char *name, awd_uint16 name_len) :

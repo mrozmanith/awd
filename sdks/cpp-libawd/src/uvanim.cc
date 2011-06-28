@@ -3,11 +3,7 @@
 #include "util.h"
 
 // Get mkstemp replacement
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 
 AWDUVAnimation::AWDUVAnimation(const char *name, awd_uint16 name_len) :

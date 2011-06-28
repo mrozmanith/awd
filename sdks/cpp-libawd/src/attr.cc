@@ -6,9 +6,7 @@
 #include "awd_types.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#endif
+#include "platform.h"
 
 
 
