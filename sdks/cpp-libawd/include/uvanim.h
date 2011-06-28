@@ -8,6 +8,7 @@
 
 typedef struct _AWD_uvanim_fr {
     awd_float64 *transform_mtx;
+    awd_uint16 duration;
     struct _AWD_uvanim_fr *next;
 } AWD_uvanim_fr;
 
@@ -31,7 +32,7 @@ class AWDUVAnimation :
         AWDUVAnimation(const char *, awd_uint16);
         ~AWDUVAnimation();
 
-        void set_next_frame_tf(awd_float64 *);
+        void set_next_frame_tf(awd_float64 *, awd_uint16);
 };
 
 #endif
