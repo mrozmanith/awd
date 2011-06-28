@@ -2,11 +2,7 @@
 #include "ns.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 
 AWDNamespace::AWDNamespace(const char *uri, awd_uint16 uri_len) :

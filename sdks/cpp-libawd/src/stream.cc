@@ -5,11 +5,7 @@
 #include "awd_types.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 AWDDataStream::AWDDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
 {

@@ -1,6 +1,7 @@
 #ifndef _LIBAWD_AWDW32_H
 #define _LIBAWD_AWDW32_H
 
+#ifdef WIN32
 #include <io.h>
 #include <windows.h>
 #include <sys/stat.h>
@@ -14,5 +15,11 @@
 #define unlink _unlink
 
 #define off_t int
+
+#else // UNIX
+
+#include <unistd.h>
+
+#endif // WIN32
 
 #endif

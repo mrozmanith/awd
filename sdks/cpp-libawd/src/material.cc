@@ -1,11 +1,7 @@
 #include "material.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 AWDSimpleMaterial::AWDSimpleMaterial(awd_uint8 type, const char *name, awd_uint16 name_len) : 
     AWDBlock(SIMPLE_MATERIAL),

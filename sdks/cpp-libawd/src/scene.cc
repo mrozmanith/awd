@@ -2,11 +2,7 @@
 #include "scene.h"
 #include "util.h"
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 
 AWDSceneBlock::AWDSceneBlock(AWD_block_type type, const char *name, awd_uint16 name_len, awd_float64 *mtx) :

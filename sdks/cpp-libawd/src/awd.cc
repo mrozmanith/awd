@@ -3,11 +3,7 @@
 #include <string.h>
 #include <zlib.h>
 
-#ifdef WIN32
-#include "awdw32.h"
-#else
-#include <unistd.h>
-#endif
+#include "platform.h"
 
 #include "awd.h"
 #include "util.h"
