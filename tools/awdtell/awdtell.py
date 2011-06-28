@@ -18,6 +18,7 @@ offset = 0
 indent_level = 0
 
 BT_MESH_DATA = 1
+BT_CONTAINER = 22
 BT_MESH_INST = 24
 BT_SKELETON = 101
 BT_SKELPOSE = 102
@@ -169,14 +170,28 @@ def print_skelpose(data):
 
     offs += print_user_attributes(data[offs:])
 
+def read_scene_data(data):
+    parent = struct.unpack_from('>I', data)[0]
+    matrix = struct.unpack_from('>16f', data, 4) #TODO: Check actual width
+    name = read_var_str(data, 68)
+
+    return (parent, matrix, name, 70+len(name))
+
+def print_container(data):
+    global indent_level
+
+    parent, matrix, name, offs = read_scene_data(data)
+    printl('NAME: %s' % name)
+    printl('PARENT ID: %d' % parent)
+    printl('TRANSFORM MATRIX:')
+    print_matrix(matrix)
+
 
 def print_mesh_instance(data):
     global indent_level
 
-    parent = struct.unpack_from('>I', data)[0]
-    matrix = struct.unpack_from('>16d', data, 4)
-    name = read_var_str(data, 132);
-    data_id = struct.unpack_from('>I', data, 132 + 2 + len(name))[0]
+    parent, matrix, name, offs = read_scene_data(data)
+    data_id = struct.unpack_from('>I', data, offs)[0]
 
     printl('NAME: %s' % name)
     printl('DATA ID: %d' % data_id)
@@ -261,6 +276,7 @@ def print_next_block(data):
 
     block_types = {}
     block_types[BT_MESH_DATA] = 'MeshData'
+    block_types[BT_CONTAINER] = 'Container'
     block_types[BT_MESH_INST] = 'MeshInst'
     block_types[BT_SKELETON] =  'Skeleton'
     block_types[BT_SKELPOSE] =  'SkeletonPose'
@@ -274,7 +290,7 @@ def print_next_block(data):
     if type in block_types:
         block_type = block_types[type]
     else:
-        block_type = '<error> %s' % hex(type)
+        block_type = '<error> %s' % type
 
     printl('BLOCK %s' % block_type)
     indent_level += 1
@@ -284,6 +300,9 @@ def print_next_block(data):
     if type == BT_MESH_INST and include&SCENE:
         printl()
         print_mesh_instance(data[offset+10 : offset+10+length])
+    elif type == BT_CONTAINER and include &SCENE:
+        printl()
+        print_container(data[offset+10 : offset+10+length])
     elif type == BT_MESH_DATA and include&GEOMETRY:
         printl()
         print_mesh_data(data[offset+10 : offset+10+length])
@@ -328,10 +347,9 @@ if __name__ == '__main__':
         if compression == 0:
             offset = 12
             uncompressed_data = data
-        elif compression == core.AWD.DEFLATE:
+        elif compression == core.DEFLATE:
             offset = 0
             data = data[12:]
-            print('raw body len=%d' % len(data));
             uncompressed_data = zlib.decompress(data)
         else:
             print('unknown compression: %d' % compression)
