@@ -30,8 +30,8 @@ install: dynamic
     
 
 dynamic: $(OBJ) 
-	$(CXX) -dynamiclib -install_name $(LIBDIR)/$(DYLIB) -current_version $(LIBVER) $(LDFLAGS) $(CFLAGS) $(OBJ) -o $(BUILDDIR)/$(DYLIB)
 	mkdir -p $(BUILDDIR)/awd/
+	$(CXX) -dynamiclib -install_name $(LIBDIR)/$(DYLIB) -current_version $(LIBVER) $(LDFLAGS) $(CFLAGS) $(OBJ) -o $(BUILDDIR)/$(DYLIB)
 	cp include/*.h $(BUILDDIR)/awd/
 
 static: $(OBJ) 
