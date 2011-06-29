@@ -114,10 +114,9 @@ AWDSkeletonPose::write_body(int fd, bool wide_geom, bool wide_mtx)
 
 
 
-AWDSkeletonAnimation::AWDSkeletonAnimation(const char *name, awd_uint16 name_len, awd_uint8 frame_rate) :
+AWDSkeletonAnimation::AWDSkeletonAnimation(const char *name, awd_uint16 name_len) :
     AWDNamedElement(name, name_len), AWDAttrElement(), AWDBlock(SKELETON_ANIM)
 {
-    this->frame_rate = frame_rate;
     this->num_frames = 0;
     this->first_frame = NULL;
     this->last_frame = NULL;
@@ -173,7 +172,7 @@ AWDSkeletonAnimation::calc_body_length(bool wide_geom, bool wide_mtx)
     pose_len = sizeof(awd_baddr)+sizeof(awd_uint16);
 
     len = 2 + this->get_name_length();                              // Name varstr
-    len += 3;                                                       // num frames + frame rate
+    len += 2;                                                       // num frames + frame rate
     len += (this->num_frames * pose_len);                           // Pose list
     len += this->calc_attr_length(true,true, wide_geom, wide_mtx);  // Props and attributes
     
@@ -191,7 +190,6 @@ AWDSkeletonAnimation::write_body(int fd, bool wide_geom, bool wide_mtx)
 
     num_frames_be = UI16(this->num_frames);
     write(fd, &num_frames_be, sizeof(awd_uint16));
-    write(fd, &this->frame_rate, sizeof(awd_uint8));
 
     this->properties->write_attributes(fd, wide_geom, wide_mtx);
 

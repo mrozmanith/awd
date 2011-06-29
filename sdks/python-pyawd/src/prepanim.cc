@@ -94,7 +94,7 @@ __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     frames_attr = PyObject_GetAttrString(block, "_AWDSkeletonAnimation__frames");
     num_frames = PyList_Size(frames_attr);
     
-    lawd_anim = new AWDSkeletonAnimation(name, name_len, num_frames);
+    lawd_anim = new AWDSkeletonAnimation(name, name_len);
     
     for (i=0; i<num_frames; i++) {
         AWDSkeletonPose *lawd_pose;
