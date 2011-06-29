@@ -44,7 +44,6 @@ class AWDSkeletonAnimation : public AWDNamedElement,
     public AWDAttrElement, public AWDBlock
 {
     private:
-        awd_uint8 frame_rate;
         awd_uint16 num_frames;
 
         AWD_skelanim_fr *first_frame;
@@ -55,7 +54,7 @@ class AWDSkeletonAnimation : public AWDNamedElement,
         void write_body(int, bool,bool);
 
     public:
-        AWDSkeletonAnimation(const char *, awd_uint16, awd_uint8);
+        AWDSkeletonAnimation(const char *, awd_uint16);
         ~AWDSkeletonAnimation();
 
         void set_next_frame_pose(AWDSkeletonPose *, awd_uint16);
