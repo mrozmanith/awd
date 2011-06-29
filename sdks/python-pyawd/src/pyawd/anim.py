@@ -7,6 +7,29 @@ class GenericAnimFrame(object):
         self.data = data
 
 
+class GenericAnim(object):
+    def __init__(self, frames):
+        super(GenericAnim, self).__init__()
+        self.__frames = frames
+
+    def __len__(self):
+        return len(self.__frames)
+
+    def __getitem__(self, key):
+        idx = int(key)
+        return self.__frames[idx]
+
+    def __setitem__(self, key, val):
+        idx = int(key)
+        if isinstance(val, GenericAnimFrame):
+            self.__frames[idx] = val
+        else:
+            raise ValueError('value must be GenericAnimFrame instance')
+
+    def __contains__(self, item):
+        return item in self.__frames
+
+
 class AWDSkeleton(core.AWDBlockBase):
     def __init__(self, name=''):
         super(AWDSkeleton, self).__init__()
@@ -14,11 +37,11 @@ class AWDSkeleton(core.AWDBlockBase):
         self.root_joint = None
         
 
-class AWDSkeletonAnimation(core.AWDBlockBase):
+class AWDSkeletonAnimation(GenericAnim, core.AWDBlockBase):
     def __init__(self, name=''):
-        super(AWDSkeletonAnimation, self).__init__()
         self.name = name
         self.__frames = []
+        super(AWDSkeletonAnimation, self).__init__(self.__frames)
 
     def add_frame(self, pose, duration):
         dur = int(duration)
@@ -58,12 +81,15 @@ class AWDSkeletonPose(core.AWDBlockBase):
         self.transforms.append(transform)
         
 
-class AWDUVAnimation(core.AWDBlockBase):
+class AWDUVAnimation(GenericAnim, core.AWDBlockBase):
     def __init__(self, name=''):
-        super(AWDUVAnimation, self).__init__()
         self.name = name
         self.__frames = []
+        super(AWDUVAnimation, self).__init__(self.__frames)
 
     def add_frame(self, transform, duration):
         dur = int(duration)
         self.__frames.append(GenericAnimFrame(data=transform, duration=dur))
+
+
+
