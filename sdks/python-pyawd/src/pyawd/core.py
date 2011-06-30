@@ -48,9 +48,16 @@ class AWDAttrElement(object):
 
 class AWD(object):
 
-    def __init__(self, compression=0, flags=0):
+    def __init__(self, compression=0, streaming=False, wide_geom=False, wide_mtx=False):
         self.compression = compression
-        self.flags = flags
+
+        self.flags = 0
+        if streaming:
+            self.flags |= 1
+        if wide_geom:
+            self.flags |= 2
+        if wide_mtx:
+            self.flags |= 4
 
         self.texture_blocks = []
         self.material_blocks = []

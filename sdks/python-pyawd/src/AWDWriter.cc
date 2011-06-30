@@ -55,7 +55,9 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
     AWD *lawd_awd;
     PyObject *awd_obj;
     PyObject *fobj;
+    PyObject *flags_attr;
     PyObject *compression_attr;
+    awd_uint16 flags;
     AWD_compression compression;
     int fd;
 
@@ -79,7 +81,14 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
         compression = (AWD_compression)PyLong_AsLong(compression_attr);
     }
 
-    lawd_awd = new AWD(compression,0);
+    flags = 0; // Default
+    flags_attr = PyObject_GetAttrString(awd_obj, "flags");
+    if (flags_attr!=NULL) {
+        flags = (awd_uint16)PyLong_AsLong(flags_attr);
+    }
+
+    // Create AWD document
+    lawd_awd = new AWD(compression,flags);
 
     if (fd >= 0) {
         pyawd_bcache *bcache;
@@ -87,6 +96,7 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
         bcache = (pyawd_bcache *)malloc(sizeof(pyawd_bcache));
         pyawd_bcache_init(bcache);
 
+        // Create libawd structures from all python blocks
         __prepare_blocks(awd_obj, "uvanim_blocks", lawd_awd, bcache, __prepare_uvanim);
         __prepare_blocks(awd_obj, "texture_blocks", lawd_awd, bcache, __prepare_texture);
         __prepare_blocks(awd_obj, "material_blocks", lawd_awd, bcache, __prepare_material);
