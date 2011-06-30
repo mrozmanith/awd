@@ -21,6 +21,7 @@ typedef enum {
     TRIANGLES,
     UVS,
     VERTEX_NORMALS,
+    VERTEX_TANGENTS,
     JOINT_INDICES,
     VERTEX_WEIGHTS,
 } AWD_mesh_str_type;
