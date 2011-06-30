@@ -16,8 +16,8 @@
 
 AWD::AWD(AWD_compression compression, awd_uint16 flags)
 {
-    this->major_version = AWD_MAJOR_VERSION;
-    this->minor_version = AWD_MINOR_VERSION;
+    this->major_version = AWD_VERSION_MAJOR;
+    this->minor_version = AWD_VERSION_MINOR;
     this->compression = compression;
     this->flags = flags;
     this->texture_blocks = new AWDBlockList();

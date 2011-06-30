@@ -14,8 +14,10 @@
 #include "scene.h"
 
 
-#define AWD_MAJOR_VERSION 0
-#define AWD_MINOR_VERSION 1
+#define AWD_VERSION_MAJOR 2
+#define AWD_VERSION_MINOR 0
+#define AWD_VERSION_BUILD 0
+#define AWD_VERSION_RELEASE 'a'
 
 #define AWD_STREAMING               0x1
 #define AWD_OPTIMIZE_FOR_ACCURACY   0x2
