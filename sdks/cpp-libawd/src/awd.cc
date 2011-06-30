@@ -49,6 +49,13 @@ AWD::~AWD()
 
 
 
+bool
+AWD::has_flag(int flag)
+{
+    return ((this->flags & flag) > 0);
+}
+
+
 void
 AWD::add_material(AWDSimpleMaterial *block)
 {
@@ -142,9 +149,11 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
 
     len = 0;
     while ((block = it.next()) != NULL) {
-        //block->add_dependencies(this);
-        //TODO: Check flags for wide boolean (hard-coded as false now)
-        len += block->write_block(fd, AWD_FALSE, AWD_FALSE, ++this->last_used_baddr);
+        bool wide_mtx, wide_geom;
+
+        wide_mtx = this->has_flag(AWD_WIDE_MTX);
+        wide_geom = this->has_flag(AWD_WIDE_GEOM);
+        len += block->write_block(fd, wide_geom, wide_mtx, ++this->last_used_baddr);
     }
 
     return len;
