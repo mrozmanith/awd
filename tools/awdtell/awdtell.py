@@ -16,6 +16,8 @@ ANIMATION   = 0x8
 include = 0
 offset = 0
 indent_level = 0
+wide_geom = False
+wide_geom = True
 
 BT_MESH_DATA = 1
 BT_CONTAINER = 22
@@ -47,7 +49,7 @@ def print_header(data):
     printl('body size:    %d (%s)' % (header[4], hex(header[4])))
     printl()
 
-    return header[3]
+    return (header[3], header[2] & 2, header[2] & 4)
 
 def read_var_str(data, offs=0):
     len = struct.unpack_from('>H', data, offs)
@@ -122,7 +124,7 @@ def print_skeleton(data):
             joint_name, joint_id, parent_id))
 
         offs += (2 + len(joint_name))
-        mtx = struct.unpack_from('>16d', data, offs)
+        mtx = read_mtx(data, offs)
 
         indent_level += 1
         print_matrix(mtx)
@@ -160,7 +162,7 @@ def print_skelpose(data):
         indent_level += 1
         offs += 1
         if has_transform == 1:
-            mtx = struct.unpack_from('>16d', data, offs)
+            mtx = read_mtx(data, offs)
             print_matrix(mtx)
             offs += 128
         indent_level -= 1
@@ -172,7 +174,7 @@ def print_skelpose(data):
 
 def read_scene_data(data):
     parent = struct.unpack_from('>I', data)[0]
-    matrix = struct.unpack_from('>16f', data, 4) #TODO: Check actual width
+    matrix = read_mtx(data, 4)
     name = read_var_str(data, 68)
 
     return (parent, matrix, name, 70+len(name))
@@ -199,6 +201,14 @@ def print_mesh_instance(data):
     printl('TRANSFORM MATRIX:')
     print_matrix(matrix)
 
+
+def read_mtx(data, offset):
+    if wide_mtx:
+        matrix = struct.unpack_from('>16d', data, offset) 
+    else:
+        matrix = struct.unpack_from('>16f', data, offset) 
+
+    return matrix
 
 def print_matrix(matrix):
     for i in range(0, 15, 4):
@@ -241,11 +251,18 @@ def print_mesh_data(data):
 
             if type < len(stream_types):
                 stream_type = stream_types[type]
-                if type == 1 or type == 3 or type==8:
-                    elem_data_format = 'f'
+                if type == 1 or type == 3 or type==7:
+                    if wide_geom:
+                        elem_data_format = 'd'
+                    else:
+                        elem_data_format = 'f'
                     elem_print_format = '%f'
-                elif type == 2 or type == 7:
-                    elem_data_format = 'H'
+
+                elif type == 2 or type == 6:
+                    if wide_geom:
+                        elem_data_format = 'I'
+                    else:
+                        elem_data_format = 'H'
                     elem_print_format = '%d'
             else:
                 stream_type = '<error> %x' % type
@@ -320,6 +337,7 @@ def print_next_block(data):
 
 
 if __name__ == '__main__':
+    global wide_geom, wide_mtx
     opts, files = getopt.getopt(sys.argv[1:], 'bgsax')
 
     for opt in opts:
@@ -341,7 +359,7 @@ if __name__ == '__main__':
         printl(file)
 
         indent_level += 1
-        compression = print_header(data)
+        compression, wide_geom, wide_mtx = print_header(data)
 
         uncompressed_data = None
         if compression == 0:
