@@ -71,15 +71,15 @@ global proc int MayaAWDExporterUI(string $parent,
         string $options[] = {};
 
         if (`radioButtonGrp -q -sl radWideMtx` == 1)
-            $options[$oi] = "wide_mtx=1";
-        else
             $options[$oi] = "wide_mtx=0";
+        else
+            $options[$oi] = "wide_mtx=1";
 
         $oi++;
         if (`radioButtonGrp -q -sl radWideGeom` == 1)
-            $options[$oi] = "wide_geom=1";
-        else
             $options[$oi] = "wide_geom=0";
+        else
+            $options[$oi] = "wide_geom=1";
 
         $oi++;
         if (`optionMenu -q -sl optCompression` == 1)

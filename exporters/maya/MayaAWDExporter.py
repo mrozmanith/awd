@@ -46,8 +46,11 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
                 compression = DEFLATE
             elif comp_str == 'lzma':
                 compression = LZMA
+
+            wide_mtx = int(o('wide_mtx', False))
+            wide_geom = int(o('wide_geom', False))
                 
-            exporter = MayaAWDExporter(file, compression)
+            exporter = MayaAWDExporter(file, compression, wide_geom=wide_geom, wide_mtx=wide_mtx)
             exporter.include_geom = bool(o('inc_geom', False))
             exporter.include_scene = bool(o('inc_scene', False))
             exporter.flatten_untransformed = bool(o('flatten_untransformed', False))
@@ -161,7 +164,7 @@ class MayaAWDBlockCache:
 
 
 class MayaAWDExporter:
-    def __init__(self, file, compression):
+    def __init__(self, file, compression, wide_geom=False, wide_mtx=False):
         self.file = file
         self.block_cache = MayaAWDBlockCache()
         self.skeleton_paths = []
@@ -181,7 +184,7 @@ class MayaAWDExporter:
 
         self.has_skelanim = False
 
-        self.awd = AWD(compression=compression)
+        self.awd = AWD(compression=compression, wide_geom=wide_geom, wide_mtx=wide_mtx)
 
 
     def export(self, selection):
