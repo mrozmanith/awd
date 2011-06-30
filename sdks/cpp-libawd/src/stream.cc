@@ -110,6 +110,9 @@ AWDMeshDataStream::get_elem_size(awd_bool wide)
         case VERTEX_NORMALS:
             elem_size = sizeof(awd_float32);
             break;
+        case VERTEX_TANGENTS:
+            elem_size = sizeof(awd_float32);
+            break;
         case JOINT_INDICES:
             elem_size = sizeof(awd_uint16);
             break;
