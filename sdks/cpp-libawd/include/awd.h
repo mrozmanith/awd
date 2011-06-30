@@ -20,7 +20,8 @@
 #define AWD_VERSION_RELEASE 'a'
 
 #define AWD_STREAMING               0x1
-#define AWD_OPTIMIZE_FOR_ACCURACY   0x2
+#define AWD_WIDE_GEOM               0x2
+#define AWD_WIDE_MTX                0x4
 
 class AWD
 {
@@ -55,6 +56,8 @@ class AWD
         AWD(AWD_compression, awd_uint16);
         ~AWD();
         awd_uint32 flush(int);
+
+        bool has_flag(int);
 
         void add_texture(AWDTexture *);
         void add_material(AWDSimpleMaterial *);
