@@ -100,8 +100,8 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
                         break
 
                 if not existed:
-                    mc.error('Could not find sequence file "%s"' % seq_path)
-                    sys.exit()
+                    mc.warning('Could not find sequence file "%s. Will not export animation."' % seq_path)
+                    return []
 
             try:
                 with open(seq_path, 'r') as seqf:
