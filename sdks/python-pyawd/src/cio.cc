@@ -39,8 +39,10 @@ PyObject *_init_cio(PyObject *m)
     // Add classes to module
     _add_mod_type(m, "AWDWriter", &cio_AWDWriterType);
 
-    PyModule_AddIntConstant(m, "LIBAWD_MAJOR_VERSION", AWD_MAJOR_VERSION);
-    PyModule_AddIntConstant(m, "LIBAWD_MINOR_VERSION", AWD_MINOR_VERSION);
+    PyModule_AddIntConstant(m, "LIBAWD_VERSION_MAJOR", AWD_VERSION_MAJOR);
+    PyModule_AddIntConstant(m, "LIBAWD_VERSION_MINOR", AWD_VERSION_MINOR);
+    PyModule_AddIntConstant(m, "LIBAWD_VERSION_BUILD", AWD_VERSION_BUILD);
+    PyModule_AddIntConstant(m, "LIBAWD_VERSION_RELEASE", AWD_VERSION_RELEASE);
 
     return m;
 }
