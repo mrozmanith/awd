@@ -4,6 +4,7 @@ import sys
 import getopt
 import struct
 import zlib
+import pylzma
 
 from pyawd import core
 
@@ -337,7 +338,6 @@ def print_next_block(data):
 
 
 if __name__ == '__main__':
-    global wide_geom, wide_mtx
     opts, files = getopt.getopt(sys.argv[1:], 'bgsax')
 
     for opt in opts:
@@ -369,6 +369,11 @@ if __name__ == '__main__':
             offset = 0
             data = data[12:]
             uncompressed_data = zlib.decompress(data)
+        elif compression == core.LZMA:
+            offset = 0
+            uncompressed_len = struct.unpack_from('>I', data, 12)[0]
+            data = data[16:]
+            uncompressed_data = pylzma.decompress(data, uncompressed_len, uncompressed_len)
         else:
             print('unknown compression: %d' % compression)
             sys.exit(-1)
