@@ -36,7 +36,10 @@ global proc int MayaAWDExporterUI(string $parent,
             -mw 20 -mh 20
             -bs "etchedIn";
             checkBox -label "Include mesh data" -v 1 -align "left" chkIncludeGeom;
-            checkBox -label "Include scenegraph" -v 1 -align "left" chkIncludeScene;
+            checkBox -label "Include scenegraph" -v 1 -align "left" 
+                -onc "checkBox -e -en true chkFlatten"
+                -ofc "checkBox -e -en false chkFlatten"
+                chkIncludeScene;
             checkBox -label "Flatten untransformed containers" -align "left" chkFlatten;
             checkBox -label "Replace external references with empty placeholders" -align "left" chkReplaceExRefs;
         
@@ -44,7 +47,10 @@ global proc int MayaAWDExporterUI(string $parent,
         frameLayout -l "Materials"
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include materials" -v 1 -align "left" chkIncludeMat;
+            checkBox -label "Include materials" -v 1 -align "left" 
+                -onc "checkBox -e -en true chkEmbedTex"
+                -ofc "checkBox -e -en false chkEmbedTex"
+                chkIncludeMat;
             checkBox -label "Embed textures" -align "left" chkEmbedTex;
         
         setParent $parent;
@@ -57,7 +63,11 @@ global proc int MayaAWDExporterUI(string $parent,
         frameLayout -l "Animation" 
             -mw 20 -mh 20
             -bs "etchedIn";
-            checkBox -label "Include skeletal animation" -v 1 -align "left" chkIncludeSkelAnim;
+            checkBox -label "Include skeletal animation" 
+                -v 1 -align "left" 
+                -ofc "intSliderGrp -e -en false inpJointsPerVert"
+                -onc "intSliderGrp -e -en true inpJointsPerVert"
+                chkIncludeSkelAnim;
             flowLayout -h 30;
                 intSliderGrp -cl3 "left" "left" "left" -cw3 140 25 70 -f true -l "Max joints per vertex:" -h 20 -min 1 -max 5 -v 3 -step 1 inpJointsPerVert;
             setParent "..";
