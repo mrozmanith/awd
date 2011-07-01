@@ -314,9 +314,10 @@ AWD::flush(int out_fd)
         // of uncompressed body and the actual body data
         // concatenated together.
         tmp_len_bo = UI32(tmp_len);
+        printf("tmp_len: %d, %x\n", tmp_len, tmp_len);
         body_buf = (awd_uint8*)malloc(body_len);
-        memcpy(body_buf, props_buf, props_len);
-        memcpy(body_buf+props_len, &tmp_len_bo, sizeof(awd_uint32));
+        memcpy(body_buf, &tmp_len_bo, sizeof(awd_uint32));
+        memcpy(body_buf+sizeof(awd_uint32), props_buf, props_len);
         memcpy(body_buf+props_len+sizeof(awd_uint32), lzma_buf, lzma_len);
     }
 
