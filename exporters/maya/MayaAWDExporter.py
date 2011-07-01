@@ -221,13 +221,22 @@ class MayaAWDExporter:
                     print('export %s' % dag_it.fullPathName())
                     print('================================================')
 
+                    def find_nearest_cached_ancestor(child_dag_fn):
+                        if child_dag_fn.parentCount() > 0:
+                            parent_dag_fn = om.MFnDagNode(child_dag_fn.parent(0))
+                            print('looking in cache for %s ' % parent_dag_fn.fullPathName())
+                            awd_parent = self.block_cache.get(parent_dag_fn.fullPathName())
+                            if awd_parent is not None:
+                                return awd_parent
+                            else:
+                                return find_nearest_cached_ancestor(parent_dag_fn)
+                        else:
+                            return None
+                        
+
                     awd_parent = None
                     dag_fn = om.MFnDagNode(dag_it.currentItem())
-                    if dag_fn.parentCount() > 0:
-                        parent_dag = om.MFnDagNode(dag_fn.parent(0))
-                        print('looking in cache for %s ' % parent_dag.fullPathName())
-                        awd_parent = self.block_cache.get(parent_dag.fullPathName())
-
+                    parent_dag = find_nearest_cached_ancestor(dag_fn)
                     shapes = mc.listRelatives(transform, s=True, f=True)
                     if shapes is not None:
                         shape = shapes[0]
@@ -235,13 +244,17 @@ class MayaAWDExporter:
                     else:
                         # Container!
                         mtx = mc.xform(transform, q=True, m=True)
-                        ctr = AWDContainer(name=dag_it.partialPathName(), transform=self.mtx_list2awd(mtx))
-                        print('saving in cache with id %s' % transform)
-                        self.block_cache.add(transform, ctr)
-                        if awd_parent is not None:
-                            awd_parent.add_child(ctr)
-                        else:
-                            self.awd.add_scene_block(ctr)
+
+                        #Skip this container if untransformed and transformation is identity
+                        id_mtx = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]
+                        if not (self.flatten_untransformed and mtx == id_mtx):
+                            ctr = AWDContainer(name=dag_it.partialPathName(), transform=self.mtx_list2awd(mtx))
+                            print('saving in cache with id %s' % transform)
+                            self.block_cache.add(transform, ctr)
+                            if awd_parent is not None:
+                                awd_parent.add_child(ctr)
+                            else:
+                                self.awd.add_scene_block(ctr)
   
             else:
                 if dag_it.fullPathName(): # Not root
