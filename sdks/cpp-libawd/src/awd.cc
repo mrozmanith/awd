@@ -29,6 +29,8 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->uvanim_blocks = new AWDBlockList();
     this->scene_blocks = new AWDBlockList();
 
+    this->namespace_blocks = new AWDBlockList();
+
     this->last_used_nsid = 0;
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -45,6 +47,7 @@ AWD::~AWD()
     delete this->skelpose_blocks;
     delete this->uvanim_blocks;
     delete this->scene_blocks;
+    delete this->namespace_blocks;
 }
 
 
@@ -60,16 +63,6 @@ void
 AWD::add_material(AWDSimpleMaterial *block)
 {
     this->material_blocks->append(block);
-}
-
-
-void
-AWD::add_namespace(AWDNamespace *block)
-{
-    if (this->namespace_blocks->append(block)) {
-        this->last_used_nsid++;
-        block->set_handle(this->last_used_nsid);
-    }
 }
 
 
@@ -121,6 +114,36 @@ AWD::add_uv_anim(AWDUVAnimation *block)
     this->uvanim_blocks->append(block);
 }
 
+
+void
+AWD::add_namespace(AWDNamespace *block)
+{
+    if (this->namespace_blocks->append(block)) {
+        this->last_used_nsid++;
+        block->set_handle(this->last_used_nsid);
+    }
+}
+
+
+AWDNamespace *
+AWD::get_namespace(const char *uri)
+{
+    AWDNamespace *ns;
+    AWDBlockIterator it(this->namespace_blocks);
+
+    while ((ns = (AWDNamespace *)it.next()) != NULL) {
+        const char *ns_uri;
+        int ns_uri_len;
+
+        ns_uri = ns->get_uri(&ns_uri_len);
+
+        if (strncmp(ns_uri, uri, ns_uri_len)==0) {
+            return ns;
+        }
+    }
+
+    return NULL;
+}
 
 
 void
@@ -314,7 +337,6 @@ AWD::flush(int out_fd)
         // of uncompressed body and the actual body data
         // concatenated together.
         tmp_len_bo = UI32(tmp_len);
-        printf("tmp_len: %d, %x\n", tmp_len, tmp_len);
         body_buf = (awd_uint8*)malloc(body_len);
         memcpy(body_buf, &tmp_len_bo, sizeof(awd_uint32));
         memcpy(body_buf+sizeof(awd_uint32), props_buf, props_len);

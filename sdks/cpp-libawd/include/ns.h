@@ -20,6 +20,8 @@ class AWDNamespace :
         AWDNamespace(const char *, awd_uint16);
         ~AWDNamespace();
 
+        const char *get_uri(int *);
+
         awd_nsid get_handle();
         void set_handle(awd_nsid handle);
 };

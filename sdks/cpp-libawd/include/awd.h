@@ -67,7 +67,9 @@ class AWD
         void add_skeleton_anim(AWDSkeletonAnimation *);
         void add_uv_anim(AWDUVAnimation *);
         void add_scene_block(AWDSceneBlock *);
+
         void add_namespace(AWDNamespace *);
+        AWDNamespace *get_namespace(const char *);
 };
 
 
