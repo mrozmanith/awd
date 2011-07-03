@@ -25,4 +25,6 @@ void __prepare_skelpose(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_uvanim(PyObject *, AWD *, pyawd_bcache *);
 void __prepare_scene_block(PyObject *, AWD *, pyawd_bcache *);
 
+void __prepare_attr_element(PyObject *, AWD *, AWDAttrElement *);
+
 #endif

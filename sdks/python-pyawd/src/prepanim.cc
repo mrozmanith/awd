@@ -1,5 +1,5 @@
 /**
- * This file contains reparation functions for all blocks belonging in the pyawd.anim
+ * This file contains preparation functions for all blocks belonging in the pyawd.anim
  * module. 
  *
  * These are invoked by AWDWriter to convert a python object to it's C++/libawd

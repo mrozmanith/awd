@@ -73,6 +73,9 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         lawd_md->add_sub_mesh(lawd_sub);
     }
 
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_md);
+
     awd->add_mesh_data(lawd_md);
 
     // Add to block cache so other blocks can reference it
