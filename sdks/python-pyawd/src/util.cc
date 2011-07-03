@@ -8,13 +8,19 @@ pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
     PyObject *a;
 
     a = PyObject_GetAttrString(o, attr);
+    if (a != NULL) {
 #if PYTHON_VERSION == 3
-    *str = PyUnicode_AS_DATA(a);
-    *len = PyUnicode_GET_DATA_SIZE(a);
+        *str = PyUnicode_AS_DATA(a);
+        *len = PyUnicode_GET_DATA_SIZE(a);
 #else
-    *str = PyString_AsString(a);
-    *len = PyString_Size(a);
+        *str = PyString_AsString(a);
+        *len = PyString_Size(a);
 #endif
+    }
+    else {
+        *str = NULL;
+        *len = 0;
+    }
 }
 
 awd_float64 *

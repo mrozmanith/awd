@@ -96,7 +96,7 @@ AWDSkeletonJoint::add_child_joint(AWDSkeletonJoint *joint)
 
 
 int
-AWDSkeletonJoint::calc_length(bool wide_mtx)
+AWDSkeletonJoint::calc_length(bool wide_geom, bool wide_mtx)
 {
     int len;
     AWDSkeletonJoint *child;
@@ -106,9 +106,11 @@ AWDSkeletonJoint::calc_length(bool wide_mtx)
         sizeof(awd_uint16) + this->get_name_length() + 
         MTX4_SIZE(wide_mtx);
 
+    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
+
     child = this->first_child;
     while (child) {
-        len += child->calc_length(wide_mtx);
+        len += child->calc_length(wide_geom, wide_mtx);
         child = child->next;
     }
 
@@ -134,7 +136,7 @@ AWDSkeletonJoint::calc_num_children()
 
 
 int
-AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_mtx)
+AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_geom, bool wide_mtx)
 {
     int num_written;
     awd_uint32 child_id;
@@ -157,6 +159,8 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_mtx)
     awdutil_write_mtx4(fd, this->bind_mtx, wide_mtx);
 
     //  TODO: Write attributes
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 
     // Write children
     child_id = id+1;
@@ -165,7 +169,7 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_mtx)
     while (child) {
         int num_children_written;
 
-        num_children_written = child->write_joint(fd, child_id, wide_mtx);
+        num_children_written = child->write_joint(fd, child_id, wide_geom, wide_mtx);
 
         child_id += num_children_written;
         num_written += num_children_written;
@@ -208,7 +212,7 @@ AWDSkeleton::calc_body_length(bool wide_geom, bool wide_mtx)
     len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
 
     if (this->root_joint != NULL)
-        len += this->root_joint->calc_length(wide_mtx);
+        len += this->root_joint->calc_length(wide_geom, wide_mtx);
 
     return len;
 }
@@ -231,7 +235,7 @@ AWDSkeleton::write_body(int fd, bool wide_geom, bool wide_mtx)
 
     // Write joints (if any)
     if (this->root_joint != NULL)
-        this->root_joint->write_joint(fd, 1, wide_mtx);
+        this->root_joint->write_joint(fd, 1, wide_geom, wide_mtx);
 
     // Write user attributes
     this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);

@@ -94,6 +94,9 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     scene_block->set_name(name, name_len);
     scene_block->set_transform(mtx);
 
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, scene_block);
+
     awd->add_scene_block(scene_block);
     pyawd_bcache_add(bcache, block, scene_block);
 

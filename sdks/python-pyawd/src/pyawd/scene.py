@@ -1,7 +1,7 @@
 from pyawd import utils 
 from pyawd import core
 
-class AWDSceneBlockBase(core.AWDBlockBase):
+class AWDSceneBlockBase(core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name='', transform=None):
         super(AWDSceneBlockBase, self).__init__()
         self.__children = []

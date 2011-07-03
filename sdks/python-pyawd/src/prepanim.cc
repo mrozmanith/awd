@@ -12,7 +12,7 @@
 
 
 static AWDSkeletonJoint *
-__prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
+__prepare_skeljoint(PyObject *py_joint, AWD *awd, AWDSkeletonJoint *lawd_parent)
 {
     int i;
     int num_children;
@@ -38,6 +38,9 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
 
     lawd_joint = new AWDSkeletonJoint(name, name_len, mtx);
 
+    // Prep any user attributes
+    __prepare_attr_element(py_joint, awd, lawd_joint);
+
     if (lawd_parent)
         lawd_parent->add_child_joint(lawd_joint);
 
@@ -48,7 +51,7 @@ __prepare_skeljoint(PyObject *py_joint, AWDSkeletonJoint *lawd_parent)
         PyObject *py_child;
 
         py_child = PyList_GetItem(children_attr, i);
-        __prepare_skeljoint(py_child, lawd_joint);
+        __prepare_skeljoint(py_child, awd, lawd_joint);
     }
 
     return lawd_joint;
@@ -71,9 +74,12 @@ __prepare_skeleton(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     if (root_attr != Py_None) {
         AWDSkeletonJoint *lawd_joint;
 
-        lawd_joint = __prepare_skeljoint(root_attr, NULL);
+        lawd_joint = __prepare_skeljoint(root_attr, awd, NULL);
         lawd_skel->set_root_joint(lawd_joint);
     }
+
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_skel);
 
     awd->add_skeleton(lawd_skel);
     pyawd_bcache_add(bcache, block, lawd_skel);
@@ -113,6 +119,9 @@ __prepare_skelanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         lawd_anim->set_next_frame_pose(lawd_pose, dur);
     }
 
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_anim);
+
     awd->add_skeleton_anim(lawd_anim);
     pyawd_bcache_add(bcache, block, lawd_anim);
 }
@@ -150,6 +159,9 @@ __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
             lawd_pose->set_next_transform(NULL);
         }
     }
+
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_pose);
 
     awd->add_skeleton_pose(lawd_pose);
     pyawd_bcache_add(bcache, block, lawd_pose);
@@ -191,6 +203,9 @@ __prepare_uvanim(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
         lawd_anim->set_next_frame_tf(mtx, dur);
     }
+
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_anim);
 
     awd->add_uv_anim(lawd_anim);
     pyawd_bcache_add(bcache, block, lawd_anim);

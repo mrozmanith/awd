@@ -37,6 +37,9 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
             lawd_mat->set_texture(tex);
     }
 
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_mat);
+
     awd->add_material(lawd_mat);
     pyawd_bcache_add(bcache, block, lawd_mat);
 }
@@ -71,13 +74,18 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     else {
         const char *buf;
         int buf_len;
-        PyObject *data_attr;
 
         pyawdutil_get_strattr(block, "_AWDTexture__data", &buf, &buf_len);
         if (buf_len>0) {
             lawd_tex->set_embed_data((awd_uint8 *)buf, (awd_uint32)buf_len);
         }
+        else {
+            // TODO: Implement way to set errors (return null)
+        }
     }
+
+    // Prep any user attributes
+    __prepare_attr_element(block, awd, lawd_tex);
 
     awd->add_texture(lawd_tex);
     pyawd_bcache_add(bcache, block, lawd_tex);
