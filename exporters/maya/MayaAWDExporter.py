@@ -60,6 +60,10 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
             exporter.include_skeletons = bool(o('inc_skeletons', False))
             exporter.include_materials = bool(o('inc_materials', False))
             exporter.embed_textures = bool(o('embed_textures', False))
+            exporter.include_attr = bool(o('inc_attr', False))
+
+            if exporter.include_attr:
+                exporter.user_ns = AWDNamespace(str(o('attrns', '')))
 
             if exporter.include_skelanim:
                 exporter.animation_sequences = self.read_sequences(o('seqsrc'), base_path)
@@ -171,6 +175,7 @@ class MayaAWDExporter:
         self.joint_indices = {}
         self.mesh_vert_indices = {}
 
+        self.include_attr = False
         self.include_geom = False
         self.include_scene = False
         self.flatten_untransformed = False
@@ -255,6 +260,8 @@ class MayaAWDExporter:
                                 awd_parent.add_child(ctr)
                             else:
                                 self.awd.add_scene_block(ctr)
+
+                            self.set_attributes(transform, ctr)
   
             else:
                 if dag_it.fullPathName(): # Not root
@@ -456,6 +463,8 @@ class MayaAWDExporter:
  
             inst = AWDMeshInst(md, tf_name, self.mtx_list2awd(mtx))
  
+            self.set_attributes(transform, inst)
+
             # Look for materials
             if self.include_materials:
                 self.export_materials(transform, inst)
@@ -730,6 +739,12 @@ class MayaAWDExporter:
     
             # Store mesh data block to block cache
 
+    def set_attributes(self, dag_path, awd_elem):
+        if self.include_attr:
+            extra_attributes = mc.listAttr(dag_path, ud=True)
+            for attr in extra_attributes:
+                val = mc.getAttr('%s.%s' % (dag_path, attr))
+                awd_elem.attributes[self.user_ns][str(attr)] = val
 
     def get_name(self, dag_path):
         # TODO: Deal with unicode names. In pyawd?

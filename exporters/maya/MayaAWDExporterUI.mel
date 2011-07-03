@@ -29,6 +29,19 @@ global proc int MayaAWDExporterUI(string $parent,
                 menuItem -l "Uncompressed (None)";
                 menuItem -l "ZLIB/Deflate (Good)";
                 menuItem -l "LZMA (Best)"; 
+
+
+        setParent $parent;
+        frameLayout -l "Extension"
+            -mw 20 -mh 20
+            -bs "etchedIn";
+            checkBox -label "Include user attributes" -v 0 -align "left"
+                -onc "textField -e -en true tfUserNamespace"
+                -ofc "textField -e -en false tfUserNamespace"
+                chkIncludeAttributes;
+
+            text -label "User attribute namespace:" -align "left";
+            textField -en false -tx "http://example.com/myawdns" tfUserNamespace;
         
         
         setParent $parent;
@@ -73,7 +86,7 @@ global proc int MayaAWDExporterUI(string $parent,
             setParent "..";
             checkBox -label "Include UV animation" -align "left" chkIncludeUVAnim;
         
-            text -label "Sequence file path" -align "left";
+            text -label "Sequence file path:" -align "left";
             textField -tx "sequences.txt" tfSequences;
     }
     else if ($action == "query") { 
@@ -100,6 +113,13 @@ global proc int MayaAWDExporterUI(string $parent,
             $options[$oi] = "compression=lzma";
 
         $oi++;
+        if (`checkBox -q -v chkIncludeAttributes`) {
+            $options[$oi] = "inc_attr=1";
+            $oi++;
+            $options[$oi] = "attrns="+`textField -q -tx tfUserNamespace`;
+            $oi++;
+        }
+
         if (`checkBox -q -v chkIncludeGeom`) {
             $options[$oi] = "inc_geom=1";
             $oi++;
