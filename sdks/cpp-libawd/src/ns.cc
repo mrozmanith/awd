@@ -32,6 +32,14 @@ AWDNamespace::set_handle(awd_nsid handle)
 }
 
 
+const char *
+AWDNamespace::get_uri(int *len)
+{
+    *len = this->uri_len;
+    return this->uri;
+}
+
+
 awd_uint32 
 AWDNamespace::calc_body_length(bool wide_geom, bool wide_mtx)
 {
