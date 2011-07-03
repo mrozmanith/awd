@@ -30,14 +30,14 @@ class GenericAnim(object):
         return item in self.__frames
 
 
-class AWDSkeleton(core.AWDBlockBase):
+class AWDSkeleton(core.AWDBlockBase, core.AWDAttrElement):
     def __init__(self, name=''):
         super(AWDSkeleton, self).__init__()
         self.name = name
         self.root_joint = None
         
 
-class AWDSkeletonAnimation(GenericAnim, core.AWDBlockBase):
+class AWDSkeletonAnimation(GenericAnim, core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.__frames = []
@@ -48,7 +48,7 @@ class AWDSkeletonAnimation(GenericAnim, core.AWDBlockBase):
         self.__frames.append(GenericAnimFrame(data=pose, duration=dur))
 
 
-class AWDSkeletonJoint(object):
+class AWDSkeletonJoint(core.AWDAttrElement):
     def __init__(self, name='', inv_bind_mtx=None):
         super(AWDSkeletonJoint, self).__init__()
         self.name = name
@@ -71,7 +71,7 @@ class AWDSkeletonJoint(object):
         self.__children.append(child)
 
 
-class AWDSkeletonPose(core.AWDBlockBase):
+class AWDSkeletonPose(core.AWDBlockBase, core.AWDAttrElement):
     def __init__(self, name=''):
         super(AWDSkeletonPose, self).__init__()
         self.name = name
@@ -81,7 +81,7 @@ class AWDSkeletonPose(core.AWDBlockBase):
         self.transforms.append(transform)
         
 
-class AWDUVAnimation(GenericAnim, core.AWDBlockBase):
+class AWDUVAnimation(GenericAnim, core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name=''):
         self.name = name
         self.__frames = []

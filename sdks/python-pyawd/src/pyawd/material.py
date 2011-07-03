@@ -3,7 +3,7 @@ from pyawd import core
 TEX_EXTERNAL = 0
 TEX_EMBED_JPG = 1
 
-class AWDTexture(core.AWDBlockBase):
+class AWDTexture(core.AWDAttrElement, core.AWDBlockBase):
 
     def __init__(self, type=0, name='', url=None):
         super(AWDTexture, self).__init__()
@@ -15,7 +15,7 @@ class AWDTexture(core.AWDBlockBase):
         with open(path, 'rb') as f:
             self.__data = f.read()
 
-class AWDMaterial(core.AWDBlockBase):
+class AWDMaterial(core.AWDAttrElement, core.AWDBlockBase):
     COLOR = 1
     BITMAP = 2
 
