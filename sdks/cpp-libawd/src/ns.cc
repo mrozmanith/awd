@@ -43,7 +43,7 @@ AWDNamespace::get_uri(int *len)
 awd_uint32 
 AWDNamespace::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return sizeof(awd_nsid) && sizeof(awd_uint16) + this->uri_len;
+    return sizeof(awd_nsid) + sizeof(awd_uint16) + this->uri_len;
 }
 
 

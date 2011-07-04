@@ -234,6 +234,7 @@ AWD::flush(int out_fd)
         return AWD_FALSE;
     }
 
+    tmp_len += this->write_blocks(this->namespace_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skeleton_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skelpose_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skelanim_blocks, tmp_fd);
