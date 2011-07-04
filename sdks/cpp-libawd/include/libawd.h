@@ -11,6 +11,7 @@
 #include "skelanim.h"
 #include "material.h"
 #include "texture.h"
+#include "camera.h"
 //#include "writing.h"
 #include "awdlzma.h"
 
