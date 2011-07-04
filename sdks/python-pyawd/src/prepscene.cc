@@ -54,6 +54,15 @@ __prepare_container(PyObject *block)
 }
 
 
+static AWDSceneBlock *
+__prepare_scene(PyObject *block)
+{
+    AWDScene *lawd_scene;
+    lawd_scene = new AWDScene(NULL, 0);
+
+    return lawd_scene;
+}
+
 
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
@@ -70,11 +79,14 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWDSceneBlock *scene_block;
     const char *type = block->ob_type->tp_name;
 
-    if (strcmp(type, "AWDMeshInst")>=0) {
+    if (strcmp(type, "AWDMeshInst")==0) {
         scene_block = __prepare_mesh_inst(block, bcache);
     }
-    else if (strcmp(type, "AWDContainer")>=0) {
+    else if (strcmp(type, "AWDContainer")==0) {
         scene_block = __prepare_container(block);
+    }
+    else if (strcmp(type, "AWDScene")==0) {
+        scene_block = __prepare_scene(block);
     }
     else {
         // Unknown type
