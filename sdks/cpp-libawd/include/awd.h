@@ -10,6 +10,7 @@
 #include "skeleton.h"
 #include "skelanim.h"
 #include "texture.h"
+#include "camera.h"
 #include "uvanim.h"
 #include "scene.h"
 
