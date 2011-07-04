@@ -37,11 +37,22 @@ class AWDSceneBlock :
 };
 
 
+class AWDScene :
+    public AWDSceneBlock
+{
+    protected:
+        awd_uint32 calc_body_length(bool, bool);
+        void write_body(int, bool, bool);
+
+    public:
+        AWDScene(const char *, awd_uint16);
+        ~AWDScene();
+};
+
+
 class AWDContainer :
     public AWDSceneBlock
 {
-    private:
-
     protected:
         awd_uint32 calc_body_length(bool, bool);
         void write_body(int, bool, bool);

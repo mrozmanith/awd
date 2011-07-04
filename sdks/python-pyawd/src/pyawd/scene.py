@@ -37,6 +37,10 @@ class AWDSceneBlockBase(core.AWDAttrElement, core.AWDBlockBase):
             self.__children.remove(child)
 
 
+class AWDScene(AWDSceneBlockBase):
+    def __init__(self, name='', transform=None):
+        super(AWDScene, self).__init__(name, transform)
+
 
 class AWDMeshInst(AWDSceneBlockBase):
     def __init__(self, data, name='', transform=None):
