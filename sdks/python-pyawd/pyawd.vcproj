@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\prepattr.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\src\prepgeom.cc"
 				>
 			</File>
