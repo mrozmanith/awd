@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="rmdir /S /Q build\pyawd;&#x0D;&#x0A;mkdir build\pyawd&#x0D;&#x0A;"
+				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -101,7 +101,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="rmdir /S /Q build\pyawd;&#x0D;&#x0A;mkdir build\pyawd&#x0D;&#x0A;"
+				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
