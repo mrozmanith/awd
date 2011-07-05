@@ -69,3 +69,12 @@ class AWDCamera(AWDSceneBlockBase):
         self.lens = lens
         self.fov = 35.0
 
+
+LIGHT_POINT = 1
+LIGHT_DIR = 2
+
+class AWDLight(AWDSceneBlockBase):
+    def __init__(self, name='', transform=None, type=LIGHT_POINT):
+        super(AWDLight, self).__init__(name, transform)
+        self.type = type
+

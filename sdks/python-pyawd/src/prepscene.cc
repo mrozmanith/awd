@@ -92,6 +92,22 @@ __prepare_camera(PyObject *block)
 }
 
 
+static AWDSceneBlock *
+__prepare_light(PyObject *block)
+{
+    PyObject *type_attr;
+    AWD_light_type type;
+    AWDLight *lawd_light;
+
+    type_attr = PyObject_GetAttrString(block, "type");
+    type = (AWD_light_type)PyLong_AsLong(type_attr);
+
+    lawd_light = new AWDLight(NULL, 0, type);
+
+    return lawd_light;
+}
+
+
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
@@ -118,6 +134,9 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     }
     else if (strcmp(type, "AWDCamera")==0) {
         scene_block = __prepare_camera(block);
+    }
+    else if (strcmp(type, "AWDLight")==0) {
+        scene_block = __prepare_light(block);
     }
     else {
         // Unknown type
