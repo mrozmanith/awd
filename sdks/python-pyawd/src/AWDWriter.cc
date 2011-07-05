@@ -44,6 +44,29 @@ cio_AWDWriter_init(cio_AWDWriter *self, PyObject *args, PyObject *kwds)
 
 
 
+static void
+__prepare_metadata(PyObject *pyawd_AWD, AWD *lawd_awd)
+{
+    PyObject *meta;
+
+    meta = PyObject_GetAttrString(pyawd_AWD, "metadata");
+    if (meta && meta != Py_None) {
+        char *enc_name;
+        char *enc_ver;
+        AWDMetaData *lawd_meta;
+
+        lawd_meta = new AWDMetaData();
+
+        pyawdutil_get_strattr(meta, "generator", (const char**)&lawd_meta->generator_name, NULL);
+        pyawdutil_get_strattr(meta, "generator_version", (const char**)&lawd_meta->generator_version, NULL);
+        pyawdutil_get_strattr(meta, "encoder", (const char**)&enc_name, NULL);
+        pyawdutil_get_strattr(meta, "encoder_version", (const char **)&enc_ver, NULL);
+
+        lawd_meta->override_encoder_metadata(enc_name, enc_ver);
+        lawd_awd->set_metadata(lawd_meta);
+    }
+}
+
 
 
 /**
@@ -92,6 +115,8 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
 
     if (fd >= 0) {
         pyawd_bcache *bcache;
+
+        __prepare_metadata(awd_obj, lawd_awd);
 
         bcache = (pyawd_bcache *)malloc(sizeof(pyawd_bcache));
         pyawd_bcache_init(bcache);

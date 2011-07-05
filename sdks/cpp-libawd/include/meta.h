@@ -28,6 +28,8 @@ class AWDMetaData :
         AWDMetaData();
         char *generator_name;
         char *generator_version;
+
+        void override_encoder_metadata(char *, char *);
 };
 
 
