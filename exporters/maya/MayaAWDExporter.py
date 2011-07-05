@@ -59,6 +59,8 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
             exporter.include_skelanim = bool(o('inc_skelanim', False))
             exporter.include_skeletons = bool(o('inc_skeletons', False))
             exporter.include_materials = bool(o('inc_materials', False))
+            exporter.include_cameras = bool(o('inc_cams', False))
+            exporter.include_lights = bool(o('inc_lights', False))
             exporter.embed_textures = bool(o('embed_textures', False))
             exporter.include_attr = bool(o('inc_attr', False))
 
@@ -184,6 +186,8 @@ class MayaAWDExporter:
         self.include_skelanim = False
         self.include_skeletons = False
         self.include_materials = False
+        self.include_cameras = False
+        self.include_lights = False
         self.embed_textures = False
         self.animation_sequences = []
 
@@ -229,7 +233,7 @@ class MayaAWDExporter:
                     def find_nearest_cached_ancestor(child_dag_fn):
                         if child_dag_fn.parentCount() > 0:
                             parent_dag_fn = om.MFnDagNode(child_dag_fn.parent(0))
-                            print('looking in cache for %s ' % parent_dag_fn.fullPathName())
+                            print('looking in cache for "%s"' % parent_dag_fn.fullPathName())
                             awd_parent = self.block_cache.get(parent_dag_fn.fullPathName())
                             if awd_parent is not None:
                                 return awd_parent
@@ -239,13 +243,17 @@ class MayaAWDExporter:
                             return None
                         
 
-                    awd_parent = None
                     dag_fn = om.MFnDagNode(dag_it.currentItem())
-                    parent_dag = find_nearest_cached_ancestor(dag_fn)
+                    awd_parent = find_nearest_cached_ancestor(dag_fn)
                     shapes = mc.listRelatives(transform, s=True, f=True)
                     if shapes is not None:
                         shape = shapes[0]
-                        self.export_mesh(transform, shape, awd_parent)
+                        api_type = mc.nodeType(shape, api=True)
+                        if api_type == 'kMesh':
+                            self.export_mesh(transform, shape, awd_parent)
+                        elif api_type == 'kCamera' and self.include_cameras:
+                            # Cameras for some reason are "shapes" in Maya
+                            self.export_camera(transform, awd_parent)
                     else:
                         # Container!
                         mtx = mc.xform(transform, q=True, m=True)
@@ -265,11 +273,25 @@ class MayaAWDExporter:
   
             else:
                 if dag_it.fullPathName(): # Not root
+                    # Stop iterating this branch of the tree
                     dag_it.prune()
                 print('skipping invisible %s' % dag_it.fullPathName())
 
             dag_it.next()
 
+
+    def export_camera(self, transform, awd_parent):
+        mtx = mc.xform(transform, q=True, m=True)
+        cam = AWDCamera(self.get_name(transform), AWDMatrix4x4(mtx))
+        cam.type = CAM_FREE
+        cam.lens = LENS_PERSPECTIVE
+        cam.fov = mc.camera(transform, q=True, vfv=True)
+
+        if awd_parent is not None:
+            awd_parent.add_child(cam)
+        else:
+            self.awd.add_scene_block(cam)
+        
 
     def export_skeletons(self):
         dag_it = om.MItDependencyNodes(om.MFn.kSkinClusterFilter)

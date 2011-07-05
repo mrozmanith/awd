@@ -88,6 +88,13 @@ global proc int MayaAWDExporterUI(string $parent,
         
             text -label "Sequence file path:" -align "left";
             textField -tx "sequences.txt" tfSequences;
+
+        setParent $parent;
+        frameLayout -l "Cameras and lights"
+            -mw 20 -mh 20
+            -bs "etchedIn";
+            checkBox -label "Include cameras" chkIncludeCameras;
+            checkBox -label "Include lights" chkIncludeLights;
     }
     else if ($action == "query") { 
         int $oi=0;
@@ -169,6 +176,17 @@ global proc int MayaAWDExporterUI(string $parent,
         }
 
         $options[$oi] = "seqsrc="+`textField -q -tx tfSequences`;
+        $oi++;
+
+        if (`checkBox -q -v chkIncludeCameras`) {
+            $oitions[$oi] = "inc_cams=1";
+            $oi++;
+        }
+
+        if (`checkBox -q -v chkIncludeLights`) {
+            $oitions[$oi] = "inc_lights=1";
+            $oi++;
+        }
 
 
         // Join option string (equivalent of '&'.join(options) in Python)
