@@ -28,6 +28,17 @@ class AWDNamespace(object):
         return self.__handle
 
 
+class AWDMetaData(object):
+    def __init__(self):
+        import pyawd
+        self.encoder = 'PyAWD (%s)' % pyawd.backend[0]
+        self.encoder_version = '%d.%d.%d%s (%d.%d.%d%s)' % (
+            pyawd.version[1], pyawd.version[2], pyawd.version[3], pyawd.version[4],
+            pyawd.backend[1], pyawd.backend[2], pyawd.backend[3], pyawd.backend[4])
+        self.generator = None
+        self.generator_version = None
+
+
 class AWDAttrElement(object):
     class AWDAttrDict(object):
         def __init__(self):
@@ -59,6 +70,7 @@ class AWD(object):
         if wide_mtx:
             self.flags |= 4
 
+        self.metadata = None
         self.texture_blocks = []
         self.material_blocks = []
         self.mesh_data_blocks = []
@@ -78,7 +90,7 @@ class AWD(object):
 
         writer = io.AWDWriter()
         writer.write(self, file)
-        
+
     def add_texture(self, block):
         self.texture_blocks.append(block)
 

@@ -11,15 +11,15 @@ pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
     if (a != NULL) {
 #if PYTHON_VERSION == 3
         *str = PyUnicode_AS_DATA(a);
-        *len = PyUnicode_GET_DATA_SIZE(a);
+        if (len) *len = PyUnicode_GET_DATA_SIZE(a);
 #else
         *str = PyString_AsString(a);
-        *len = PyString_Size(a);
+        if (len) *len = PyString_Size(a);
 #endif
     }
     else {
         *str = NULL;
-        *len = 0;
+        if (len) *len = 0;
     }
 }
 
