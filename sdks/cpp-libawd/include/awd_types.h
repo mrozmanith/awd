@@ -66,8 +66,8 @@ typedef enum {
     UV_ANIM=121,
 
     // Misc
-    COMMAND=254,
-    NAMESPACE=255
+    NAMESPACE=254,
+    METADATA=255
 
 } AWD_block_type;
 

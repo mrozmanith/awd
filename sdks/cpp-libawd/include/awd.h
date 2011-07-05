@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "uvanim.h"
 #include "scene.h"
+#include "meta.h"
 
 
 #define AWD_VERSION_MAJOR 2
@@ -24,6 +25,7 @@
 #define AWD_WIDE_GEOM               0x2
 #define AWD_WIDE_MTX                0x4
 
+
 class AWD
 {
     private:
@@ -32,6 +34,8 @@ class AWD
         awd_uint8 minor_version;
         awd_uint16 flags;
         AWD_compression compression;
+
+        AWDMetaData *metadata;
 
         AWDBlockList * namespace_blocks;
         AWDBlockList * texture_blocks;
@@ -59,6 +63,8 @@ class AWD
         awd_uint32 flush(int);
 
         bool has_flag(int);
+
+        void set_metadata(AWDMetaData *);
 
         void add_texture(AWDTexture *);
         void add_material(AWDSimpleMaterial *);
