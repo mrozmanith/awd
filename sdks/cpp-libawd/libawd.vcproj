@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\camera.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lib\zlib\crc32.h"
 				>
 			</File>
@@ -342,6 +346,10 @@
 			</File>
 			<File
 				RelativePath=".\lib\lzma\Bra.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\camera.cc"
 				>
 			</File>
 			<File
