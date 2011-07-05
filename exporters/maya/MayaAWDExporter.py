@@ -445,6 +445,7 @@ class MayaAWDExporter:
             # This is an external reference, and it should be
             # replaced with an empty container in the AWD file
             ctr = AWDContainer(name=tf_name, transform=AWDMatrix4x4(mtx))
+            self.set_attributes(transform, ctr)
             self.block_cache.add(transform, ctr)
             if awd_ctr is not None:
                 awd_ctr.add_child(ctr)
