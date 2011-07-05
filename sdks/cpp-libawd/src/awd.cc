@@ -31,6 +31,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 
     this->namespace_blocks = new AWDBlockList();
 
+    this->metadata = NULL;
     this->last_used_nsid = 0;
     this->last_used_baddr = 0;
     this->header_written = AWD_FALSE;
@@ -56,6 +57,13 @@ bool
 AWD::has_flag(int flag)
 {
     return ((this->flags & flag) > 0);
+}
+
+
+void
+AWD::set_metadata(AWDMetaData *block)
+{
+    this->metadata = block;
 }
 
 
@@ -234,6 +242,14 @@ AWD::flush(int out_fd)
         return AWD_FALSE;
     }
 
+    if (this->metadata) {
+        bool wide_mtx, wide_geom;
+
+        wide_mtx = this->has_flag(AWD_WIDE_MTX);
+        wide_geom = this->has_flag(AWD_WIDE_GEOM);
+        tmp_len += this->metadata->write_block(tmp_fd, wide_geom, wide_mtx, ++this->last_used_baddr);
+    }
+
     tmp_len += this->write_blocks(this->namespace_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skeleton_blocks, tmp_fd);
     tmp_len += this->write_blocks(this->skelpose_blocks, tmp_fd);
@@ -356,5 +372,7 @@ AWD::flush(int out_fd)
 
     return AWD_TRUE;
 }
+
+
 
 
