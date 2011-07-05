@@ -1,6 +1,7 @@
 from pyawd import utils 
 from pyawd import core
 
+
 class AWDSceneBlockBase(core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name='', transform=None):
         super(AWDSceneBlockBase, self).__init__()
@@ -52,3 +53,19 @@ class AWDMeshInst(AWDSceneBlockBase):
 class AWDContainer(AWDSceneBlockBase):
     def __init__(self, name='', transform=None):
         super(AWDContainer, self).__init__(name, transform)
+
+
+CAM_FREE = 1
+CAM_TARGET = 2
+CAM_HOVER = 3
+
+LENS_PERSPECTIVE = 1
+LENS_ORTHOGRAPHIC = 2
+
+class AWDCamera(AWDSceneBlockBase):
+    def __init__(self, name='', transform=None, type=CAM_FREE, lens=LENS_ORTHOGRAPHIC):
+        super(AWDCamera, self).__init__(name, transform)
+        self.type = type
+        self.lens = lens
+        self.fov = 35.0
+

@@ -64,6 +64,34 @@ __prepare_scene(PyObject *block)
 }
 
 
+static AWDSceneBlock *
+__prepare_camera(PyObject *block)
+{
+    PyObject *type_attr;
+    PyObject *lens_attr;
+    PyObject *fov_attr;
+
+    awd_float64 fov;
+    AWD_cam_type type;
+    AWD_lens_type lens;
+    AWDCamera *lawd_cam;
+
+    type_attr = PyObject_GetAttrString(block, "type");
+    type = (AWD_cam_type)PyLong_AsLong(type_attr);
+
+    lens_attr = PyObject_GetAttrString(block, "lens");
+    lens = (AWD_lens_type)PyLong_AsLong(lens_attr);
+
+    fov_attr = PyObject_GetAttrString(block, "fov");
+    fov = PyFloat_AsDouble(fov_attr);
+
+    lawd_cam = new AWDCamera(NULL, 0, type, lens);
+    lawd_cam->set_lens_fov(fov);
+    
+    return lawd_cam;
+}
+
+
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
@@ -87,6 +115,9 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     }
     else if (strcmp(type, "AWDScene")==0) {
         scene_block = __prepare_scene(block);
+    }
+    else if (strcmp(type, "AWDCamera")==0) {
+        scene_block = __prepare_camera(block);
     }
     else {
         // Unknown type
