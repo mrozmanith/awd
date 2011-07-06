@@ -91,3 +91,7 @@ class AWDPrimitive(AWDSceneBlockBase):
         self.type = type
 
 
+class AWDCubePrimitive(AWDPrimitive):
+    def __init__(self, name='', transform=None):
+        super(AWDCubePrimitive, self).__init__(name, transform, PRIMITIVE_CUBE)
+
