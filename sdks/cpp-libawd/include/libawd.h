@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "camera.h"
 #include "light.h"
+#include "primitive.h"
 //#include "writing.h"
 #include "awdlzma.h"
 
