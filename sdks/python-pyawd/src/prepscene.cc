@@ -109,14 +109,25 @@ __prepare_light(PyObject *block)
 
 
 static AWDSceneBlock *
-__prepare_primitive(PyObject *block)
+__prepare_primitive(PyObject *block, bool subtype)
 {
-    PyObject *type_attr;
     AWD_primitive_type type;
     AWDPrimitive *lawd_prim;
 
-    type_attr = PyObject_GetAttrString(block, "type");
-    type = (AWD_primitive_type)PyLong_AsLong(type_attr);
+    if (subtype) {
+        if (strcmp(block->ob_type->tp_name, "AWDCubePrimitive")==0) {
+            type = AWD_PRIMITIVE_CUBE;
+        }
+        else {
+            //TODO: Handle error, unknown sub-type
+            return NULL;
+        }
+    }
+    else {
+        PyObject *type_attr;
+        type_attr = PyObject_GetAttrString(block, "type");
+        type = (AWD_primitive_type)PyLong_AsLong(type_attr);
+    }
 
     lawd_prim = new AWDPrimitive(NULL, 0, type);
 
@@ -155,11 +166,17 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         scene_block = __prepare_light(block);
     }
     else if (strcmp(type, "AWDPrimitive")==0) {
-        scene_block = __prepare_primitive(block);
+        scene_block = __prepare_primitive(block, false);
     }
     else {
-        // Unknown type
-        return;
+        PyTypeObject *base = block->ob_type->tp_base;
+        if (base && strcmp(base->tp_name, "AWDPrimitive")==0) {
+            scene_block = __prepare_primitive(block, true);
+        }
+        else {
+            // Unknown type
+            return;
+        }
     }
 
     mtx = NULL;
