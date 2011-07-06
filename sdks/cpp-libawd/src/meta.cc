@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <string.h>
 
+#include "platform.h"
 #include "meta.h"
 #include "awd.h"
 
