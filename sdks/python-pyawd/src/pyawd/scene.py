@@ -78,3 +78,16 @@ class AWDLight(AWDSceneBlockBase):
         super(AWDLight, self).__init__(name, transform)
         self.type = type
 
+
+PRIMITIVE_PLANE = 1
+PRIMITIVE_CUBE = 2
+PRIMITIVE_SPHERE = 3
+PRIMITIVE_CYLINDER = 4
+PRIMITIVE_CONE = 5
+
+class AWDPrimitive(AWDSceneBlockBase):
+    def __init__(self, name='', transform=None, type=PRIMITIVE_PLANE):
+        super(AWDPrimitive, self).__init__(name, transform)
+        self.type = type
+
+

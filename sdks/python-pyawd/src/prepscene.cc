@@ -108,6 +108,22 @@ __prepare_light(PyObject *block)
 }
 
 
+static AWDSceneBlock *
+__prepare_primitive(PyObject *block)
+{
+    PyObject *type_attr;
+    AWD_primitive_type type;
+    AWDPrimitive *lawd_prim;
+
+    type_attr = PyObject_GetAttrString(block, "type");
+    type = (AWD_primitive_type)PyLong_AsLong(type_attr);
+
+    lawd_prim = new AWDPrimitive(NULL, 0, type);
+
+    return lawd_prim;
+}
+
+
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
@@ -137,6 +153,9 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     }
     else if (strcmp(type, "AWDLight")==0) {
         scene_block = __prepare_light(block);
+    }
+    else if (strcmp(type, "AWDPrimitive")==0) {
+        scene_block = __prepare_primitive(block);
     }
     else {
         // Unknown type
