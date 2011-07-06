@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 #define open _open
 #define lseek _lseek
@@ -13,6 +14,7 @@
 #define read _read
 #define close _close
 #define unlink _unlink
+#define snprintf _snprintf
 
 #define off_t int
 

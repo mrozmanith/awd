@@ -245,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\meta.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\name.h"
 				>
 			</File>
@@ -369,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\light.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\lib\lzma\LzFind.c"
 				>
 			</File>
@@ -393,11 +401,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\meta.cc"
+				>
+			</File>
+			<File
 				RelativePath=".\src\name.cc"
 				>
 			</File>
 			<File
 				RelativePath=".\src\ns.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\primitive.cc"
 				>
 			</File>
 			<File
