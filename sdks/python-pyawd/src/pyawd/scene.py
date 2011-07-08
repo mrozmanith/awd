@@ -90,8 +90,47 @@ class AWDPrimitive(AWDSceneBlockBase):
         super(AWDPrimitive, self).__init__(name, transform)
         self.type = type
 
+class AWDPlanePrimitive(AWDPrimitive):
+    def __init__(self, name='', transform=None):
+        super(AWDPlanePrimitive, self).__init__(name, transform, PRIMITIVE_PLANE)
+        self.width = None
+        self.height = None
+        self.segmentsW = None
+        self.segmentsH = None
+        self.yUp = None
 
 class AWDCubePrimitive(AWDPrimitive):
     def __init__(self, name='', transform=None):
         super(AWDCubePrimitive, self).__init__(name, transform, PRIMITIVE_CUBE)
+        self.width = None
+        self.height = None
+        self.depth = None
+        self.segmentsW = None
+        self.segmentsH = None
+        self.segmentsD = None
 
+class AWDSpherePrimitive(AWDPrimitive):
+    def __init__(self, name='', transform=None):
+        super(AWDSpherePrimitive, self).__init__(name, transform, PRIMITIVE_SPHERE)
+        self.radius = None
+        self.segmentsW = None
+        self.segmentsH = None
+
+class AWDCylinderPrimitive(AWDPrimitive):
+    def __init__(self, name='', transform=None):
+        super(AWDCylinderPrimitive, self).__init__(name, transform, PRIMITIVE_CYLINDER)
+        self.radius = None
+        self.topRadius = None
+        self.bottomRadius = None
+        self.height = None
+        self.segmentsW = None
+        self.segmentsH = None
+
+class AWDConePrimitive(AWDPrimitive):
+    def __init__(self, name='', transform=None):
+        super(AWDConePrimitive, self).__init__(name, transform, PRIMITIVE_CONE)
+        self.radius = None
+        self.segmentsW = None
+        self.segmentsH = None
+    
+    
