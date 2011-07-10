@@ -12,21 +12,51 @@ import mathutils
 from math import degrees
 
 
+class AWDBlockCache(object):
+    '''A cache of already created AWD blocks, and their connection to
+        nodes in the Maya DAG. The cache should always be checked before
+        creating a blocks, so that blocks can be reused within the file
+        when possible.'''
+    
+    def __init__(self):
+        self.__cache = []
+
+    def get(self, path):
+        block = None
+        for item in self.__cache:
+            if item[0] == path:
+                block = item[1]
+                break
+
+        return block
+            
+
+    def add(self, path, block):
+        if self.get(path) is None:
+            self.__cache.append((path, block))
+        
+
+
 class BlenderAWDExporter(object):
     def __init__(self, path):
         self.path = path
+        self.block_cache = AWDBlockCache()
     
     def export(self):
         self.awd = AWD()
         
         for o in bpy.context.scene.objects:
             if o.type == 'MESH':
-                md = self.build_mesh_data(o.data)
+                md = self.block_cache.get(o.data)
+                if md is None:
+                    md = self.build_mesh_data(o.data)
+                    self.awd.add_mesh_data(md)
+                    self.block_cache.add(o.data, md)
+                
                 mtx = self.mtx_bl2awd(o.matrix_local)
                 inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
                 
-                self.awd.add_scene_block(inst)
-                self.awd.add_mesh_data(md)
+                self.awd.add_scene_block(inst)                
       
         with open(self.path, 'wb') as f:
             self.awd.flush(f)
@@ -186,7 +216,7 @@ class BlenderAWDExporter(object):
         return md
         
     
-    def mtx_bl2awd(mtx):    
+    def mtx_bl2awd(self, mtx):    
         # Decompose matrix
         pos, rot, scale = mtx.decompose()
         
