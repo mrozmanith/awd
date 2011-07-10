@@ -12,50 +12,28 @@ import mathutils
 from math import degrees
 
 
-def mtx_bl2awd(mtx):    
-    # Decompose matrix
-    pos, rot, scale = mtx.decompose()
+class BlenderAWDExporter(object):
+    def __init__(self, path):
+        self.path = path
     
-    # Swap translation axes
-    tmp = pos.y
-    pos.y = pos.z
-    pos.z = tmp
-    
-    # Swap rotation axes
-    tmp = rot.y
-    rot.x = -rot.x
-    rot.y = -rot.z
-    rot.z = -tmp
-    
-    # Recompose matrix
-    mtx = mathutils.Matrix.Translation(pos).to_4x4() * rot.to_matrix().to_4x4()
-    
-    # Create list from rows
-    rows = list(mtx)
-    mtx_list = []
-    mtx_list.extend(list(rows[0]))
-    mtx_list.extend(list(rows[1]))
-    mtx_list.extend(list(rows[2]))
-    mtx_list.extend(list(rows[3]))
-    
-    # Apply swapped-axis scale
-    mtx_list[0] *= scale.x
-    mtx_list[5] *= scale.y
-    mtx_list[10] *= scale.z
-    
-    #print(mtx_list[0:4])
-    #print(mtx_list[4:8])
-    #print(mtx_list[8:12])
-    #print(mtx_list[12:])
-    
-    return AWDMatrix4x4(mtx_list)
-
-awd = AWD()
-
-for o in bpy.context.scene.objects:
-    if o.type == 'MESH':
-        geom = o.data
+    def export(self):
+        self.awd = AWD()
         
+        for o in bpy.context.scene.objects:
+            if o.type == 'MESH':
+                md = self.build_mesh_data(o.data)
+                mtx = self.mtx_bl2awd(o.matrix_local)
+                inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
+                
+                self.awd.add_scene_block(inst)
+                self.awd.add_mesh_data(md)
+      
+        with open(self.path, 'wb') as f:
+            self.awd.flush(f)
+        
+    
+    
+    def build_mesh_data(self, geom):
         expanded_vertices = []
         vertex_edges = {}
         
@@ -205,11 +183,48 @@ for o in bpy.context.scene.objects:
         md[0].add_stream(STR_UVS, uvs)
         md[0].add_stream(STR_VERTEX_NORMALS, normals)
         
-        inst = AWDMeshInst(data=md, name=o.name, transform=mtx_bl2awd(o.matrix_local))
+        return md
         
-        awd.add_scene_block(inst)
-        awd.add_mesh_data(md)
+    
+    def mtx_bl2awd(mtx):    
+        # Decompose matrix
+        pos, rot, scale = mtx.decompose()
+        
+        # Swap translation axes
+        tmp = pos.y
+        pos.y = pos.z
+        pos.z = tmp
+        
+        # Swap rotation axes
+        tmp = rot.y
+        rot.x = -rot.x
+        rot.y = -rot.z
+        rot.z = -tmp
+        
+        # Recompose matrix
+        mtx = mathutils.Matrix.Translation(pos).to_4x4() * rot.to_matrix().to_4x4()
+        
+        # Create list from rows
+        rows = list(mtx)
+        mtx_list = []
+        mtx_list.extend(list(rows[0]))
+        mtx_list.extend(list(rows[1]))
+        mtx_list.extend(list(rows[2]))
+        mtx_list.extend(list(rows[3]))
+        
+        # Apply swapped-axis scale
+        mtx_list[0] *= scale.x
+        mtx_list[5] *= scale.y
+        mtx_list[10] *= scale.z
+        
+        #print(mtx_list[0:4])
+        #print(mtx_list[4:8])
+        #print(mtx_list[8:12])
+        #print(mtx_list[12:])
+        
+        return AWDMatrix4x4(mtx_list)
+    
 
 
-with open('blendout.awd', 'wb') as f:
-    awd.flush(f)
+exporter = BlenderAWDExporter('blendout.awd')
+exporter.export()
