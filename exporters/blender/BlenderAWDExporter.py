@@ -29,7 +29,6 @@ class AWDBlockCache(object):
                 break
 
         return block
-            
 
     def add(self, path, block):
         if self.get(path) is None:
@@ -41,6 +40,7 @@ class BlenderAWDExporter(object):
     def __init__(self, path):
         self.path = path
         self.block_cache = AWDBlockCache()
+        self.exported_objects = []
     
     def export(self):
         self.awd = AWD()
@@ -55,9 +55,23 @@ class BlenderAWDExporter(object):
                 
                 mtx = self.mtx_bl2awd(o.matrix_local)
                 inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
+                self.block_cache.add(o, inst)
                 
-                self.awd.add_scene_block(inst)                
+                self.exported_objects.append(o)              
       
+      
+        # Loop through scene objects again and add either directly
+        # to the AWD document root or to it's parent if one exists.
+        # At this point, an AWD representation of the parent is
+        # guaranteed to have been created if included in the export.
+        for o in self.exported_objects:
+            block = self.block_cache.get(o)
+            if o.parent is not None:
+                par_block = self.block_cache.get(o.parent)
+                par_block.add_child(block)
+            else:
+                self.awd.add_scene_block(block)
+        
         with open(self.path, 'wb') as f:
             self.awd.flush(f)
         
