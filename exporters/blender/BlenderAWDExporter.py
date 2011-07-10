@@ -6,11 +6,49 @@ from pyawd.anim import *
 from pyawd.scene import *
 from pyawd.geom import *
 from pyawd.material import *
-#from pyawd.utils import *
+from pyawd.utils import *
 
 import mathutils
 from math import degrees
 
+
+def mtx_bl2awd(mtx):    
+    # Decompose matrix
+    pos, rot, scale = mtx.decompose()
+    
+    # Swap translation axes
+    tmp = pos.y
+    pos.y = pos.z
+    pos.z = tmp
+    
+    # Swap rotation axes
+    tmp = rot.y
+    rot.x = -rot.x
+    rot.y = -rot.z
+    rot.z = -tmp
+    
+    # Recompose matrix
+    mtx = mathutils.Matrix.Translation(pos).to_4x4() * rot.to_matrix().to_4x4()
+    
+    # Create list from rows
+    rows = list(mtx)
+    mtx_list = []
+    mtx_list.extend(list(rows[0]))
+    mtx_list.extend(list(rows[1]))
+    mtx_list.extend(list(rows[2]))
+    mtx_list.extend(list(rows[3]))
+    
+    # Apply swapped-axis scale
+    mtx_list[0] *= scale.x
+    mtx_list[5] *= scale.y
+    mtx_list[10] *= scale.z
+    
+    #print(mtx_list[0:4])
+    #print(mtx_list[4:8])
+    #print(mtx_list[8:12])
+    #print(mtx_list[12:])
+    
+    return AWDMatrix4x4(mtx_list)
 
 awd = AWD()
 
@@ -167,7 +205,7 @@ for o in bpy.context.scene.objects:
         md[0].add_stream(STR_UVS, uvs)
         md[0].add_stream(STR_VERTEX_NORMALS, normals)
         
-        inst = AWDMeshInst(data=md, name=o.name)
+        inst = AWDMeshInst(data=md, name=o.name, transform=mtx_bl2awd(o.matrix_local))
         
         awd.add_scene_block(inst)
         awd.add_mesh_data(md)
