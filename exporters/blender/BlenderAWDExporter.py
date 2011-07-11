@@ -74,8 +74,9 @@ class BlenderAWDExporter(object):
         for o in self.exported_objects:
             block = self.block_cache.get(o)
             if o.parent is not None:
-                par_block = self.block_cache.get(o.parent)
-                par_block.add_child(block)
+                if o.parent.type != 'ARMATURE':
+                    par_block = self.block_cache.get(o.parent)
+                    par_block.add_child(block)
             else:
                 self.awd.add_scene_block(block)
         
@@ -195,9 +196,11 @@ class BlenderAWDExporter(object):
                 vertices.append(v_data['v'].co.x)
                 vertices.append(v_data['v'].co.z)
                 vertices.append(v_data['v'].co.y)
-                uvs.extend(v_data['uv'])
                 indices.append(len(collapsed_vertices))
                 
+                if has_uvs:
+                    uvs.extend(v_data['uv'])
+                                    
                 # Add to list of collapsed vertices so that future
                 # searches can find the vertex
                 collapsed_vertices.append(v_data)
@@ -231,8 +234,10 @@ class BlenderAWDExporter(object):
         md.add_sub_mesh(AWDSubMesh())
         md[0].add_stream(STR_VERTICES, vertices)
         md[0].add_stream(STR_TRIANGLES, indices)
-        md[0].add_stream(STR_UVS, uvs)
         md[0].add_stream(STR_VERTEX_NORMALS, normals)
+        
+        if has_uvs:
+            md[0].add_stream(STR_UVS, uvs)
         
         return md
         
