@@ -48,23 +48,14 @@ class BlenderAWDExporter(object):
         for o in bpy.context.scene.objects:
             print(o.type)
             if o.type == 'EMPTY':
-                mtx = self.mtx_bl2awd(o.matrix_local)
-                ctr = AWDContainer(name=o.name, transform=mtx)
-                self.block_cache.add(o, ctr)
-                self.exported_objects.append(o)
+                self.export_container(o)
                 
             elif o.type == 'MESH':
-                md = self.block_cache.get(o.data)
-                if md is None:
-                    md = self.build_mesh_data(o.data)
-                    self.awd.add_mesh_data(md)
-                    self.block_cache.add(o.data, md)
+                self.export_mesh(o)
                 
-                mtx = self.mtx_bl2awd(o.matrix_local)
-                inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
-                self.block_cache.add(o, inst)
+            elif o.type == 'ARMATURE':
+                self.export_skeleton(o)
                 
-                self.exported_objects.append(o)              
       
       
         # Loop through scene objects again and add either directly
@@ -74,7 +65,9 @@ class BlenderAWDExporter(object):
         for o in self.exported_objects:
             block = self.block_cache.get(o)
             if o.parent is not None:
-                if o.parent.type != 'ARMATURE':
+                if o.parent.type == 'ARMATURE':
+                    pass # TODO: Export weights
+                else:
                     par_block = self.block_cache.get(o.parent)
                     par_block.add_child(block)
             else:
@@ -84,6 +77,28 @@ class BlenderAWDExporter(object):
             self.awd.flush(f)
         
     
+    def export_container(self, o):
+        mtx = self.mtx_bl2awd(o.matrix_local)
+        ctr = AWDContainer(name=o.name, transform=mtx)
+        self.block_cache.add(o, ctr)
+        self.exported_objects.append(o)
+    
+    
+    def export_mesh(self, o):
+        md = self.block_cache.get(o.data)
+        if md is None:
+            md = self.build_mesh_data(o.data)
+            self.awd.add_mesh_data(md)
+            self.block_cache.add(o.data, md)
+        
+        mtx = self.mtx_bl2awd(o.matrix_local)
+        inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
+        self.block_cache.add(o, inst)
+        
+        self.exported_objects.append(o)    
+    
+    def export_skeleton(self, o):
+        pass
     
     def build_mesh_data(self, geom):
         expanded_vertices = []
