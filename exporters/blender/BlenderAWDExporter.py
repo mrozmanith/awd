@@ -46,7 +46,14 @@ class BlenderAWDExporter(object):
         self.awd = AWD()
         
         for o in bpy.context.scene.objects:
-            if o.type == 'MESH':
+            print(o.type)
+            if o.type == 'EMPTY':
+                mtx = self.mtx_bl2awd(o.matrix_local)
+                ctr = AWDContainer(name=o.name, transform=mtx)
+                self.block_cache.add(o, ctr)
+                self.exported_objects.append(o)
+                
+            elif o.type == 'MESH':
                 md = self.block_cache.get(o.data)
                 if md is None:
                     md = self.build_mesh_data(o.data)
