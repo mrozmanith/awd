@@ -248,7 +248,7 @@ def print_mesh_data(data):
 
         indent_level += 1
         while offs < sub_end:
-            stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', 'VERTEX_NORMALS', 'VERTEX_TANGENTS', 'FACE_NORMALS', 'JOINT_INDICES', 'VERTEX_WEIGHTS')
+            stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', 'VERTEX_NORMALS', 'VERTEX_TANGENTS', 'JOINT_INDICES', 'VERTEX_WEIGHTS')
             type, str_len = struct.unpack_from('>BI', data, offs)
             offs += 5
 
