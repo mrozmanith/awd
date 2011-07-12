@@ -8,6 +8,8 @@ from pyawd.geom import *
 from pyawd.material import *
 from pyawd.utils import *
 
+import functools
+
 import mathutils
 from math import degrees
 
@@ -41,6 +43,7 @@ class BlenderAWDExporter(object):
         self.path = path
         self.block_cache = AWDBlockCache()
         self.exported_objects = []
+        self.vertex_indices = {}
     
     def export(self):
         self.awd = AWD()
@@ -66,7 +69,8 @@ class BlenderAWDExporter(object):
             block = self.block_cache.get(o)
             if o.parent is not None:
                 if o.parent.type == 'ARMATURE':
-                    pass # TODO: Export weights
+                    self.extract_joint_weights(o)
+                    
                 else:
                     par_block = self.block_cache.get(o.parent)
                     par_block.add_child(block)
@@ -75,6 +79,53 @@ class BlenderAWDExporter(object):
         
         with open(self.path, 'wb') as f:
             self.awd.flush(f)
+    
+    
+    def extract_joint_weights(self, o):
+        armature = o.parent
+        geom = o.data
+        skel = self.block_cache.get(armature)
+                    
+        # TODO: Don't hard code
+        joints_per_vert = 3
+        
+        joint_weights = []
+        joint_indices = []
+        
+        vert_indices = self.vertex_indices[geom.name]
+        for bl_vidx in vert_indices:
+            v = geom.vertices[bl_vidx]
+            
+            weight_objs = []
+            for ge in v.groups:
+                group = o.vertex_groups[ge.group]
+                j_idx = skel.joint_index(name=group.name)
+                if j_idx is not None:
+                    weight_objs.append((j_idx, ge.weight))
+                else:
+                    weight_objs.append((0, 0))
+            
+            # Normalize weights by slicing to the desired length, calculating
+            # the sum of all weights and then dividing all weights by that sum.
+            weight_objs = weight_objs[0:joints_per_vert]
+            sum_obj = functools.reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
+            weight_objs = [(w[0], w[1]/sum_obj[1]) for w in weight_objs]
+            
+            # Add more empty weight objects if too few
+            if len(weight_objs) != joints_per_vert:
+                weight_objs.extend([(0,0)] * (joints_per_vert-len(weight_objs)))
+            
+            for w_obj in weight_objs:
+                joint_indices.append(w_obj[0])
+                joint_weights.append(w_obj[1])
+            
+        
+        # Add newly assembled streams
+        md = self.block_cache.get(geom)
+        md[0].add_stream(STR_JOINT_WEIGHTS, joint_weights)
+        md[0].add_stream(STR_JOINT_INDICES, joint_indices)
+            
+
         
     
     def export_container(self, o):
@@ -120,6 +171,7 @@ class BlenderAWDExporter(object):
             skel = AWDSkeleton(name=o.name)
             skel.root_joint = root_joint
             self.awd.add_skeleton(skel)
+            self.block_cache.add(o, skel)
     
     def build_mesh_data(self, geom):
         expanded_vertices = []
@@ -224,6 +276,12 @@ class BlenderAWDExporter(object):
         uvs = []
         
         
+        # A list of mappings between AWD vertex indices and
+        # original (bpy) vertex indices, to use when binding
+        vert_indices = []
+        self.vertex_indices[geom.name] = vert_indices
+        
+        
         for v_data in expanded_vertices:
             idx = get_vert_idx(v_data)
             if idx >= 0:
@@ -233,6 +291,9 @@ class BlenderAWDExporter(object):
                 vertices.append(v_data['v'].co.z)
                 vertices.append(v_data['v'].co.y)
                 indices.append(len(collapsed_vertices))
+                
+                # Store for binding
+                vert_indices.append(v_data['v'].index)
                 
                 if has_uvs:
                     uvs.extend(v_data['uv'])
