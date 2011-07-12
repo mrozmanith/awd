@@ -106,8 +106,8 @@ def print_skeleton(data):
     name = read_var_str(data)
     offs = 2+len(name)
 
-    num_joints = struct.unpack_from('>I', data, offs)[0]
-    offs += 4
+    num_joints = struct.unpack_from('>H', data, offs)[0]
+    offs += 2
 
     printl('NAME: %s' % name)
     printl('JOINTS: %d' % num_joints)
@@ -129,9 +129,11 @@ def print_skeleton(data):
 
         indent_level += 1
         print_matrix(mtx)
+        offs += 64
+        offs += 4
+        offs += print_user_attributes(data[offs:])
         indent_level -= 1
 
-        offs += 128
         joints_printed += 1
 
     indent_level -= 1
