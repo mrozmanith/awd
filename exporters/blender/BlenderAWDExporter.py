@@ -98,7 +98,28 @@ class BlenderAWDExporter(object):
         self.exported_objects.append(o)    
     
     def export_skeleton(self, o):
-        pass
+        root_joint = None
+        for b in o.data.bones:
+            joint = AWDSkeletonJoint(b.name)
+            joint.inv_bind_mtx = self.mtx_bl2awd(
+                mathutils.Matrix.Translation(b.tail_local).inverted())
+                
+            if root_joint is None:
+                root_joint = AWDSkeletonJoint('root')
+                root_joint.add_child_joint(joint)
+                root_joint.inv_bind_mtx = self.mtx_bl2awd(
+                    mathutils.Matrix.Translation(b.head_local).inverted())
+            else:
+                p_block = self.block_cache.get(b.parent)
+                if p_block is not None:
+                    p_block.add_child_joint(joint)
+            
+            self.block_cache.add(b, joint)
+        
+        if root_joint is not None:
+            skel = AWDSkeleton(name=o.name)
+            skel.root_joint = root_joint
+            self.awd.add_skeleton(skel)
     
     def build_mesh_data(self, geom):
         expanded_vertices = []
