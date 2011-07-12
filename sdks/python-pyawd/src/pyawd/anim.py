@@ -35,6 +35,36 @@ class AWDSkeleton(core.AWDBlockBase, core.AWDAttrElement):
         super(AWDSkeleton, self).__init__()
         self.name = name
         self.root_joint = None
+
+    def joint_index(self, name=None, joint=None):
+        if name is None:
+            if joint is not None:
+                name = joint.name
+            else:
+                raise AttributeError('either name or joint argument must be defined.')
+
+        if self.root_joint is None:
+            return None
+        elif self.root_joint.name == name:
+            return self.root_joint
+        else:
+            def find_name(joints, cur_idx):
+                for j in joints:
+                    #print('checking joint "%s", idx=%d' % (j.name, cur_idx))
+                    if j.name == name:
+                        return (cur_idx, cur_idx)
+                    else:
+                        found_idx, cur_idx = find_name(j._AWDSkeletonJoint__children, cur_idx+1)
+                        if found_idx is not None:
+                            return (found_idx, cur_idx)
+
+                return (None, cur_idx)
+
+            # Find joint, starting at 2 (1 being the root, which has already
+            # been checked outside of the recursion.)
+            ret = find_name(self.root_joint._AWDSkeletonJoint__children, 2)
+            if ret is not None:
+                return ret[0]
         
 
 class AWDSkeletonAnimation(GenericAnim, core.AWDAttrElement, core.AWDBlockBase):
