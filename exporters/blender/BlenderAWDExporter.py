@@ -388,5 +388,6 @@ class BlenderAWDExporter(object):
     
 
 
-exporter = BlenderAWDExporter('blendout.awd')
-exporter.export()
+if __name__ == '__main__':
+    exporter = BlenderAWDExporter('blendout.awd')
+    exporter.export()
