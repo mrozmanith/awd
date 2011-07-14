@@ -75,7 +75,11 @@ class BlenderAWDExporter(object):
             if o.parent is not None:
                 if o.parent.type == 'ARMATURE':
                     self.extract_joint_weights(o)
-                    
+                    if o.parent.parent is not None:
+                        par_block = self.block_cache.get(o.parent.parent)
+                        par_block.add_child(block)
+                    else:
+                        self.awd.add_scene_block(block)
                 else:
                     par_block = self.block_cache.get(o.parent)
                     par_block.add_child(block)
@@ -161,12 +165,19 @@ class BlenderAWDExporter(object):
                 bpy.context.scene.frame_current = frame
                 for o in self.exported_skeletons:
                     skel_pose = AWDSkeletonPose()
+                    
                     for bp in o.pose.bones:
                         mtx = self.mtx_bl2awd(bp.matrix_basis)
                         skel_pose.add_joint_transform(mtx)
                     
                         self.awd.add_skeleton_pose(skel_pose)
                         skel_anims[o.name].add_frame(skel_pose, 40)
+                    
+                    # Pad with an identity transform to match the number
+                    # of joints (for first joint both head and tail were
+                    # included when skeleton was created.)
+                    skel_pose.add_joint_transform(
+                        self.mtx_bl2awd(mathutils.Matrix()))
             
                 
                 
