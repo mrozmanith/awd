@@ -1,4 +1,9 @@
 import bpy
+import bpy.path
+
+import re
+import os.path
+import functools
 
 import pyawd
 from pyawd.core import *
@@ -7,8 +12,6 @@ from pyawd.scene import *
 from pyawd.geom import *
 from pyawd.material import *
 from pyawd.utils import *
-
-import functools
 
 import mathutils
 from math import degrees
@@ -42,6 +45,8 @@ class BlenderAWDExporter(object):
     def __init__(self, path):
         self.path = path
         self.block_cache = AWDBlockCache()
+        self.exported_skeletons = []
+        self.animation_sequences = []
         self.exported_objects = []
         self.vertex_indices = {}
     
@@ -76,6 +81,11 @@ class BlenderAWDExporter(object):
                     par_block.add_child(block)
             else:
                 self.awd.add_scene_block(block)
+        
+        
+        # Export animation sequences
+        self.export_animation()
+        
         
         with open(self.path, 'wb') as f:
             self.awd.flush(f)
@@ -133,6 +143,18 @@ class BlenderAWDExporter(object):
         ctr = AWDContainer(name=o.name, transform=mtx)
         self.block_cache.add(o, ctr)
         self.exported_objects.append(o)
+        
+        
+        
+    def export_animation(self):
+        for seq in self.animation_sequences:
+            seq_name = seq[0]
+            frame_idx = seq[1]
+            end_frame = seq[2]
+            
+            for o in self.exported_skeletons:
+                print('exporting %s (%d-%d)' % (seq_name, frame_idx, end_frame))
+                
     
     
     def export_mesh(self, o):
@@ -181,6 +203,7 @@ class BlenderAWDExporter(object):
             skel.root_joint = root_joint
             self.awd.add_skeleton(skel)
             self.block_cache.add(o, skel)
+            self.exported_skeletons.append(o)
     
     def build_mesh_data(self, geom):
         expanded_vertices = []
@@ -346,7 +369,7 @@ class BlenderAWDExporter(object):
             md[0].add_stream(STR_UVS, uvs)
         
         return md
-        
+    
     
     def mtx_bl2awd(self, mtx):    
         # Decompose matrix
@@ -389,5 +412,46 @@ class BlenderAWDExporter(object):
 
 
 if __name__ == '__main__':
+    def read_sequences(seq_path, base_path):
+        sequences = []
+        if seq_path is not None:
+            if not os.path.isabs(seq_path):
+                # Look for this file in a list of different locations,
+                # and use the first one in which it exists.
+                existed = False
+                bases = [
+                    bpy.path.abspath('//'),
+                    base_path
+                ]
+
+                for base in bases:
+                    new_path = os.path.join(base, seq_path)
+                    print('Looking for sequence file in %s' % new_path)
+                    if os.path.exists(new_path) and os.path.isfile(new_path):
+                        existed = True
+                        seq_path = new_path
+                        break
+
+                if not existed:
+                    mc.warning('Could not find sequence file "%s. Will not export animation."' % seq_path)
+                    return []
+
+            try:
+                with open(seq_path, 'r') as seqf:
+                    lines = seqf.readlines()
+                    for line in lines:
+                        # Skip comments
+                        if line[0] == '#':
+                            continue
+
+                        line_fields = re.split('[^a-zA-Z0-9]', line.strip())
+                        sequences.append((line_fields[0], int(line_fields[1]), int(line_fields[2])))
+            except:
+                raise
+                pass
+
+        return sequences
+
     exporter = BlenderAWDExporter('blendout.awd')
+    exporter.animation_sequences = read_sequences('sequences.txt', '.')
     exporter.export()
