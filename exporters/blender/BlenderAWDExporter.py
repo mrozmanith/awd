@@ -138,6 +138,11 @@ class BlenderAWDExporter(object):
     def export_mesh(self, o):
         md = self.block_cache.get(o.data)
         if md is None:
+            # If bound to a skeleton, set that skeleton in bind pose
+            # to make sure that the geometry is defined in that state
+            if o.parent is not None and o.parent.type == 'ARMATURE':
+                o.parent.data.pose_position = 'REST'
+                
             md = self.build_mesh_data(o.data)
             self.awd.add_mesh_data(md)
             self.block_cache.add(o.data, md)
@@ -150,6 +155,10 @@ class BlenderAWDExporter(object):
     
     def export_skeleton(self, o):
         root_joint = None
+        
+        # Use bind pose
+        o.data.pose_position = 'REST'
+        
         for b in o.data.bones:
             joint = AWDSkeletonJoint(b.name)
             joint.inv_bind_mtx = self.mtx_bl2awd(
