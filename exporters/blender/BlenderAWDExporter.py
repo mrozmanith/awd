@@ -148,12 +148,27 @@ class BlenderAWDExporter(object):
         
     def export_animation(self):
         for seq in self.animation_sequences:
-            seq_name = seq[0]
-            frame_idx = seq[1]
-            end_frame = seq[2]
             
+            skel_anims = {}
             for o in self.exported_skeletons:
-                print('exporting %s (%d-%d)' % (seq_name, frame_idx, end_frame))
+                skel_anim = AWDSkeletonAnimation(seq[0])
+                skel_anims[o.name] = skel_anim
+                self.awd.add_skeleton_anim(skel_anim)
+            
+            print('Exporting sequences %s (%d-%d)' % seq)
+            
+            for frame in range(seq[1], seq[2]):
+                bpy.context.scene.frame_current = frame
+                for o in self.exported_skeletons:
+                    skel_pose = AWDSkeletonPose()
+                    for bp in o.pose.bones:
+                        mtx = self.mtx_bl2awd(bp.matrix_basis)
+                        skel_pose.add_joint_transform(mtx)
+                    
+                        self.awd.add_skeleton_pose(skel_pose)
+                        skel_anims[o.name].add_frame(skel_pose, 40)
+            
+                
                 
     
     
