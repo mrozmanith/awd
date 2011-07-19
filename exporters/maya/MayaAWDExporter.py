@@ -2,6 +2,7 @@ import re
 import sys
 import math
 import os.path
+from time import time
 
 import maya.OpenMaya as om
 import maya.cmds as mc
@@ -19,7 +20,22 @@ from pyawd.utils import *
 
 
 
+b_start = 0.0
 
+def benchmark_start():
+    global b_start
+    b_start = time()
+
+def benchmark_stop():
+    global b_start
+
+    dur = time() - b_start
+    b_start = 0.0
+    return dur
+
+def benchmark_print():
+    dur = benchmark_stop()
+    print('Duration: %fs' % dur)
 
 
 class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
@@ -516,6 +532,7 @@ class MayaAWDExporter:
         if sets is not None:
             for set in sets:
                 if mc.nodeType(set)=='shadingEngine':
+                    mat = None
                     mat_his = mc.listHistory(set)
                     for state in mat_his:
                         state_type = mc.nodeType(state)
@@ -658,6 +675,7 @@ class MayaAWDExporter:
                 vec = mc.polyNormalPerVertex(attr, q=True, xyz=True)
                 return vec
     
+            benchmark_start()
     
             print('getting mesh data for %s' % dag_path.fullPathName())
             print('type: %s' % dag_path.node().apiTypeStr())
@@ -680,14 +698,14 @@ class MayaAWDExporter:
                     u,v = get_uvs(vert_it, poly_index)
                     normal = get_vnormal(shape_path, vert_index, poly_index)
                     pos = vert_it.position()
-    
+
                     exp_vert_list.append(
                         [ vert_index, poly_index, pos[0], pos[1], pos[2], u, v, normal[0], normal[1], normal[2] ])
                     
                 poly_it.next()
-    
-    
+
             print('- Raw (expanded) data list created')
+            benchmark_print()
     
             # Store this so binding (joint index) data can be
             # put into the right place of the new vertex list
@@ -699,24 +717,27 @@ class MayaAWDExporter:
             uvs = []
             normals = []
     
+            exp_vert_inds = {}
     
-            def has_vert(haystack, needle, normal_threshold=45):
+            def has_vert(haystack, needle):
                 idx = 0
-                normal_threshold *= (3.141592636/180)
-                for v in haystack:
-                    correct = True
-                    for prop in range(2, 10):
-                        if needle[prop] != v[prop]:
-                            correct = False
-                            break
+                if needle[0] in exp_vert_inds:
+                    for v_idx in exp_vert_inds[needle[0]]:
+                        v = haystack[v_idx]
+                        correct = True
+                        for prop in range(2, 10):
+                            if needle[prop] != v[prop]:
+                                correct = False
+                                break
     
-                    idx += 1
+                        idx += 1
     
                 return -1
                 
             merged_vertices = []
     
             print('- Creating condensed list')
+            benchmark_start()
     
             for v in exp_vert_list:
                 idx = has_vert(merged_vertices, v)
@@ -726,6 +747,14 @@ class MayaAWDExporter:
                 else:
                     # Store this for binding data
                     vert_indices.append(v[0])
+    
+                    # This vertex will be added into the expanded list of vertices,
+                    # which can get very large. To enable fast look-up, we map it's
+                    # original index to that in the expanded list
+                    vert_index = v[0]
+                    if vert_index not in exp_vert_inds:
+                        exp_vert_inds[vert_index] = []
+                    exp_vert_inds[vert_index].append(len(merged_vertices))
     
                     indices.append(len(merged_vertices))
                     merged_vertices.append(v)
@@ -741,7 +770,9 @@ class MayaAWDExporter:
                 normals.append(v[8])    # Normal Y
                 normals.append(-v[9])   # Normal Z (inverted)
     
+            benchmark_print()
             print('- DONE! Flipping windings')
+            benchmark_start()
     
             # Flip windings
             for idx in range(1, len(indices), 3):
@@ -749,6 +780,7 @@ class MayaAWDExporter:
                 indices[idx] = indices[idx+1]
                 indices[idx+1] = tmp
     
+            benchmark_print()
             print('- Creating sub-mesh')
             sub = AWDSubMesh()
             sub.add_stream(pyawd.geom.STR_VERTICES, vertices)
