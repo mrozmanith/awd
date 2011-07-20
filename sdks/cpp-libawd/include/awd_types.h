@@ -17,6 +17,7 @@ typedef double awd_float64;
 typedef unsigned int awd_baddr;
 typedef unsigned char awd_nsid;
 
+typedef unsigned int awd_color;
 typedef unsigned char awd_bool;
 
 

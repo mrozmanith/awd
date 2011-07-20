@@ -9,14 +9,30 @@
 typedef awd_uint16 awd_propkey;
 
 typedef enum {
-    AWD_ATTR_INT16=1,
+    // Numeric types
+    AWD_ATTR_INT8=1,
+    AWD_ATTR_INT16,
     AWD_ATTR_INT32,
+    AWD_ATTR_UINT8,
+    AWD_ATTR_UINT16,
+    AWD_ATTR_UINT32,
     AWD_ATTR_FLOAT32,
     AWD_ATTR_FLOAT64,
-    AWD_ATTR_STRING,
+
+    // Derived numeric types
+    AWD_ATTR_BOOL=21,
+    AWD_ATTR_COLOR,
     AWD_ATTR_BADDR,
-    AWD_ATTR_MTX4,
-    AWD_ATTR_BOOL,
+
+    // Aggregate/array types
+    AWD_ATTR_STRING=31,
+    AWD_ATTR_VECTOR2x1,
+    AWD_ATTR_VECTOR3x1,
+    AWD_ATTR_VECTOR4x1,
+    AWD_ATTR_MTX3x2,
+    AWD_ATTR_MTX3x3,
+    AWD_ATTR_MTX4x3,
+    AWD_ATTR_MTX4x4,
 } AWD_attr_type;
 
 
@@ -31,6 +47,9 @@ typedef union {
     awd_uint32 *ui32;
     awd_float32 *f32;
     awd_float64 *f64;
+    awd_float64 *mtx;
+    awd_float64 *vec;
+    awd_uint32 *col;
     awd_baddr *addr;
     char *str;
 } AWD_attr_val_ptr;

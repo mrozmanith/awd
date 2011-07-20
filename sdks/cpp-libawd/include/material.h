@@ -35,6 +35,7 @@ class AWDMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrEleme
 
         bool repeat;
         bool alpha_blending;
+        awd_color color;
         awd_float32 alpha_threshold;
 
         void set_type(AWD_mat_type);

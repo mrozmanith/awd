@@ -9,7 +9,7 @@
 #include "platform.h"
 
 awd_float64 *
-awdutil_id_mtx4(awd_float64 *mtx)
+awdutil_id_mtx4x4(awd_float64 *mtx)
 {
     if (mtx == NULL) {
         mtx = (awd_float64*)malloc(16 * sizeof(awd_float64));
@@ -24,38 +24,44 @@ awdutil_id_mtx4(awd_float64 *mtx)
 }
 
 
-static void
+awd_uint32
 awdutil_write_floats(int fd, awd_float64 *list, int len, bool wide)
 {
     int i;
+    awd_uint32 bytes_written = 0;
+
     for (i=0; i<len; i++) {
         if (wide) {
             awd_float64 n;
             n = F64(list[i]);
             write(fd, &n, sizeof(awd_float64));
+            bytes_written += sizeof(awd_float64);
         }
         else {
             awd_float32 n;
             n = F32((awd_float32)list[i]);
             write(fd, &n, sizeof(awd_float32));
+            bytes_written += sizeof(awd_float64);
         }
     }
+
+    return bytes_written;
 }
 
-void
+awd_uint32
 awdutil_write_mtx3x2(int fd, awd_float64 *mtx, bool wide)
 {
-    awdutil_write_floats(fd, mtx, 6, wide);
+    return awdutil_write_floats(fd, mtx, 6, wide);
 }
 
-void
-awdutil_write_mtx4(int fd, awd_float64 *mtx, bool wide)
+awd_uint32
+awdutil_write_mtx4x4(int fd, awd_float64 *mtx, bool wide)
 {
-    awdutil_write_floats(fd, mtx, 16, wide);
+    return awdutil_write_floats(fd, mtx, 16, wide);
 }
 
 
-void
+awd_uint32
 awdutil_write_varstr(int fd, const char *str, awd_uint16 str_len)
 {
     awd_uint16 len_be;
@@ -69,6 +75,8 @@ awdutil_write_varstr(int fd, const char *str, awd_uint16 str_len)
         len_be = 0;
         write(fd, &len_be, sizeof(awd_uint16));
     }
+
+    return str_len + sizeof(awd_uint16);
 }
 
 

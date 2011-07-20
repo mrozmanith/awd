@@ -14,7 +14,7 @@ AWDSceneBlock::AWDSceneBlock(AWD_block_type type, const char *name, awd_uint16 n
     this->children = new AWDBlockList();
 
     if (mtx == NULL);
-        mtx = awdutil_id_mtx4(NULL);
+        mtx = awdutil_id_mtx4x4(NULL);
     this->set_transform(mtx);
 }
 
@@ -42,7 +42,7 @@ AWDSceneBlock::write_scene_common(int fd, bool wide_mtx)
     // Write scene block common fields
     // TODO: Move this to separate base class
     write(fd, &parent_addr, sizeof(awd_baddr));
-    awdutil_write_mtx4(fd, this->transform_mtx, wide_mtx);
+    awdutil_write_mtx4x4(fd, this->transform_mtx, wide_mtx);
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
 }
 
