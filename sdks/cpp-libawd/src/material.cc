@@ -10,6 +10,7 @@ AWDMaterial::AWDMaterial(AWD_mat_type type, const char *name, awd_uint16 name_le
 {
     this->type = type;
     this->texture = NULL;
+    this->color = 0;
     this->alpha_threshold = 0.0f;
     this->alpha_blending = false;
     this->repeat = false;
@@ -61,32 +62,42 @@ AWDMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
 void
 AWDMaterial::prepare_write()
 {
-    if (this->texture) {
-        AWD_attr_val_ptr tex_val;
-        tex_val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
-        *tex_val.addr = this->texture->get_addr();
-        this->properties->set(PROP_MAT_TEXTURE, tex_val, sizeof(awd_baddr), AWD_ATTR_BADDR);
+    if (this->type == AWD_MATTYPE_COLOR) {
+        if (this->color > 0) {
+            AWD_attr_val_ptr col_val;
+            col_val.ui32 = (awd_uint32 *)malloc(sizeof(awd_uint32));
+            *col_val.ui32 = this->color;
+            this->properties->set(PROP_MAT_COLOR, col_val, sizeof(awd_uint32), AWD_ATTR_UINT32);
+        }
     }
+    else {
+        if (this->texture) {
+            AWD_attr_val_ptr tex_val;
+            tex_val.addr = (awd_baddr *)malloc(sizeof(awd_baddr));
+            *tex_val.addr = this->texture->get_addr();
+            this->properties->set(PROP_MAT_TEXTURE, tex_val, sizeof(awd_baddr), AWD_ATTR_BADDR);
+        }
 
-    if (this->repeat) {
-        AWD_attr_val_ptr rep_val;
-        rep_val.b = (awd_bool *)malloc(sizeof(awd_bool));
-        *rep_val.b = AWD_TRUE;
-        this->properties->set(PROP_MAT_REPEAT, rep_val, sizeof(awd_bool), AWD_ATTR_BOOL);
-    }
+        if (this->repeat) {
+            AWD_attr_val_ptr rep_val;
+            rep_val.b = (awd_bool *)malloc(sizeof(awd_bool));
+            *rep_val.b = AWD_TRUE;
+            this->properties->set(PROP_MAT_REPEAT, rep_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+        }
 
-    if (this->alpha_blending) {
-        AWD_attr_val_ptr trans_val;
-        trans_val.b = (awd_bool *)malloc(sizeof(awd_bool));
-        *trans_val.b = AWD_TRUE;
-        this->properties->set(PROP_MAT_ALPHA_BLENDING, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
-    }
+        if (this->alpha_blending) {
+            AWD_attr_val_ptr trans_val;
+            trans_val.b = (awd_bool *)malloc(sizeof(awd_bool));
+            *trans_val.b = AWD_TRUE;
+            this->properties->set(PROP_MAT_ALPHA_BLENDING, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+        }
 
-    if (this->alpha_threshold != 0.0f) {
-        AWD_attr_val_ptr th_val;
-        th_val.f32 = (awd_float32 *)malloc(sizeof(awd_float32));
-        *th_val.f32 = this->alpha_threshold;
-        this->properties->set(PROP_MAT_ALPHA_THRESHOLD, th_val, sizeof(awd_float32), AWD_ATTR_FLOAT32);
+        if (this->alpha_threshold != 0.0f) {
+            AWD_attr_val_ptr th_val;
+            th_val.f32 = (awd_float32 *)malloc(sizeof(awd_float32));
+            *th_val.f32 = this->alpha_threshold;
+            this->properties->set(PROP_MAT_ALPHA_THRESHOLD, th_val, sizeof(awd_float32), AWD_ATTR_FLOAT32);
+        }
     }
 }
 

@@ -58,7 +58,6 @@ class AWDMeshData :
 
     protected:
         awd_uint32 calc_body_length(bool, bool);
-        void prepare_write();
         void write_body(int, bool, bool);
 
     public:

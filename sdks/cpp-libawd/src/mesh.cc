@@ -181,18 +181,6 @@ AWDMeshData::calc_body_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDMeshData::prepare_write()
-{
-    if (this->bind_mtx) {
-        AWD_attr_val_ptr bind_val;
-
-        bind_val.f64 = this->bind_mtx;
-        this->properties->set(PROP_MD_BIND_MTX, bind_val, 16*sizeof(awd_float64), AWD_ATTR_MTX4);
-    }
-}
-
-
-void
 AWDMeshData::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awd_uint16 num_subs_be;

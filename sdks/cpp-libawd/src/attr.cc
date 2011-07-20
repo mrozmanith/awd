@@ -29,14 +29,17 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
         // Check type, and write data accordingly
         switch (this->type) {
             case AWD_ATTR_INT16:
+            case AWD_ATTR_UINT16:
                 i16_be = UI16(*val.i16);
                 write(fd, &i16_be, sizeof(awd_int16));
                 bytes_written += sizeof(awd_int16);
                 val.i16++;
                 break;
 
-            case AWD_ATTR_BADDR:
             case AWD_ATTR_INT32:
+            case AWD_ATTR_UINT32:
+            case AWD_ATTR_BADDR:
+            case AWD_ATTR_COLOR:
                 i32_be = UI32(*val.i32);
                 write(fd, &i32_be, sizeof(awd_int32));
                 bytes_written += sizeof(awd_int32);
@@ -68,9 +71,14 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
                 bytes_written += this->value_len;
                 break;
 
-            case AWD_ATTR_MTX4:
-                awdutil_write_mtx4(fd, val.f64, wide_mtx);
-                bytes_written += 128;
+            case AWD_ATTR_VECTOR2x1:
+            case AWD_ATTR_VECTOR3x1:
+            case AWD_ATTR_VECTOR4x1:
+            case AWD_ATTR_MTX3x2:
+            case AWD_ATTR_MTX3x3:
+            case AWD_ATTR_MTX4x3:
+            case AWD_ATTR_MTX4x4:
+                bytes_written += awdutil_write_floats(fd, val.f64, this->value_len, wide_mtx);
                 break;
 
             default:

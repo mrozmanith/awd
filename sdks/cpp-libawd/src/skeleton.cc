@@ -18,7 +18,7 @@ AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_fl
     this->num_children = 0;
 
     if (this->bind_mtx == NULL) {
-        this->bind_mtx = awdutil_id_mtx4(NULL);
+        this->bind_mtx = awdutil_id_mtx4x4(NULL);
     }
 }
 
@@ -156,7 +156,7 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_geom, bool wide_m
     write(fd, &id_be, sizeof(awd_uint32));
     write(fd, &par_id_be, sizeof(awd_uint32));
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
-    awdutil_write_mtx4(fd, this->bind_mtx, wide_mtx);
+    awdutil_write_mtx4x4(fd, this->bind_mtx, wide_mtx);
 
     //  TODO: Write attributes
     this->properties->write_attributes(fd, wide_geom, wide_mtx);
