@@ -16,13 +16,19 @@ typedef enum {
     AWD_ATTR_STRING,
     AWD_ATTR_BADDR,
     AWD_ATTR_MTX4,
+    AWD_ATTR_BOOL,
 } AWD_attr_type;
 
 
 typedef union {
     void *v;
+    awd_bool *b;
+    awd_int8 *i8;
     awd_int16 *i16;
     awd_int32 *i32;
+    awd_uint8 *ui8;
+    awd_uint16 *ui16;
+    awd_uint32 *ui32;
     awd_float32 *f32;
     awd_float64 *f64;
     awd_baddr *addr;

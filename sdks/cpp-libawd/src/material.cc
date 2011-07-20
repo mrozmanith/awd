@@ -3,16 +3,18 @@
 
 #include "platform.h"
 
-AWDSimpleMaterial::AWDSimpleMaterial(awd_uint8 type, const char *name, awd_uint16 name_len) : 
+AWDMaterial::AWDMaterial(AWD_mat_type type, const char *name, awd_uint16 name_len) : 
     AWDBlock(SIMPLE_MATERIAL),
     AWDNamedElement(name, name_len),
     AWDAttrElement()
 {
     this->type = type;
     this->texture = NULL;
+    this->transparent = false;
+    this->repeat = false;
 }
 
-AWDSimpleMaterial::~AWDSimpleMaterial()
+AWDMaterial::~AWDMaterial()
 {
     // Texture will be deleted 
     // by the block list it's in
@@ -20,14 +22,14 @@ AWDSimpleMaterial::~AWDSimpleMaterial()
 }
 
 
-awd_uint8
-AWDSimpleMaterial::get_type()
+AWD_mat_type
+AWDMaterial::get_type()
 {
     return this->type;
 }
 
 void
-AWDSimpleMaterial::set_type(awd_uint8 type)
+AWDMaterial::set_type(AWD_mat_type type)
 {
     this->type = type;
 }
@@ -35,13 +37,13 @@ AWDSimpleMaterial::set_type(awd_uint8 type)
 
 
 AWDTexture *
-AWDSimpleMaterial::get_texture()
+AWDMaterial::get_texture()
 {
     return this->texture;
 }
 
 void
-AWDSimpleMaterial::set_texture(AWDTexture *texture)
+AWDMaterial::set_texture(AWDTexture *texture)
 {
     this->texture = texture;
 }
@@ -49,14 +51,14 @@ AWDSimpleMaterial::set_texture(AWDTexture *texture)
 
 
 awd_uint32
-AWDSimpleMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
 {
     return 3 + this->get_name_length() + this->calc_attr_length(true,true, wide_geom, wide_mtx);
 }
 
 
 void
-AWDSimpleMaterial::prepare_write()
+AWDMaterial::prepare_write()
 {
     if (this->texture) {
         AWD_attr_val_ptr tex_val;
@@ -64,11 +66,25 @@ AWDSimpleMaterial::prepare_write()
         *tex_val.addr = this->texture->get_addr();
         this->properties->set(PROP_MAT_TEXTURE, tex_val, sizeof(awd_baddr), AWD_ATTR_BADDR);
     }
+
+    if (this->repeat) {
+        AWD_attr_val_ptr rep_val;
+        rep_val.b = (awd_bool *)malloc(sizeof(awd_bool));
+        *rep_val.b = AWD_TRUE;
+        this->properties->set(PROP_MAT_REPEAT, rep_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+    }
+
+    if (this->transparent) {
+        AWD_attr_val_ptr trans_val;
+        trans_val.b = (awd_bool *)malloc(sizeof(awd_bool));
+        *trans_val.b = AWD_TRUE;
+        this->properties->set(PROP_MAT_TRANSPARENT, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+    }
 }
 
 
 void
-AWDSimpleMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     // Write type

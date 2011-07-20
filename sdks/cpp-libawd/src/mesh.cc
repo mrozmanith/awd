@@ -266,7 +266,7 @@ AWDMeshInst::~AWDMeshInst()
 
 
 void
-AWDMeshInst::add_material(AWDSimpleMaterial *material)
+AWDMeshInst::add_material(AWDMaterial *material)
 {
     this->materials->force_append(material);
 }

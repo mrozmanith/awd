@@ -67,7 +67,7 @@ class AWD
         void set_metadata(AWDMetaData *);
 
         void add_texture(AWDTexture *);
-        void add_material(AWDSimpleMaterial *);
+        void add_material(AWDMaterial *);
         void add_mesh_data(AWDMeshData *);
         void add_skeleton(AWDSkeleton *);
         void add_skeleton_pose(AWDSkeletonPose *);
