@@ -19,6 +19,7 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWD_mat_type type;
     PyObject *type_attr;
     PyObject *tex_attr;
+    PyObject *ath_attr;
 
     AWDMaterial *lawd_mat;
 
@@ -38,7 +39,12 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     }
 
     lawd_mat->repeat = pyawdutil_has_true_attr(block, "repeat");
-    lawd_mat->transparent = pyawdutil_has_true_attr(block, "transparent");
+    lawd_mat->alpha_blending = pyawdutil_has_true_attr(block, "alpha_blending");
+
+    ath_attr = PyObject_GetAttrString(block, "alpha_threshold");
+    if (ath_attr && PyNumber_Check(ath_attr)) {
+        lawd_mat->alpha_threshold = (awd_float32)PyFloat_AsDouble(PyNumber_Float(ath_attr));
+    }
 
     // Prep any user attributes
     __prepare_attr_element(block, awd, lawd_mat);
