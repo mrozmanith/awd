@@ -2,6 +2,27 @@
 
 #include <awd/libawd.h>
 
+bool
+pyawdutil_has_true_attr(PyObject *o, const char *attr)
+{
+    PyObject *a;
+
+    a = PyObject_GetAttrString(o, attr);
+    if (a != NULL) {
+        if (a == Py_True)
+            return true;
+
+        if (PyNumber_Check(a)) {
+            PyObject *i;
+            i = PyNumber_Int(a);
+            if (PyInt_AsLong(i) > 0)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void
 pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
 {

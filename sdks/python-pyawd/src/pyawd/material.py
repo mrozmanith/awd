@@ -24,5 +24,7 @@ class AWDMaterial(core.AWDAttrElement, core.AWDBlockBase):
         self.type = type
         self.name = name
         self.texture = texture
+        self.repeat = False
+        self.transparent = False
 
 

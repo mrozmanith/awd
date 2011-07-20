@@ -16,18 +16,18 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     const char *name;
     int name_len;
-    awd_uint8 type;
+    AWD_mat_type type;
     PyObject *type_attr;
     PyObject *tex_attr;
 
-    AWDSimpleMaterial *lawd_mat;
+    AWDMaterial *lawd_mat;
 
     type_attr = PyObject_GetAttrString(block, "type");
-    type = (awd_uint8)PyLong_AsLong(type_attr);
+    type = (AWD_mat_type)PyLong_AsLong(type_attr);
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
 
-    lawd_mat = new AWDSimpleMaterial(type, name, name_len);
+    lawd_mat = new AWDMaterial(type, name, name_len);
 
     tex_attr = PyObject_GetAttrString(block, "texture");
     if (tex_attr != Py_None) {
@@ -36,6 +36,9 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         if (tex)
             lawd_mat->set_texture(tex);
     }
+
+    lawd_mat->repeat = pyawdutil_has_true_attr(block, "repeat");
+    lawd_mat->transparent = pyawdutil_has_true_attr(block, "transparent");
 
     // Prep any user attributes
     __prepare_attr_element(block, awd, lawd_mat);
