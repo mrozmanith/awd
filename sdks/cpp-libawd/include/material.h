@@ -9,7 +9,8 @@
 #define PROP_MAT_COLOR 1
 #define PROP_MAT_TEXTURE 2
 #define PROP_MAT_TRANSPARENT 11
-#define PROP_MAT_REPEAT 12
+#define PROP_MAT_ALPHA_THRESHOLD 12
+#define PROP_MAT_REPEAT 13
 
 
 typedef enum {
@@ -33,7 +34,8 @@ class AWDMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrEleme
         ~AWDMaterial();
 
         bool repeat;
-        bool transparent;
+        bool alpha_blending;
+        awd_float32 alpha_threshold;
 
         void set_type(AWD_mat_type);
         AWD_mat_type get_type();

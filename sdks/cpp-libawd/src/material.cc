@@ -10,7 +10,8 @@ AWDMaterial::AWDMaterial(AWD_mat_type type, const char *name, awd_uint16 name_le
 {
     this->type = type;
     this->texture = NULL;
-    this->transparent = false;
+    this->alpha_threshold = 0.0f;
+    this->alpha_blending = false;
     this->repeat = false;
 }
 
@@ -74,11 +75,18 @@ AWDMaterial::prepare_write()
         this->properties->set(PROP_MAT_REPEAT, rep_val, sizeof(awd_bool), AWD_ATTR_BOOL);
     }
 
-    if (this->transparent) {
+    if (this->alpha_blending) {
         AWD_attr_val_ptr trans_val;
         trans_val.b = (awd_bool *)malloc(sizeof(awd_bool));
         *trans_val.b = AWD_TRUE;
         this->properties->set(PROP_MAT_TRANSPARENT, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+    }
+
+    if (this->alpha_threshold != 0.0f) {
+        AWD_attr_val_ptr th_val;
+        th_val.f32 = (awd_float32 *)malloc(sizeof(awd_float32));
+        *th_val.f32 = this->alpha_threshold;
+        this->properties->set(PROP_MAT_ALPHA_THRESHOLD, th_val, sizeof(awd_float32), AWD_ATTR_FLOAT32);
     }
 }
 
