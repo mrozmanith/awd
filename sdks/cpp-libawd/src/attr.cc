@@ -63,6 +63,11 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
                 bytes_written += this->value_len;
                 break;
 
+            case AWD_ATTR_BOOL:
+                write(fd, val.b, this->value_len);
+                bytes_written += this->value_len;
+                break;
+
             case AWD_ATTR_MTX4:
                 awdutil_write_mtx4(fd, val.f64, wide_mtx);
                 bytes_written += 128;
