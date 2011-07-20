@@ -6,15 +6,21 @@
 #include "block.h"
 #include "attr.h"
 
-#define AWD_MATTYPE_BITMAP 2
-
+#define PROP_MAT_COLOR 1
 #define PROP_MAT_TEXTURE 2
+#define PROP_MAT_TRANSPARENT 11
+#define PROP_MAT_REPEAT 12
 
 
-class AWDSimpleMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrElement
+typedef enum {
+    AWD_MATTYPE_COLOR=1,
+    AWD_MATTYPE_BITMAP=2
+} AWD_mat_type;
+
+class AWDMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrElement
 {
     private:
-        awd_uint8 type;
+        AWD_mat_type type;
         AWDTexture *texture;
 
     protected:
@@ -23,11 +29,14 @@ class AWDSimpleMaterial : public AWDBlock, public AWDNamedElement, public AWDAtt
         void write_body(int, bool, bool);
 
     public:
-        AWDSimpleMaterial(awd_uint8, const char *, awd_uint16);
-        ~AWDSimpleMaterial();
+        AWDMaterial(AWD_mat_type, const char *, awd_uint16);
+        ~AWDMaterial();
 
-        void set_type(awd_uint8);
-        awd_uint8 get_type();
+        bool repeat;
+        bool transparent;
+
+        void set_type(AWD_mat_type);
+        AWD_mat_type get_type();
 
         void set_texture(AWDTexture *);
         AWDTexture *get_texture();

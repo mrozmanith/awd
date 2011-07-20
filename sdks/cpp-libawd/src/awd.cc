@@ -68,7 +68,7 @@ AWD::set_metadata(AWDMetaData *block)
 
 
 void
-AWD::add_material(AWDSimpleMaterial *block)
+AWD::add_material(AWDMaterial *block)
 {
     this->material_blocks->append(block);
 }

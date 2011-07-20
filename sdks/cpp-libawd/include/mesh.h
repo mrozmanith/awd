@@ -93,7 +93,7 @@ class AWDMeshInst :
         AWDMeshInst(const char *, awd_uint16, AWDMeshData *, awd_float64 *);
         ~AWDMeshInst();
 
-        void add_material(AWDSimpleMaterial *);
+        void add_material(AWDMaterial *);
 
         AWDMeshData * get_data();
         void set_data(AWDMeshData *);
