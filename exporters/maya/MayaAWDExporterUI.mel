@@ -65,6 +65,16 @@ global proc int MayaAWDExporterUI(string $parent,
                 -ofc "checkBox -e -en false chkEmbedTex"
                 chkIncludeMat;
             checkBox -label "Embed textures" -align "left" chkEmbedTex;
+            text -align "left" -l"Transparency method:";
+            columnLayout -co "left" 20;
+                radioButtonGrp -nrb 3 -vr -cl3 "left" "left" "left" -sl 3
+                    -labelArray3 "Ignore alpha" "Use alpha blending (semi-transparency, slow)" "Binary alpha (using threshold, fast)" 
+                    -on3 "floatSliderGrp -e -en true inpAlphaThreshold"
+                    -of3 "floatSliderGrp -e -en false inpAlphaThreshold"
+                    radAlphaMethod;
+                columnLayout -co "left" 18;
+                    floatSliderGrp -cl3 "left" "left" "left" -cw3 60 25 70 -f true -l "Threshold:" -h 18 -min 0 -max 1 -v 0.5 -step 0.1 inpAlphaThreshold;
+
         
         setParent $parent;
         frameLayout -l "Skeletons"
@@ -154,6 +164,15 @@ global proc int MayaAWDExporterUI(string $parent,
 
         if (`checkBox -q -v chkEmbedTex`) {
             $options[$oi] = "embed_textures=1";
+            $oi++;
+        }
+
+        if (`radioButtonGrp -q -sl radAlphaMethod` == 2) {
+            $options[$oi] = "alpha_blending=1";
+            $oi++;
+        }
+        else if (`radioButtonGrp -q -sl radAlphaMethod` == 3) {
+            $options[$oi] = "alpha_threshold="+`floatSliderGrp -q -v inpAlphaThreshold`;
             $oi++;
         }
 
