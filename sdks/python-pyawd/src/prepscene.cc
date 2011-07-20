@@ -34,9 +34,9 @@ __prepare_mesh_inst(PyObject *block, pyawd_bcache *bcache)
     mat_attr = PyObject_GetAttrString(block, "materials");
     num_materials = PyList_Size(mat_attr);
     for (i=0; i<num_materials; i++) {
-        AWDSimpleMaterial *lawd_mat;
+        AWDMaterial *lawd_mat;
 
-        lawd_mat = (AWDSimpleMaterial *)pyawd_bcache_get(bcache, PyList_GetItem(mat_attr, i));
+        lawd_mat = (AWDMaterial *)pyawd_bcache_get(bcache, PyList_GetItem(mat_attr, i));
         lawd_inst->add_material(lawd_mat);
     }
 
