@@ -564,6 +564,16 @@ class MayaAWDExporter:
  
                             if mat is not None:
                                 mat.texture = tex
+
+                        elif state_type == 'place2dTexture' and mat is not None:
+                            # Determine from place2dTexture node whether
+                            # this material should repeat/wrap
+                            rep_uv = mc.getAttr('%s.re' % state)[0]
+                            if rep_uv[0] != 1.0 or rep_uv[1] != 1.0:
+                                mat.repeat = True
+                            elif mc.getAttr(state+'.wu') or mc.getAttr(state+'.wv'):
+                                mat.repeat = True
+
  
  
  
