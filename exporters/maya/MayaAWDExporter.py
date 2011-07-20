@@ -78,6 +78,8 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
             exporter.include_cameras = bool(o('inc_cams', False))
             exporter.include_lights = bool(o('inc_lights', False))
             exporter.embed_textures = bool(o('embed_textures', False))
+            exporter.alpha_blending = bool(o('alpha_blending', False))
+            exporter.alpha_threshold = float(o('alpha_threshold', 0.0))
             exporter.include_attr = bool(o('inc_attr', False))
 
             if exporter.include_attr:
@@ -545,11 +547,16 @@ class MayaAWDExporter:
                                 self.block_cache.add(state, mat)
                                 print('created material')
 
-                                # Check if transparency is an input (rather than scalars)
-                                # in which case the material needs to be marked as transparent,
-                                # to indicate that the texture's alpha channel should be used.
-                                tr_input = mc.connectionInfo('%s.it' % state, isDestination=True)
-                                mat.transparent = tr_input
+                                if self.alpha_blending or self.alpha_threshold > 0.0:
+                                    # Check if transparency is an input (rather than scalars)
+                                    # in which case the material needs to be marked as transparent,
+                                    # to indicate that the texture's alpha channel should be used.
+                                    tr_input = mc.connectionInfo('%s.it' % state, isDestination=True)
+                                    if tr_input:
+                                        if self.alpha_threshold > 0.0:
+                                            mat.alpha_threshold = self.alpha_threshold
+                                        else:
+                                            mat.alpha_blending = True
  
                             awd_inst.materials.append(mat)
                             print('adding material ' + state)
