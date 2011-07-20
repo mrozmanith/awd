@@ -79,7 +79,7 @@ AWDMaterial::prepare_write()
         AWD_attr_val_ptr trans_val;
         trans_val.b = (awd_bool *)malloc(sizeof(awd_bool));
         *trans_val.b = AWD_TRUE;
-        this->properties->set(PROP_MAT_TRANSPARENT, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
+        this->properties->set(PROP_MAT_ALPHA_BLENDING, trans_val, sizeof(awd_bool), AWD_ATTR_BOOL);
     }
 
     if (this->alpha_threshold != 0.0f) {
