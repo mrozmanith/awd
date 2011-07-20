@@ -544,6 +544,12 @@ class MayaAWDExporter:
                                 self.awd.add_material(mat)
                                 self.block_cache.add(state, mat)
                                 print('created material')
+
+                                # Check if transparency is an input (rather than scalars)
+                                # in which case the material needs to be marked as transparent,
+                                # to indicate that the texture's alpha channel should be used.
+                                tr_input = mc.connectionInfo('%s.it' % state, isDestination=True)
+                                mat.transparent = tr_input
  
                             awd_inst.materials.append(mat)
                             print('adding material ' + state)
