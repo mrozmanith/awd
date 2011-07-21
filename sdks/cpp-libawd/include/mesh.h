@@ -28,19 +28,24 @@ typedef enum {
 
 
 
-class AWDSubMesh
+class AWDSubMesh :
+    public AWDAttrElement
 {
     private:
+        AWDDataStream * first_stream;
         AWDDataStream * last_stream;
+        awd_uint32 calc_streams_length(bool);
 
     public:
         AWDSubMesh();
         ~AWDSubMesh();
 
-        AWDDataStream * first_stream;
         AWDSubMesh * next;
 
         void add_stream(AWD_mesh_str_type, AWD_str_ptr, awd_uint32);
+
+        awd_uint32 calc_sub_length(bool, bool);
+        void write_sub(int, bool, bool);
 };
 
 
