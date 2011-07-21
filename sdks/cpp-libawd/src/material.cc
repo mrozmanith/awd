@@ -65,9 +65,9 @@ AWDMaterial::prepare_write()
     if (this->type == AWD_MATTYPE_COLOR) {
         if (this->color > 0) {
             AWD_field_ptr col_val;
-            col_val.ui32 = (awd_uint32 *)malloc(sizeof(awd_uint32));
-            *col_val.ui32 = this->color;
-            this->properties->set(PROP_MAT_COLOR, col_val, sizeof(awd_uint32), AWD_FIELD_UINT32);
+            col_val.col = (awd_color *)malloc(sizeof(awd_uint32));
+            *col_val.col = this->color;
+            this->properties->set(PROP_MAT_COLOR, col_val, sizeof(awd_color), AWD_FIELD_COLOR);
         }
     }
     else {
