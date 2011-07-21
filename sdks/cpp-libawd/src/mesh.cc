@@ -9,7 +9,8 @@
 
 
 
-AWDSubMesh::AWDSubMesh()
+AWDSubMesh::AWDSubMesh() :
+    AWDAttrElement()
 {
     this->first_stream = NULL;
     this->last_stream = NULL;
@@ -49,6 +50,60 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 
     this->last_stream = str;
     this->last_stream->next = NULL;
+}
+
+
+awd_uint32
+AWDSubMesh::calc_streams_length(bool wide_geom)
+{
+    awd_uint32 len;
+    AWDDataStream *str;
+
+    len = 0;
+    str = this->first_stream;
+    while (str) {
+        len += 5 + str->get_length(wide_geom);
+        str = str->next;
+    }
+
+    return len;
+}
+
+
+awd_uint32
+AWDSubMesh::calc_sub_length(bool wide_geom, bool wide_mtx)
+{
+    awd_uint32 len;
+
+    len = 4; // Sub-mesh header
+    len += this->calc_streams_length(wide_geom);
+    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
+
+    return len;
+}
+
+
+void
+AWDSubMesh::write_sub(int fd, bool wide_geom, bool wide_mtx)
+{
+    AWDDataStream *str;
+    awd_uint32 sub_len;
+
+    // Verify byte-order
+    sub_len = UI32(this->calc_streams_length(wide_geom));
+
+    // Write sub-mesh header
+    write(fd, &sub_len, sizeof(awd_uint32));
+
+    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+
+    str = this->first_stream;
+    while(str) {
+        str->write_stream(fd, wide_geom);
+        str = str->next;
+    }
+
+    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }
 
 
@@ -161,18 +216,7 @@ AWDMeshData::calc_body_length(bool wide_geom, bool wide_mtx)
     mesh_len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
     sub = this->first_sub;
     while (sub) {
-        AWDDataStream *str;
-        
-        // add size of sub-mesh length
-        mesh_len += 4;
-
-        str = sub->first_stream;
-        while (str) {
-            mesh_len += 5 + str->get_length(wide_geom);
-
-            str = str->next;
-        }
-
+        mesh_len += sub->calc_sub_length(wide_geom, wide_mtx);
         sub = sub->next;
     }
 
@@ -197,30 +241,7 @@ AWDMeshData::write_body(int fd, bool wide_geom, bool wide_mtx)
     // Write all sub-meshes
     sub = this->first_sub;
     while (sub) {
-        AWDDataStream *str;
-        awd_uint32 sub_len;
-
-        sub_len = 0;
-        str = sub->first_stream;
-        while (str) {
-            sub_len += (str->get_length(wide_geom) + 5);
-
-            str = str->next;
-        }
-
-        // Verify byte-order
-        sub_len = UI32(sub_len);
-
-        // Write sub-mesh header
-        write(fd, &sub_len, sizeof(awd_uint32));
-
-        str = sub->first_stream;
-        while(str) {
-            str->write_stream(fd, wide_geom);
-
-            str = str->next;
-        }
-
+        sub->write_sub(fd, wide_geom, wide_mtx);
         sub = sub->next;
     }
     
