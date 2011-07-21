@@ -18,8 +18,6 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     int name_len;
     AWD_mat_type type;
     PyObject *type_attr;
-    PyObject *tex_attr;
-    PyObject *ath_attr;
 
     AWDMaterial *lawd_mat;
 
@@ -30,20 +28,33 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
     lawd_mat = new AWDMaterial(type, name, name_len);
 
-    tex_attr = PyObject_GetAttrString(block, "texture");
-    if (tex_attr != Py_None) {
-        AWDTexture *tex;
-        tex = (AWDTexture *)pyawd_bcache_get(bcache, tex_attr);
-        if (tex)
-            lawd_mat->set_texture(tex);
+    if (type == AWD_MATTYPE_COLOR) {
+        PyObject *col_attr;
+
+        col_attr = PyObject_GetAttrString(block, "color");
+        if (PyInt_Check(col_attr)) {
+            lawd_mat->color = PyInt_AsLong(col_attr);
+        }
     }
+    else {
+        PyObject *tex_attr;
+        PyObject *ath_attr;
 
-    lawd_mat->repeat = pyawdutil_has_true_attr(block, "repeat");
-    lawd_mat->alpha_blending = pyawdutil_has_true_attr(block, "alpha_blending");
+        tex_attr = PyObject_GetAttrString(block, "texture");
+        if (tex_attr != Py_None) {
+            AWDTexture *tex;
+            tex = (AWDTexture *)pyawd_bcache_get(bcache, tex_attr);
+            if (tex)
+                lawd_mat->set_texture(tex);
+        }
 
-    ath_attr = PyObject_GetAttrString(block, "alpha_threshold");
-    if (ath_attr && PyNumber_Check(ath_attr)) {
-        lawd_mat->alpha_threshold = (awd_float32)PyFloat_AsDouble(PyNumber_Float(ath_attr));
+        lawd_mat->repeat = pyawdutil_has_true_attr(block, "repeat");
+        lawd_mat->alpha_blending = pyawdutil_has_true_attr(block, "alpha_blending");
+
+        ath_attr = PyObject_GetAttrString(block, "alpha_threshold");
+        if (ath_attr && PyNumber_Check(ath_attr)) {
+            lawd_mat->alpha_threshold = (awd_float32)PyFloat_AsDouble(PyNumber_Float(ath_attr));
+        }
     }
 
     // Prep any user attributes

@@ -27,5 +27,6 @@ class AWDMaterial(core.AWDAttrElement, core.AWDBlockBase):
         self.repeat = False
         self.alpha_blending = False
         self.alpha_threshold = 0.0
+        self.color = 0
 
 
