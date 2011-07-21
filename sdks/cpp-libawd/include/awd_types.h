@@ -35,6 +35,58 @@ typedef unsigned char awd_bool;
 
 
 typedef enum {
+    // Numeric types
+    AWD_FIELD_INT8=1,
+    AWD_FIELD_INT16,
+    AWD_FIELD_INT32,
+    AWD_FIELD_UINT8,
+    AWD_FIELD_UINT16,
+    AWD_FIELD_UINT32,
+    AWD_FIELD_FLOAT32,
+    AWD_FIELD_FLOAT64,
+
+    // Derived numeric types
+    AWD_FIELD_BOOL=21,
+    AWD_FIELD_COLOR,
+    AWD_FIELD_BADDR,
+
+    // Aggregate/array types
+    AWD_FIELD_STRING=31,
+    AWD_FIELD_BYTEARRAY,
+
+    // Mathetmatical types
+    AWD_FIELD_VECTOR2x1=41,
+    AWD_FIELD_VECTOR3x1,
+    AWD_FIELD_VECTOR4x1,
+    AWD_FIELD_MTX3x2,
+    AWD_FIELD_MTX3x3,
+    AWD_FIELD_MTX4x3,
+    AWD_FIELD_MTX4x4,
+} AWD_field_type;
+
+
+typedef union {
+    void *v;
+    awd_bool *b;
+    awd_int8 *i8;
+    awd_int16 *i16;
+    awd_int32 *i32;
+    awd_uint8 *ui8;
+    awd_uint16 *ui16;
+    awd_uint32 *ui32;
+    awd_float32 *f32;
+    awd_float64 *f64;
+    awd_float64 *mtx;
+    awd_float64 *vec;
+    awd_uint32 *col;
+    awd_baddr *addr;
+    char *str;
+} AWD_field_ptr;
+
+
+
+
+typedef enum {
     NULL_REF=0,
 
     // Geometry/data

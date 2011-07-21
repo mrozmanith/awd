@@ -28,13 +28,13 @@ AWDMetaData::override_encoder_metadata(char *name, char *version)
 void
 AWDMetaData::prepare_write()
 {
-    AWD_attr_val_ptr val;
+    AWD_field_ptr val;
 
     val.str = this->encoder_name;
-    this->properties->set(PROP_META_ENCODER_NAME, val, strlen(this->encoder_name), AWD_ATTR_STRING);
+    this->properties->set(PROP_META_ENCODER_NAME, val, strlen(this->encoder_name), AWD_FIELD_STRING);
     
     val.str = this->encoder_version;
-    this->properties->set(PROP_META_ENCODER_VER, val, strlen(this->encoder_version), AWD_ATTR_STRING);
+    this->properties->set(PROP_META_ENCODER_VER, val, strlen(this->encoder_version), AWD_FIELD_STRING);
 }
 
 

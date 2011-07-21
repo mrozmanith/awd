@@ -13,7 +13,7 @@
 void
 AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
 {
-    AWD_attr_val_ptr val;
+    AWD_field_ptr val;
     awd_uint16 bytes_written;
     awd_int16 i16_be;
     awd_int32 i32_be;
@@ -28,56 +28,56 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
     while (bytes_written < this->value_len) {
         // Check type, and write data accordingly
         switch (this->type) {
-            case AWD_ATTR_INT16:
-            case AWD_ATTR_UINT16:
+            case AWD_FIELD_INT16:
+            case AWD_FIELD_UINT16:
                 i16_be = UI16(*val.i16);
                 write(fd, &i16_be, sizeof(awd_int16));
                 bytes_written += sizeof(awd_int16);
                 val.i16++;
                 break;
 
-            case AWD_ATTR_INT32:
-            case AWD_ATTR_UINT32:
-            case AWD_ATTR_BADDR:
-            case AWD_ATTR_COLOR:
+            case AWD_FIELD_INT32:
+            case AWD_FIELD_UINT32:
+            case AWD_FIELD_BADDR:
+            case AWD_FIELD_COLOR:
                 i32_be = UI32(*val.i32);
                 write(fd, &i32_be, sizeof(awd_int32));
                 bytes_written += sizeof(awd_int32);
                 val.i32++;
                 break;
 
-            case AWD_ATTR_FLOAT32:
+            case AWD_FIELD_FLOAT32:
                 f32_be = F32(*val.f32);
                 write(fd, &f32_be, sizeof(awd_float32));
                 bytes_written += sizeof(awd_float32);
                 val.f32++;
                 break;
 
-            case AWD_ATTR_FLOAT64:
+            case AWD_FIELD_FLOAT64:
                 f64_be = F64(*val.f64);
                 write(fd, &f64_be, sizeof(awd_float64));
                 bytes_written += sizeof(awd_float64);
                 val.f64++;
                 break;
 
-            case AWD_ATTR_STRING:
+            case AWD_FIELD_STRING:
                 // Write entire string in one go
                 write(fd, val.str, this->value_len);
                 bytes_written += this->value_len;
                 break;
 
-            case AWD_ATTR_BOOL:
+            case AWD_FIELD_BOOL:
                 write(fd, val.b, this->value_len);
                 bytes_written += this->value_len;
                 break;
 
-            case AWD_ATTR_VECTOR2x1:
-            case AWD_ATTR_VECTOR3x1:
-            case AWD_ATTR_VECTOR4x1:
-            case AWD_ATTR_MTX3x2:
-            case AWD_ATTR_MTX3x3:
-            case AWD_ATTR_MTX4x3:
-            case AWD_ATTR_MTX4x4:
+            case AWD_FIELD_VECTOR2x1:
+            case AWD_FIELD_VECTOR3x1:
+            case AWD_FIELD_VECTOR4x1:
+            case AWD_FIELD_MTX3x2:
+            case AWD_FIELD_MTX3x3:
+            case AWD_FIELD_MTX4x3:
+            case AWD_FIELD_MTX4x4:
                 bytes_written += awdutil_write_floats(fd, val.f64, this->value_len, wide_mtx);
                 break;
 
@@ -91,7 +91,7 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
 
 
 void
-AWDAttr::set_val(AWD_attr_val_ptr val, awd_uint16 val_len, AWD_attr_type val_type)
+AWDAttr::set_val(AWD_field_ptr val, awd_uint16 val_len, AWD_field_type val_type)
 {
     this->value = val;
     this->value_len = val_len;
@@ -99,8 +99,8 @@ AWDAttr::set_val(AWD_attr_val_ptr val, awd_uint16 val_len, AWD_attr_type val_typ
 }
 
 
-AWD_attr_val_ptr 
-AWDAttr::get_val(awd_uint16 *val_len, AWD_attr_type *val_type)
+AWD_field_ptr 
+AWDAttr::get_val(awd_uint16 *val_len, AWD_field_type *val_type)
 {
     *val_len = this->value_len;
     *val_type = this->type;
@@ -261,7 +261,7 @@ AWDUserAttrList::find(AWDNamespace *ns, const char *key, awd_uint16 key_len)
 
 bool
 AWDUserAttrList::get(AWDNamespace *ns, const char *key, awd_uint16 key_len,
-    AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
+    AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
 {
     AWDUserAttr *attr;
 
@@ -277,7 +277,7 @@ AWDUserAttrList::get(AWDNamespace *ns, const char *key, awd_uint16 key_len,
 
 void
 AWDUserAttrList::set(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_attr_val_ptr value, awd_uint16 value_length, AWD_attr_type type)
+    AWD_field_ptr value, awd_uint16 value_length, AWD_field_type type)
 {
     bool created;
     AWDUserAttr *attr;
@@ -431,7 +431,7 @@ AWDNumAttrList::find(awd_propkey key)
 
 
 bool
-AWDNumAttrList::get(awd_propkey key, AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
+AWDNumAttrList::get(awd_propkey key, AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
 {
     AWDNumAttr *attr;
 
@@ -447,7 +447,7 @@ AWDNumAttrList::get(awd_propkey key, AWD_attr_val_ptr *val, awd_uint16 *val_len,
 
 
 void
-AWDNumAttrList::set(awd_propkey key, AWD_attr_val_ptr value, awd_uint16 value_length, AWD_attr_type type)
+AWDNumAttrList::set(awd_propkey key, AWD_field_ptr value, awd_uint16 value_length, AWD_field_type type)
 {
     bool created;
     AWDNumAttr *attr;    
@@ -520,7 +520,7 @@ AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide
 
 bool
 AWDAttrElement::get_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_attr_val_ptr *val, awd_uint16 *val_len, AWD_attr_type *val_type)
+    AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
 {
     return this->user_attributes->get(ns, key, key_len, val, val_len, val_type);
 }
@@ -528,7 +528,7 @@ AWDAttrElement::get_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len,
 
 void
 AWDAttrElement::set_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_attr_val_ptr val, awd_uint16 val_len, AWD_attr_type val_type)
+    AWD_field_ptr val, awd_uint16 val_len, AWD_field_type val_type)
 {
     this->user_attributes->set(ns, key, key_len, val, val_len, val_type);
 }

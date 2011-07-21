@@ -4,63 +4,15 @@
 #include "ns.h"
 #include "awd_types.h"
 
-#define ATTR_RETURN_NULL AWD_attr_val_ptr _ptr; _ptr.str = NULL; return _ptr;
+#define ATTR_RETURN_NULL AWD_field_ptr _ptr; _ptr.v = NULL; return _ptr;
 
 typedef awd_uint16 awd_propkey;
-
-typedef enum {
-    // Numeric types
-    AWD_ATTR_INT8=1,
-    AWD_ATTR_INT16,
-    AWD_ATTR_INT32,
-    AWD_ATTR_UINT8,
-    AWD_ATTR_UINT16,
-    AWD_ATTR_UINT32,
-    AWD_ATTR_FLOAT32,
-    AWD_ATTR_FLOAT64,
-
-    // Derived numeric types
-    AWD_ATTR_BOOL=21,
-    AWD_ATTR_COLOR,
-    AWD_ATTR_BADDR,
-
-    // Aggregate/array types
-    AWD_ATTR_STRING=31,
-    AWD_ATTR_VECTOR2x1,
-    AWD_ATTR_VECTOR3x1,
-    AWD_ATTR_VECTOR4x1,
-    AWD_ATTR_MTX3x2,
-    AWD_ATTR_MTX3x3,
-    AWD_ATTR_MTX4x3,
-    AWD_ATTR_MTX4x4,
-} AWD_attr_type;
-
-
-typedef union {
-    void *v;
-    awd_bool *b;
-    awd_int8 *i8;
-    awd_int16 *i16;
-    awd_int32 *i32;
-    awd_uint8 *ui8;
-    awd_uint16 *ui16;
-    awd_uint32 *ui32;
-    awd_float32 *f32;
-    awd_float64 *f64;
-    awd_float64 *mtx;
-    awd_float64 *vec;
-    awd_uint32 *col;
-    awd_baddr *addr;
-    char *str;
-} AWD_attr_val_ptr;
-
-
 
 class AWDAttr
 {
     protected:
-        AWD_attr_type type;
-        AWD_attr_val_ptr value;
+        AWD_field_type type;
+        AWD_field_ptr value;
         awd_uint16 value_len;
 
         virtual void write_metadata(int)=0;
@@ -68,8 +20,8 @@ class AWDAttr
     public:
         void write_attr(int, bool, bool);
 
-        void set_val(AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
-        AWD_attr_val_ptr get_val(awd_uint16 *, AWD_attr_type *);
+        void set_val(AWD_field_ptr, awd_uint16, AWD_field_type);
+        AWD_field_ptr get_val(awd_uint16 *, AWD_field_type *);
         awd_uint16 get_val_len();
 };
 
@@ -114,9 +66,9 @@ class AWDUserAttrList {
         awd_uint32 calc_length(bool, bool);
         void write_attributes(int, bool, bool);
 
-        AWD_attr_val_ptr get_val_ptr(AWDNamespace *ns, const char *, awd_uint16);
-        bool get(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
-        void set(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+        AWD_field_ptr get_val_ptr(AWDNamespace *ns, const char *, awd_uint16);
+        bool get(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
+        void set(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint16, AWD_field_type);
 
         //void add_namespaces(AWD *);
 };
@@ -154,9 +106,9 @@ class AWDNumAttrList {
         awd_uint32 calc_length(bool, bool);
         void write_attributes(int, bool, bool);
 
-        AWD_attr_val_ptr get_val_ptr(awd_propkey);
-        bool get(awd_propkey, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
-        void set(awd_propkey, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+        AWD_field_ptr get_val_ptr(awd_propkey);
+        bool get(awd_propkey, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
+        void set(awd_propkey, AWD_field_ptr, awd_uint16, AWD_field_type);
 };
 
 
@@ -178,8 +130,8 @@ class AWDAttrElement
         awd_uint32 calc_attr_length(bool, bool, bool, bool);
 
     public:
-        bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr *, awd_uint16 *, AWD_attr_type *);
-        void set_attr(AWDNamespace *, const char *, awd_uint16, AWD_attr_val_ptr, awd_uint16, AWD_attr_type);
+        bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
+        void set_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint16, AWD_field_type);
 };
 
 #endif
