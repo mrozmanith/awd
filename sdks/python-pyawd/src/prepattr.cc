@@ -58,7 +58,7 @@ __prepare_attr_element(PyObject *py_elem, AWD *lawd_awd, AWDAttrElement *lawd_el
 #endif
                         char *key_str;
                         awd_uint16 key_len;
-                        AWD_attr_val_ptr value;
+                        AWD_field_ptr value;
                         awd_uint16 value_len;
 
 #if PYTHON_VERSION == 3
@@ -74,7 +74,7 @@ __prepare_attr_element(PyObject *py_elem, AWD *lawd_awd, AWDAttrElement *lawd_el
 #endif
 
                         //TODO: Deal with different value types differently
-                        lawd_elem->set_attr(ns, key_str, key_len, value, value_len, AWD_ATTR_STRING);
+                        lawd_elem->set_attr(ns, key_str, key_len, value, value_len, AWD_FIELD_STRING);
                     }
                 }
             }

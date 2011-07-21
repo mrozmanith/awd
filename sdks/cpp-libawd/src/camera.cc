@@ -32,10 +32,10 @@ AWDCamera::set_lens_fov(awd_float64 fov)
 void
 AWDCamera::prepare_write()
 {
-    AWD_attr_val_ptr fov_val;
+    AWD_field_ptr fov_val;
 
     fov_val.f64 = &this->lens_fov;
-    this->properties->set(PROP_CAM_FOV, fov_val, sizeof(awd_float64), AWD_ATTR_FLOAT64);
+    this->properties->set(PROP_CAM_FOV, fov_val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
 }
 
 
