@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "block.h"
 #include "attr.h"
+#include "shading.h"
 
 #define PROP_MAT_COLOR 1
 #define PROP_MAT_TEXTURE 2
@@ -18,11 +19,21 @@ typedef enum {
     AWD_MATTYPE_BITMAP=2
 } AWD_mat_type;
 
-class AWDMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrElement
+typedef struct _AWD_mat_method {
+    AWDShadingMethod *method;
+    struct _AWD_mat_method *next;
+} AWD_mat_method;
+
+class AWDMaterial : 
+    public AWDBlock, 
+    public AWDNamedElement, 
+    public AWDAttrElement
 {
     private:
         AWD_mat_type type;
         AWDTexture *texture;
+        AWD_mat_method *first_method;
+        AWD_mat_method *last_method;
 
     protected:
         awd_uint32 calc_body_length(bool, bool);
@@ -43,6 +54,8 @@ class AWDMaterial : public AWDBlock, public AWDNamedElement, public AWDAttrEleme
 
         void set_texture(AWDTexture *);
         AWDTexture *get_texture();
+
+        void add_method(AWDShadingMethod *);
 };
 
 #endif
