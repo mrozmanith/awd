@@ -216,7 +216,6 @@ AWDTerrainDiffuseMethod::AWDTerrainDiffuseMethod()
 
 
 
-
 AWDBasicSpecularMethod::AWDBasicSpecularMethod()
 {
     this->type = AWD_SHADETYPE_BASIC_SPEC;
@@ -410,4 +409,196 @@ AWDSlowFilteredShadowMapMethod::prepare_write()
         this->properties->set(PROP_SHAD_STEP_SIZE, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
     }
 }
+
+
+
+AWDColorMatrixMethod::AWDColorMatrixMethod()
+{
+    this->type = AWD_SHADETYPE_COLOR_MATRIX;
+    this->mtx = NULL;
+}
+
+void
+AWDColorMatrixMethod::prepare_write()
+{
+    if (this->mtx != NULL) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64) * 20);
+        val.f64 = this->mtx;
+        this->properties->set(PROP_SHAD_COLOR_MATRIX, val, sizeof(awd_float64)*20, AWD_FIELD_FLOAT64);
+    }
+}
+
+
+
+AWDColorTransformMethod::AWDColorTransformMethod()
+{
+    this->type = AWD_SHADETYPE_COLOR_TRANSFORM;
+    this->alpha_multiplier = 1.0;
+    this->red_multiplier = 1.0;
+    this->green_multiplier = 1.0;
+    this->blue_multiplier = 1.0;
+    this->color_offset = 0;
+}
+
+void
+AWDColorTransformMethod::prepare_write()
+{
+    if (this->alpha_multiplier != 1.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->alpha_multiplier;
+        this->properties->set(PROP_SHAD_ALPHA_MULT, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+
+    if (this->red_multiplier != 1.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->red_multiplier;
+        this->properties->set(PROP_SHAD_RED_MULT, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+    
+    if (this->green_multiplier != 1.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->green_multiplier;
+        this->properties->set(PROP_SHAD_GREEN_MULT, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+
+    if (this->blue_multiplier != 1.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->blue_multiplier;
+        this->properties->set(PROP_SHAD_BLUE_MULT, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+
+    if (this->color_offset != 0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_color));
+        *val.col = this->color_offset;
+        this->properties->set(PROP_SHAD_COLOR_OFFS, val, sizeof(awd_float64), AWD_FIELD_COLOR);
+    }
+}
+
+
+
+
+AWDEnvMapMethod::AWDEnvMapMethod()
+{
+    this->type = AWD_SHADETYPE_ENVMAP;
+    this->posx_texture = NULL;
+    this->negx_texture = NULL;
+    this->posy_texture = NULL;
+    this->negy_texture = NULL;
+    this->posz_texture = NULL;
+    this->negz_texture = NULL;
+    this->alpha = 1.0;
+}
+
+void
+AWDEnvMapMethod::prepare_write()
+{
+    if (this->alpha != 1.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->alpha;
+        this->properties->set(PROP_SHAD_ALPHA, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_POSX, this->posx_texture);
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_NEGX, this->negx_texture);
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_POSY, this->posy_texture);
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_NEGY, this->negy_texture);
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_POSZ, this->posz_texture);
+    __set_tex_prop(properties, PROP_SHAD_ENVMAP_NEGZ, this->negz_texture);
+}
+
+
+
+
+AWDFogMethod::AWDFogMethod()
+{
+    this->type = AWD_SHADETYPE_FOG;
+    this->color = 0;
+    this->distance = 10.0;
+}
+
+void
+AWDFogMethod::prepare_write()
+{
+    if (this->color != 0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_color));
+        *val.f64 = this->color;
+        this->properties->set(PROP_SHAD_COLOR, val, sizeof(awd_color), AWD_FIELD_COLOR);
+    }
+
+    if (this->distance) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->distance;
+        this->properties->set(PROP_SHAD_FOG_DIST, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+}
+
+
+
+
+
+AWDProjectiveTextureMethod::AWDProjectiveTextureMethod()
+{
+    this->type = AWD_SHADETYPE_PROJ_TEXTURE;
+    this->mode = AWD_PROJTEXMODE_MULTIPLY;
+    this->texture = NULL;
+}
+
+void
+AWDProjectiveTextureMethod::prepare_write()
+{
+    if (this->mode != AWD_PROJTEXMODE_MULTIPLY) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_uint8));
+        *val.ui8 = (awd_uint8)this->mode;
+        this->properties->set(PROP_SHAD_PROJ_MODE, val, sizeof(awd_uint8), AWD_FIELD_UINT8);
+    }
+
+    __set_tex_prop(properties, PROP_SHAD_PROJ_TEXTURE, this->texture);
+}
+
+
+
+
+AWDRimLightMethod::AWDRimLightMethod()
+{
+    this->type = AWD_SHADETYPE_RIMLIGHT;
+    this->color = 0xffffff;
+    this->strength = 0.4;
+    this->power = 2.0;
+}
+
+void
+AWDRimLightMethod::prepare_write()
+{
+    if (this->color != 0xffffff) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_color));
+        *val.col = this->color;
+        this->properties->set(PROP_SHAD_COLOR, val, sizeof(awd_color), AWD_FIELD_COLOR);
+    }
+
+    if (this->strength != 0.4) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->strength;
+        this->properties->set(PROP_SHAD_STRENGTH, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+
+    if (this->power != 2.0) {
+        AWD_field_ptr val;
+        val.v = malloc(sizeof(awd_float64));
+        *val.f64 = this->power;
+        this->properties->set(PROP_SHAD_POWER, val, sizeof(awd_float64), AWD_FIELD_FLOAT64);
+    }
+}
+
 

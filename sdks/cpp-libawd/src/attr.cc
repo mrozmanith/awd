@@ -78,6 +78,7 @@ AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
             case AWD_FIELD_MTX3x3:
             case AWD_FIELD_MTX4x3:
             case AWD_FIELD_MTX4x4:
+            case AWD_FIELD_MTX5x4:
                 bytes_written += awdutil_write_floats(fd, val.f64, this->value_len, wide_mtx);
                 break;
 

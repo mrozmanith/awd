@@ -42,6 +42,7 @@
 #define PROP_SHAD_FOG_DIST 1201
 
 #define PROP_SHAD_PROJ_MODE 1301
+#define PROP_SHAD_PROJ_TEXTURE 1302
 
 #define PROP_SHAD_POWER 1401
 
@@ -275,6 +276,108 @@ class AWDSlowFilteredShadowMapMethod :
 };
 
 
+
+
+class AWDColorMatrixMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+
+    public:
+        AWDColorMatrixMethod();
+
+        awd_float64 *mtx;
+};
+
+
+class AWDColorTransformMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+
+    public:
+        AWDColorTransformMethod();
+
+        awd_float64 alpha_multiplier;
+        awd_float64 red_multiplier;
+        awd_float64 green_multiplier;
+        awd_float64 blue_multiplier;
+        awd_color color_offset;
+};
+
+
+class AWDEnvMapMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+
+    public:
+        AWDEnvMapMethod();
+
+        AWDTexture *posx_texture;
+        AWDTexture *negx_texture;
+        AWDTexture *posy_texture;
+        AWDTexture *negy_texture;
+        AWDTexture *posz_texture;
+        AWDTexture *negz_texture;
+        awd_float64 alpha;
+};
+
+
+
+class AWDFogMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+
+    public:
+        AWDFogMethod();
+
+        awd_color color;
+        awd_float64 distance;
+};
+
+
+
+typedef enum {
+    AWD_PROJTEXMODE_MULTIPLY=1,
+    AWD_PROJTEXMODE_ADD,
+    AWD_PROJTEXMODE_MIX
+} AWD_projtex_method_mode;
+
+
+class AWDProjectiveTextureMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+    
+    public:
+        AWDProjectiveTextureMethod();
+
+        AWD_projtex_method_mode mode;
+        AWDTexture *texture;
+        // TODO: Settle on solution for projector scene object
+};
+
+
+class AWDRimLightMethod :
+    public AWDShadingMethod
+{
+    protected:
+        void prepare_write();
+
+    public:
+        AWDRimLightMethod();
+
+        awd_float64 strength;
+        awd_color color;
+        awd_float64 power;
+};
 
 
 #endif

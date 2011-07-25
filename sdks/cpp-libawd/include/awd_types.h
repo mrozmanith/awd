@@ -62,6 +62,7 @@ typedef enum {
     AWD_FIELD_MTX3x3,
     AWD_FIELD_MTX4x3,
     AWD_FIELD_MTX4x4,
+    AWD_FIELD_MTX5x4,
 } AWD_field_type;
 
 
