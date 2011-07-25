@@ -14,6 +14,8 @@ AWDMaterial::AWDMaterial(AWD_mat_type type, const char *name, awd_uint16 name_le
     this->alpha_threshold = 0.0f;
     this->alpha_blending = false;
     this->repeat = false;
+    this->first_method = NULL;
+    this->last_method = NULL;
 }
 
 AWDMaterial::~AWDMaterial()
@@ -51,11 +53,42 @@ AWDMaterial::set_texture(AWDTexture *texture)
 }
 
 
+void
+AWDMaterial::add_method(AWDShadingMethod *method)
+{
+    AWD_mat_method *item;
+
+    item = (AWD_mat_method *)malloc(sizeof(AWD_mat_method));
+    item->method = method;
+
+    if (!this->first_method)
+        this->first_method = item;
+    else
+        this->last_method->next = item;
+
+    this->last_method = item;
+    this->last_method->next = NULL;
+}
+
 
 awd_uint32
 AWDMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return 3 + this->get_name_length() + this->calc_attr_length(true,true, wide_geom, wide_mtx);
+    AWD_mat_method *cur;
+    awd_uint32 len;
+
+    len = 2; // type + method count 8-bit ints
+
+    len += sizeof(awd_uint16) + this->get_name_length();
+    len += this->calc_attr_length(true, true, wide_geom, wide_mtx);
+
+    cur = this->first_method;
+    while (cur) {
+        len += cur->method->calc_method_length(wide_geom, wide_mtx);
+        cur = cur->next;
+    }
+
+    return len;
 }
 
 
