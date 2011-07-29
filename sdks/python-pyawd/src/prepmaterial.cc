@@ -32,9 +32,15 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         PyObject *col_attr;
 
         col_attr = PyObject_GetAttrString(block, "color");
+#if PYTHON_VERSION == 3
+        if (PyLong_Check(col_attr)) {
+            lawd_mat->color = PyLong_AsLong(col_attr);
+        }
+#else
         if (PyInt_Check(col_attr)) {
             lawd_mat->color = PyInt_AsLong(col_attr);
         }
+#endif
     }
     else {
         PyObject *tex_attr;
