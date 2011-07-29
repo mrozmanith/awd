@@ -12,12 +12,14 @@ pyawdutil_has_true_attr(PyObject *o, const char *attr)
         if (a == Py_True)
             return true;
 
+#if PYTHON_VERSION != 3
         if (PyNumber_Check(a)) {
             PyObject *i;
             i = PyNumber_Int(a);
             if (PyInt_AsLong(i) > 0)
                 return true;
         }
+#endif
     }
 
     return false;
