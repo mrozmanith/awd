@@ -8,6 +8,7 @@
 
 #include "AWDWriter.h"
 #include "bcache.h"
+#include "util.h"
 
 void
 __prepare_attr_element(PyObject *py_elem, AWD *lawd_awd, AWDAttrElement *lawd_elem)
@@ -36,13 +37,7 @@ __prepare_attr_element(PyObject *py_elem, AWD *lawd_awd, AWDAttrElement *lawd_el
                 const char *key_str;
                 int key_len;
 
-#if PYTHON_VERSION == 3
-                key_str = PyUnicode_AS_DATA(key);
-                key_len = PyUnicode_GET_DATA_SIZE(key);
-#else
-                key_str = PyString_AsString(key);
-                key_len = PyString_Size(key);
-#endif
+                pyawdutil_get_str(key, &key_str, &key_len);
 
                 ns = lawd_awd->get_namespace(key_str);
                 if (!ns) {
@@ -56,25 +51,16 @@ __prepare_attr_element(PyObject *py_elem, AWD *lawd_awd, AWDAttrElement *lawd_el
 #else
                     if (PyString_Check(attr_key)) {
 #endif
-                        char *key_str;
-                        awd_uint16 key_len;
+                        const char *key_str;
+                        int key_len;
                         AWD_field_ptr value;
-                        awd_uint16 value_len;
+                        int value_len;
 
-#if PYTHON_VERSION == 3
-                        key_str = (char *)PyUnicode_AS_DATA(attr_key);
-                        key_len = PyUnicode_GET_DATA_SIZE(attr_key);
-                        value.str = (char *)PyUnicode_AS_DATA(PyObject_Str(attr_val));
-                        value_len = PyUnicode_GET_DATA_SIZE(PyObject_Str(attr_val));
-#else
-                        key_str = PyString_AsString(attr_key);
-                        key_len = PyString_Size(attr_key);
-                        value.str = PyString_AsString(PyObject_Str(attr_val));
-                        value_len = PyString_Size(PyObject_Str(attr_val));
-#endif
+                        pyawdutil_get_str(attr_key, &key_str, &key_len);
+                        pyawdutil_get_str(attr_val, (const char **)&value.str, &value_len);
 
                         //TODO: Deal with different value types differently
-                        lawd_elem->set_attr(ns, key_str, key_len, value, value_len, AWD_FIELD_STRING);
+                        lawd_elem->set_attr(ns, key_str, (awd_uint16)key_len, value, (awd_uint16)value_len, AWD_FIELD_STRING);
                     }
                 }
             }
