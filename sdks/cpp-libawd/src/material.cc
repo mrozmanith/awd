@@ -16,6 +16,7 @@ AWDMaterial::AWDMaterial(AWD_mat_type type, const char *name, awd_uint16 name_le
     this->repeat = false;
     this->first_method = NULL;
     this->last_method = NULL;
+    this->num_methods = 0;
 }
 
 AWDMaterial::~AWDMaterial()
@@ -68,6 +69,8 @@ AWDMaterial::add_method(AWDShadingMethod *method)
 
     this->last_method = item;
     this->last_method->next = NULL;
+
+    this->num_methods++;
 }
 
 
@@ -138,10 +141,19 @@ AWDMaterial::prepare_write()
 void
 AWDMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
+    AWD_mat_method *cur;
+
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
-    // Write type
     write(fd, &this->type, sizeof(awd_uint8));
+    write(fd, &this->num_methods, sizeof(awd_uint8));
 
     this->properties->write_attributes(fd, wide_geom, wide_mtx);
+
+    cur = this->first_method;
+    while (cur) {
+        cur->method->write_method(fd, wide_geom, wide_mtx);
+        cur = cur->next;
+    }
+
     this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
 }

@@ -34,6 +34,7 @@ class AWDMaterial :
         AWDTexture *texture;
         AWD_mat_method *first_method;
         AWD_mat_method *last_method;
+        awd_uint8 num_methods;
 
     protected:
         awd_uint32 calc_body_length(bool, bool);
