@@ -25,6 +25,20 @@ pyawdutil_has_true_attr(PyObject *o, const char *attr)
     return false;
 }
 
+
+void
+pyawdutil_get_str(PyObject *o, const char **str, int *len)
+{
+#if PYTHON_VERSION == 3
+    PyObject *utf8_bytes = PyUnicode_AsUTF8String(o);
+    *str = PyBytes_AsString(utf8_bytes);
+    if (len) *len = PyBytes_Size(utf8_bytes);
+#else
+    *str = PyString_AsString(o);
+    if (len) *len = PyString_Size(o);
+#endif
+}
+
 void
 pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
 {
@@ -32,13 +46,7 @@ pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
 
     a = PyObject_GetAttrString(o, attr);
     if (a != NULL) {
-#if PYTHON_VERSION == 3
-        *str = PyUnicode_AS_DATA(a);
-        if (len) *len = PyUnicode_GET_DATA_SIZE(a);
-#else
-        *str = PyString_AsString(a);
-        if (len) *len = PyString_Size(a);
-#endif
+        pyawdutil_get_str(a, str, len);
     }
     else {
         *str = NULL;
