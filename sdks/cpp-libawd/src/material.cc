@@ -61,6 +61,7 @@ AWDMaterial::add_method(AWDShadingMethod *method)
 
     item = (AWD_mat_method *)malloc(sizeof(AWD_mat_method));
     item->method = method;
+    item->next = NULL;
 
     if (!this->first_method)
         this->first_method = item;
