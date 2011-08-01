@@ -265,6 +265,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\shading.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\skelanim.h"
 				>
 			</File>
@@ -418,6 +422,10 @@
 			</File>
 			<File
 				RelativePath=".\src\scene.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shading.cc"
 				>
 			</File>
 			<File
