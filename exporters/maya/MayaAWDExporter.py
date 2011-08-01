@@ -820,9 +820,10 @@ class MayaAWDExporter:
     def set_attributes(self, dag_path, awd_elem):
         if self.include_attr:
             extra_attributes = mc.listAttr(dag_path, ud=True)
-            for attr in extra_attributes:
-                val = mc.getAttr('%s.%s' % (dag_path, attr))
-                awd_elem.attributes[self.user_ns][str(attr)] = val
+            if extra_attributes is not None:
+                for attr in extra_attributes:
+                    val = mc.getAttr('%s.%s' % (dag_path, attr))
+                    awd_elem.attributes[self.user_ns][str(attr)] = val
 
     def get_name(self, dag_path):
         # TODO: Deal with unicode names. In pyawd?
