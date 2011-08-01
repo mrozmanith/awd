@@ -49,6 +49,10 @@ class BlenderAWDExporter(object):
         self.animation_sequences = []
         self.exported_objects = []
         self.vertex_indices = {}
+        
+        # TODO: Don't hard code these
+        self.include_attr = True
+        self.user_ns = AWDNamespace('default')
     
     def export(self):
         self.awd = AWD()
@@ -88,7 +92,7 @@ class BlenderAWDExporter(object):
         
         
         # Export animation sequences
-        self.export_animation()
+        # self.export_animation()
         
         
         with open(self.path, 'wb') as f:
@@ -148,6 +152,9 @@ class BlenderAWDExporter(object):
         self.block_cache.add(o, ctr)
         self.exported_objects.append(o)
         
+        if self.include_attr:
+            self.set_attributes(o, ctr)
+        
         
         
     def export_animation(self):
@@ -203,6 +210,9 @@ class BlenderAWDExporter(object):
         mtx = self.mtx_bl2awd(o.matrix_local)
         inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
         self.block_cache.add(o, inst)
+        
+        if self.include_attr:
+            self.set_attributes(o, inst)
         
         self.exported_objects.append(o)    
     
@@ -402,6 +412,12 @@ class BlenderAWDExporter(object):
         return md
     
     
+    def set_attributes(self, ob, awd_elem):
+        for key in ob.keys():
+            if (key != '_RNA_UI'):
+                print('setting prop %s.%s=%s' % (ob.name, key, ob[key]))
+                awd_elem.attributes[self.user_ns][str(key)] = ob[key]
+                    
     def mtx_bl2awd(self, mtx):    
         # Decompose matrix
         pos, rot, scale = mtx.decompose()
