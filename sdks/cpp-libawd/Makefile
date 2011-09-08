@@ -38,10 +38,12 @@ static: $(OBJ)
 	ar crs $(STATLIB) $(OBJ)
 
 .c.o:
-	$(CC) -c $(INCLUDE) $(CFLAGS) $(DEFINES) $< -o $@
+	@echo "$< > $@"
+	@$(CC) -c $(INCLUDE) $(CFLAGS) $(DEFINES) $< -o $@
 
 .cc.o:
-	$(CXX) -c $(INCLUDE) $(CFLAGS) $(DEFINES) $< -o $@
+	@echo "$< > $@"
+	@$(CXX) -c $(INCLUDE) $(CFLAGS) $(DEFINES) $< -o $@
 	
 clean: clean-objects
 	rm -rf $(BUILDDIR)/*
