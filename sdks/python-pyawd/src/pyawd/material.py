@@ -1,9 +1,10 @@
 from pyawd import core
 
-TEX_EXTERNAL = 0
-TEX_EMBED_JPG = 1
 
 class AWDTexture(core.AWDAttrElement, core.AWDBlockBase):
+    EXTERNAL = 0
+    EMBED_JPG = 1
+    EMBED_PNG = 2
 
     def __init__(self, type=0, name='', url=None):
         super(AWDTexture, self).__init__()

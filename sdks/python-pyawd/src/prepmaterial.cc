@@ -98,10 +98,14 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         }
     }
     else {
+        PyObject *tex_bytes;
         const char *buf;
         int buf_len;
 
-        pyawdutil_get_strattr(block, "_AWDTexture__data", &buf, &buf_len);
+        tex_bytes = PyObject_GetAttrString(block, "_AWDTexture__data");
+        buf = PyBytes_AsString(tex_bytes);
+        buf_len = PyBytes_Size(tex_bytes);
+
         if (buf_len>0) {
             lawd_tex->set_embed_data((awd_uint8 *)buf, (awd_uint32)buf_len);
         }
