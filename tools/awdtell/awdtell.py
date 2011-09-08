@@ -167,7 +167,11 @@ def print_skelpose(data):
         if has_transform == 1:
             mtx = read_mtx(data, offs)
             print_matrix(mtx)
-            offs += 128
+            offs += 64
+        else:
+            indent_level += 1
+            printl('No transformation of this joint')
+            indent_level -= 1
         indent_level -= 1
             
 

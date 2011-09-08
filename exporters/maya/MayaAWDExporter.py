@@ -534,6 +534,7 @@ class MayaAWDExporter:
         if sets is not None:
             for set in sets:
                 if mc.nodeType(set)=='shadingEngine':
+                    tex = None
                     mat = None
                     mat_his = mc.listHistory(set)
                     for state in mat_his:
@@ -561,13 +562,17 @@ class MayaAWDExporter:
                             awd_inst.materials.append(mat)
                             print('adding material ' + state)
                             
-                        elif state_type == 'file':
+                        # Only check the first file, which will likely be the color input.
+                        # TODO: This needs to be solved in a prettier way for normal maps
+                        # and other inputs like that.
+                        elif state_type == 'file' and tex is None:
                             tex = self.block_cache.get(state)
                             if tex is None:
                                 tex_abs_path = str(mc.getAttr(state+'.fileTextureName'))
                                 if self.embed_textures:
                                     tex = AWDTexture(TEX_EMBED_JPG, name=self.get_name(state))
                                     tex.embed_file(tex_abs_path)
+                                    print('embedding %s' % tex_abs_path)
                                 else:
                                     tex = AWDTexture(TEX_EXTERNAL, name=self.get_name(state))
                                     tex.url = mc.workspace(pp=tex_abs_path)
@@ -684,6 +689,7 @@ class MayaAWDExporter:
                 vs = om.MFloatArray()
                 uvis = om.MIntArray()
     
+                # TODO: Deal with this failing (missing UVs)
                 vert_it.getUVs(us, vs, uvis)
                 for i in range(len(uvis)):
                     if uvis[i] == face_idx:

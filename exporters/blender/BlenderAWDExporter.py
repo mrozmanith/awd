@@ -49,12 +49,19 @@ class BlenderAWDExporter(object):
         self.animation_sequences = []
         self.exported_objects = []
         self.vertex_indices = {}
+        
+        # TODO: Don't hard code these
+        self.compression = DEFLATE
+        self.include_attr = True
+        self.include_materials = True
+        self.embed_textures = True
+        self.user_ns = AWDNamespace('default')
+        
     
     def export(self):
-        self.awd = AWD()
+        self.awd = AWD(self.compression)
         
         for o in bpy.context.scene.objects:
-            print(o.type)
             if o.type == 'EMPTY':
                 self.export_container(o)
                 
@@ -88,7 +95,7 @@ class BlenderAWDExporter(object):
         
         
         # Export animation sequences
-        self.export_animation()
+        # self.export_animation()
         
         
         with open(self.path, 'wb') as f:
@@ -148,6 +155,9 @@ class BlenderAWDExporter(object):
         self.block_cache.add(o, ctr)
         self.exported_objects.append(o)
         
+        if self.include_attr:
+            self.set_attributes(o, ctr)
+        
         
         
     def export_animation(self):
@@ -191,6 +201,7 @@ class BlenderAWDExporter(object):
     def export_mesh(self, o):
         md = self.block_cache.get(o.data)
         if md is None:
+            print('Creating mesh %s' % o.data.name)
             # If bound to a skeleton, set that skeleton in bind pose
             # to make sure that the geometry is defined in that state
             if o.parent is not None and o.parent.type == 'ARMATURE':
@@ -203,6 +214,73 @@ class BlenderAWDExporter(object):
         mtx = self.mtx_bl2awd(o.matrix_local)
         inst = AWDMeshInst(data=md, name=o.name, transform=mtx)
         self.block_cache.add(o, inst)
+        
+        if self.include_materials:
+            print('Checking materials for %s' % o.name)
+            awd_mat = None
+            for ms in o.material_slots:
+                awd_tex = None
+                bl_mat = ms.material
+
+                if bl_mat is None or bl_mat.type != 'SURFACE':
+                    continue # Ignore non-surface materials for now
+                
+                awd_mat = self.block_cache.get(bl_mat)
+                
+                if awd_mat is None:
+                    for ts in bl_mat.texture_slots:
+                        # Skip empty slots
+                        if ts is None:
+                            continue
+                        
+                        if ts.use_map_color_diffuse:
+                            # Main input!
+                            bl_tex = ts.texture
+                            
+                            awd_tex = self.block_cache.get(bl_tex)
+                            
+                            if awd_tex is None:
+                                if bl_tex.type == 'IMAGE' and bl_tex.image is not None:
+                                    bl_img = bl_tex.image
+                                    # BitmapMaterial
+                                    if self.embed_textures:
+                                        tex_type = None
+                                        if bl_img.file_format == 'PNG':
+                                            tex_type = AWDTexture.EMBED_PNG
+                                        elif bl_img.file_format == 'JPG':
+                                            tex_type = AWDTexture.EMBED_JPG
+                                            
+                                        awd_tex = AWDTexture(tex_type, name=bl_tex.name)
+                                        awd_tex.embed_file( bpy.path.abspath( bl_img.filepath ))
+                                    else:
+                                        awd_tex = AWDTexture(AWDTexture.EXTERNAL, name=bl_tex.name)
+                                        awd_tex.url = bl_img.filepath
+                                 
+                                    self.block_cache.add(bl_tex, awd_tex)
+                                    self.awd.add_texture(awd_tex)
+                                    
+                                    break
+                            
+                    print('Found texture to create material?')
+                    if awd_tex is not None:
+                        awd_mat = AWDMaterial(AWDMaterial.BITMAP, name=bl_mat.name)
+                        awd_mat.texture = awd_tex
+                        
+                        if self.include_attr:
+                            self.set_attributes(bl_mat, awd_mat)
+                        
+                        print('Yes! Created material!')
+                        self.block_cache.add(bl_mat, awd_mat)
+                        self.awd.add_material(awd_mat)
+            
+            
+            if awd_mat is not None:
+                inst.materials.append(awd_mat)
+                
+                
+        
+        if self.include_attr:
+            self.set_attributes(o, inst)
         
         self.exported_objects.append(o)    
     
@@ -359,7 +437,8 @@ class BlenderAWDExporter(object):
                 vert_indices.append(v_data['v'].index)
                 
                 if has_uvs:
-                    uvs.extend(v_data['uv'])
+                    uvs.append(v_data['uv'][0])
+                    uvs.append(1.0 - v_data['uv'][1]) # Invert
                                     
                 # Add to list of collapsed vertices so that future
                 # searches can find the vertex
@@ -402,6 +481,12 @@ class BlenderAWDExporter(object):
         return md
     
     
+    def set_attributes(self, ob, awd_elem):
+        for key in ob.keys():
+            if (key != '_RNA_UI'):
+                #print('setting prop %s.%s=%s' % (ob.name, key, ob[key]))
+                awd_elem.attributes[self.user_ns][str(key)] = ob[key]
+                    
     def mtx_bl2awd(self, mtx):    
         # Decompose matrix
         pos, rot, scale = mtx.decompose()
@@ -464,7 +549,7 @@ if __name__ == '__main__':
                         break
 
                 if not existed:
-                    mc.warning('Could not find sequence file "%s. Will not export animation."' % seq_path)
+                    #mc.warning('Could not find sequence file "%s. Will not export animation."' % seq_path)
                     return []
 
             try:
@@ -483,6 +568,6 @@ if __name__ == '__main__':
 
         return sequences
 
-    exporter = BlenderAWDExporter('blendout.awd')
+    exporter = BlenderAWDExporter(bpy.path.abspath('//blendout.awd'))
     exporter.animation_sequences = read_sequences('sequences.txt', '.')
     exporter.export()
