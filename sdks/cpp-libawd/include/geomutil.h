@@ -36,7 +36,7 @@ public:
     ~AWDGeomUtil();
 
     void append_vert_data(unsigned int,  double, double, double, double, double, double, double, double, bool);
-    int build_geom(AWDMeshData **);
+    int build_geom(AWDMeshData *);
 };
 
 

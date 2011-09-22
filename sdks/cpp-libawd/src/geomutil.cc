@@ -61,17 +61,14 @@ AWDGeomUtil::has_vert(vdata *vd)
         // If any of vertices have force_hard set, their normals must
         // not be averaged. Hence, they must be returned by this 
         // function as separate verts.
-        printf("checking force\n");
         if (cur->force_hard || vd->force_hard)
             goto next;
 
         // If position doesn't match, move on to next vertex
-        printf("checking position\n");
         if (cur->x != vd->x || cur->y != vd->y || cur->z != vd->z)
             goto next;
 
         // If UV coordinates do not match, move on to next vertex
-        printf("checking UVs\n");
         if (cur->u != vd->u || cur->v != vd->v)
             goto next;
 
@@ -89,7 +86,6 @@ AWDGeomUtil::has_vert(vdata *vd)
 
 
         // Made it here? Then vertices match!
-        printf("match!\n");
         return idx;
 
 next:
@@ -102,7 +98,7 @@ next:
 
 
 int 
-AWDGeomUtil::build_geom(AWDMeshData **md)
+AWDGeomUtil::build_geom(AWDMeshData *md)
 {
     vdata *vd;
     AWDSubMesh *sub;
@@ -110,10 +106,14 @@ AWDGeomUtil::build_geom(AWDMeshData **md)
     int v_idx, i_idx;
     AWD_str_ptr v_str;
     AWD_str_ptr i_str;
+    AWD_str_ptr n_str;
+    AWD_str_ptr u_str;
 
     sub = new AWDSubMesh();
     v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
     i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
+    n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
+    u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
 
     v_idx = i_idx = 0;
 
@@ -127,6 +127,14 @@ AWDGeomUtil::build_geom(AWDMeshData **md)
             v_str.f64[v_idx*3+0] = vd->x;
             v_str.f64[v_idx*3+1] = vd->y;
             v_str.f64[v_idx*3+2] = vd->z;
+
+            u_str.f64[v_idx*2+0] = vd->u;
+            u_str.f64[v_idx*2+1] = vd->v;
+
+            n_str.f64[v_idx*3+0] = vd->nx;
+            n_str.f64[v_idx*3+1] = vd->ny;
+            n_str.f64[v_idx*3+2] = vd->nz;
+
             i_str.ui32[i_idx++] = v_idx++;
 
             if (!col_first_vd)
@@ -140,13 +148,13 @@ AWDGeomUtil::build_geom(AWDMeshData **md)
         vd = vd->next_exp;
     }
 
-    int i;
-    for (i=0; i<v_idx; i++) {
-        printf("vert: %f, %f, %f\n", v_str.f64[i*3+0], v_str.f64[i*3+1], v_str.f64[i*3+2]);
-    }
-    for (i=0; i<i_idx; i++) {
-        printf("index: %d\n", i_str.ui32[i]);
-    }
+    // TODO: Implement splitting of sub-meshes to avoid buffer overflows
+    sub = new AWDSubMesh();
+    sub->add_stream(VERTICES, v_str, v_idx*3);
+    sub->add_stream(TRIANGLES, i_str, i_idx);
+    sub->add_stream(VERTEX_NORMALS, n_str, v_idx*3);
+    sub->add_stream(UVS, u_str, v_idx*2);
+    md->add_sub_mesh(sub);
 
     return 1;
 }
