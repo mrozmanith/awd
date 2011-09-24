@@ -6,15 +6,15 @@
 
 
 #if PYTHON_VERSION == 3
-static struct PyModuleDef cio_mod = {
+static struct PyModuleDef cpyawd_mod = {
     PyModuleDef_HEAD_INIT,
-    "cio",
+    "cpyawd",
     "Module for reading/writing Away3D data format (AWD).",
     -1,
     NULL, NULL, NULL, NULL, NULL
 };
 #else // Python 2.6
-static PyMethodDef cio_methods[] = {
+static PyMethodDef cpyawd_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 #endif
@@ -34,10 +34,10 @@ _add_mod_type(PyObject *m, const char *name, PyTypeObject *type)
  * Invoked in different ways depending on whether this module
  * is compiled for Python 2.6 or 3.x.
 */
-PyObject *_init_cio(PyObject *m)
+PyObject *_init_cpyawd(PyObject *m)
 {
     // Add classes to module
-    _add_mod_type(m, "AWDWriter", &cio_AWDWriterType);
+    _add_mod_type(m, "AWDWriter", &cpyawd_AWDWriterType);
 
     PyModule_AddIntConstant(m, "LIBAWD_VERSION_MAJOR", AWD_VERSION_MAJOR);
     PyModule_AddIntConstant(m, "LIBAWD_VERSION_MINOR", AWD_VERSION_MINOR);
@@ -51,25 +51,25 @@ PyObject *_init_cio(PyObject *m)
 
 #if PYTHON_VERSION == 3
 PyMODINIT_FUNC
-PyInit_cio(void)
+PyInit_cpyawd(void)
 {
     PyObject *m;
 
-    m = PyModule_Create(&cio_mod);
+    m = PyModule_Create(&cpyawd_mod);
     if (m == NULL)
         return NULL;
 
-    return _init_cio(m);
+    return _init_cpyawd(m);
 }
 #else // Python 2.6
 PyMODINIT_FUNC
-initcio(void)
+initcpyawd(void)
 {
     PyObject *m;
 
-    m = Py_InitModule("cio", cio_methods);
+    m = Py_InitModule("cpyawd", cpyawd_methods);
 
-    _init_cio(m);
+    _init_cpyawd(m);
 }
 #endif
 

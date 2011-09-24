@@ -14,7 +14,7 @@
  * free()
 */
 void
-cio_AWDWriter_dealloc(cio_AWDWriter *self)
+cpyawd_AWDWriter_dealloc(cpyawd_AWDWriter *self)
 {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -24,11 +24,11 @@ cio_AWDWriter_dealloc(cio_AWDWriter *self)
  * AWDWriter();
 */
 PyObject *
-cio_AWDWriter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+cpyawd_AWDWriter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    cio_AWDWriter *self;
+    cpyawd_AWDWriter *self;
 
-    self = (cio_AWDWriter *)type->tp_alloc(type, 0);
+    self = (cpyawd_AWDWriter *)type->tp_alloc(type, 0);
     return (PyObject *)self;
 }
 
@@ -37,7 +37,7 @@ cio_AWDWriter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  * AWDWriter.__init__();
 */
 static int
-cio_AWDWriter_init(cio_AWDWriter *self, PyObject *args, PyObject *kwds)
+cpyawd_AWDWriter_init(cpyawd_AWDWriter *self, PyObject *args, PyObject *kwds)
 {
     return 0;
 }
@@ -73,7 +73,7 @@ __prepare_metadata(PyObject *pyawd_AWD, AWD *lawd_awd)
  * AWDWriter.write(awd, file)
 */
 PyObject *
-cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
+cpyawd_AWDWriter_write(cpyawd_AWDWriter *self, PyObject *args)
 {
     AWD *lawd_awd;
     PyObject *awd_obj;
@@ -148,8 +148,8 @@ cio_AWDWriter_write(cio_AWDWriter *self, PyObject *args)
 /**
  * Method dictionary
 */
-PyMethodDef cio_AWDWriter_methods[] = {
-    { "write", (PyCFunction)cio_AWDWriter_write, METH_VARARGS,
+PyMethodDef cpyawd_AWDWriter_methods[] = {
+    { "write", (PyCFunction)cpyawd_AWDWriter_write, METH_VARARGS,
         "Write everything in an AWD object to an output stream." },
 
     { NULL }
@@ -161,12 +161,12 @@ PyMethodDef cio_AWDWriter_methods[] = {
 /**
  * Type object 
 */
-PyTypeObject cio_AWDWriterType = {
+PyTypeObject cpyawd_AWDWriterType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pyawd.cio.AWDWriter",                      // tp_name
-    sizeof(cio_AWDWriter),                // tp_basicsize
+    "pyawd.cpyawd.AWDWriter",               // tp_name
+    sizeof(cpyawd_AWDWriter),               // tp_basicsize
     0,                                      // tp_itemsize
-    (destructor)cio_AWDWriter_dealloc,    // tp_dealloc
+    (destructor)cpyawd_AWDWriter_dealloc,   // tp_dealloc
     0,                                      // tp_print
     0,                                      // tp_getattr
     0,                                      // tp_setattr
@@ -190,7 +190,7 @@ PyTypeObject cio_AWDWriterType = {
     0,                                      // tp_weaklistoffset
     0,                                      // tp_iter
     0,                                      // tp_iternext
-    cio_AWDWriter_methods,                // tp_methods
+    cpyawd_AWDWriter_methods,               // tp_methods
     0,                                      // tp_members
     0,                                      // tp_getset
     0,                                      // tp_base
@@ -198,9 +198,9 @@ PyTypeObject cio_AWDWriterType = {
     0,                                      // tp_descr_get
     0,                                      // tp_descr_set
     0,                                      // tp_dictoffset
-    (initproc)cio_AWDWriter_init,         // tp_init
+    (initproc)cpyawd_AWDWriter_init,        // tp_init
     0,                                      // tp_alloc
-    cio_AWDWriter_new,                    // tp_new
+    cpyawd_AWDWriter_new,                   // tp_new
 };
 
 
