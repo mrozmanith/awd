@@ -116,14 +116,26 @@ AWDGeomUtil::has_vert(vdata *vd)
         // Check if normals match (possibly with fuzzy matching using a
         // threshold) and if they don't, move on to the next vertex.
         if (this->normal_threshold > 0) {
-            double angle;
-
-            angle = acos(cur->nx*vd->nx + cur->ny*vd->ny + cur->nz*vd->nz);
-            if (angle <= this->normal_threshold) {
+            if (vd->nx==cur->nx && vd->ny==cur->ny && vd->nz==cur->nz) {
+                // The exact same normals; avoid angle calculation
                 add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
             }
             else {
-                goto next;
+                double angle;
+                double l0, l1;
+
+                // Calculate lenghts (usually 1.0)
+                l0 = sqrt(cur->nx*cur->nx + cur->ny*cur->ny + cur->nz*cur->nz);
+                l1 = sqrt(vd->nx*vd->nx + vd->ny*vd->ny + vd->nz*vd->nz);
+
+                // Calculate angle and compare to threshold
+                angle = acos((cur->nx*vd->nx + cur->ny*vd->ny + cur->nz*vd->nz) / (l0*l1));
+                if (angle <= this->normal_threshold) {
+                    add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
+                }
+                else {
+                    goto next;
+                }
             }
         }
         else if (cur->nx != vd->nx || cur->ny != vd->ny || cur->nz != vd->nz)
