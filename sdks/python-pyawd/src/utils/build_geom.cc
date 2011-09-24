@@ -1,8 +1,8 @@
 #include <awd/mesh.h>
-#include <awd/geomlawd_util.h>
+#include <awd/geomutil.h>
 #include <cstdio>
 
-#include "lawd_utils.h"
+#include "utils.h"
 
 PyObject *
 cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
@@ -46,7 +46,7 @@ cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
     lawd_md = new AWDMeshData("dummy", 5);
     ret = lawd_util->build_geom(lawd_md);
 
-    len = lawd_md->get_num_lawd_subs();
+    len = lawd_md->get_num_subs();
     for (i=0; i<len; i++) {
         int stream_idx;
         int num_streams;
