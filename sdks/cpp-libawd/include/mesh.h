@@ -32,6 +32,7 @@ class AWDSubMesh :
     public AWDAttrElement
 {
     private:
+        unsigned int num_streams;
         AWDDataStream * first_stream;
         AWDDataStream * last_stream;
         awd_uint32 calc_streams_length(bool);
@@ -42,6 +43,8 @@ class AWDSubMesh :
 
         AWDSubMesh * next;
 
+        unsigned int get_num_streams();
+        AWDDataStream *get_stream_at(unsigned int);
         void add_stream(AWD_mesh_str_type, AWD_str_ptr, awd_uint32);
 
         awd_uint32 calc_sub_length(bool, bool);
@@ -55,7 +58,7 @@ class AWDMeshData :
     public AWDAttrElement
 {
     private:
-        int num_subs;
+        unsigned int num_subs;
         AWDSubMesh * first_sub;
         AWDSubMesh * last_sub;
 
@@ -69,8 +72,8 @@ class AWDMeshData :
         AWDMeshData(const char *, awd_uint16);
         ~AWDMeshData();
 
-        int get_num_subs();
-        AWDSubMesh *get_sub_at(int);
+        unsigned int get_num_subs();
+        AWDSubMesh *get_sub_at(unsigned int);
         void add_sub_mesh(AWDSubMesh *);
 
         awd_float64 *get_bind_mtx();
