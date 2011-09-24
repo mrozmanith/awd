@@ -12,6 +12,7 @@
 AWDSubMesh::AWDSubMesh() :
     AWDAttrElement()
 {
+    this->num_streams = 0;
     this->first_stream = NULL;
     this->last_stream = NULL;
     this->next = NULL;
@@ -34,6 +35,35 @@ AWDSubMesh::~AWDSubMesh()
 }
 
 
+unsigned int
+AWDSubMesh::get_num_streams()
+{
+    return this->num_streams;
+}
+
+
+AWDDataStream *
+AWDSubMesh::get_stream_at(unsigned int idx)
+{
+    if (idx < this->num_streams) {
+        unsigned int cur_idx;
+        AWDDataStream *cur;
+
+        cur_idx = 0;
+        cur = this->first_stream;
+        while (cur) {
+            if (cur_idx == idx)
+                return cur;
+
+            cur_idx++;
+            cur = cur->next;
+        }
+    }
+
+    return NULL;
+}
+
+
 void 
 AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
 {
@@ -48,6 +78,7 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
         this->last_stream->next = str;
     }
 
+    this->num_streams++;
     this->last_stream = str;
     this->last_stream->next = NULL;
 }
@@ -159,7 +190,7 @@ AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
 }
 
 
-int
+unsigned int
 AWDMeshData::get_num_subs()
 {
     return this->num_subs;
@@ -167,10 +198,10 @@ AWDMeshData::get_num_subs()
 
 
 AWDSubMesh *
-AWDMeshData::get_sub_at(int idx)
+AWDMeshData::get_sub_at(unsigned int idx)
 {
     if (idx < this->num_subs) {
-        int cur_idx;
+        unsigned int cur_idx;
         AWDSubMesh *cur;
 
         cur_idx = 0;
