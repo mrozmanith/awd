@@ -25,7 +25,8 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
     vdata *vd;
 
     vd = (vdata *)malloc(sizeof(vdata));
-    vd->idx = idx;
+    vd->orig_idx = idx;
+    vd->out_idx = -1;
     vd->x = x;
     vd->y = y;
     vd->z = z;
@@ -46,6 +47,42 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
         this->exp_last_vd->next_exp = vd;
 
     this->exp_last_vd = vd;
+}
+
+
+static inline void
+add_unique_influence(vdata *vd, double nx, double ny, double nz)
+{
+    if (!vd->first_normal_influence) {
+        ninfluence *inf = (ninfluence *)malloc(sizeof(ninfluence));
+        inf->nx = nx;
+        inf->ny = ny;
+        inf->nz = nz;
+        inf->next = NULL;
+        vd->first_normal_influence = inf;
+        vd->last_normal_influence = inf;
+    }
+    else {
+        ninfluence *cur;
+        ninfluence *inf;
+
+        cur = vd->first_normal_influence;
+        while (cur) {
+            if (cur->nx==nx && cur->ny==ny && cur->nz==nz)
+                return;
+
+            cur = cur->next;
+        }
+
+        // If reached, no duplicates exist
+        inf = (ninfluence *)malloc(sizeof(ninfluence));
+        inf->nx = nx;
+        inf->ny = ny;
+        inf->nz = nz;
+        inf->next = NULL;
+        vd->last_normal_influence->next = inf;
+        vd->last_normal_influence = inf;
+    }
 }
 
 
@@ -82,20 +119,32 @@ AWDGeomUtil::has_vert(vdata *vd)
             double angle;
 
             angle = acos(cur->nx*vd->nx + cur->ny*vd->ny + cur->nz*vd->nz);
-            if (angle > this->normal_threshold)
+            if (angle <= this->normal_threshold) {
+                add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
+            }
+            else {
                 goto next;
+            }
         }
         else if (cur->nx != vd->nx || cur->ny != vd->ny || cur->nz != vd->nz)
             goto next;
 
+        // Important: Don't put any more tests here after the normal test, which
+        // needs to come last since it will add normal influences, which should
+        // not be included unless the vertex matches.
 
         // Made it here? Then vertices match!
+        cur->out_idx = idx;
         return idx;
 
 next:
         idx++;
         cur = cur->next_col;
     }
+
+    // This is the first time that this vertex is encountered,
+    // so it's own influence needs to be added.
+    add_unique_influence(vd, vd->nx, vd->ny, vd->nz);
 
     return -1;
 }
@@ -150,6 +199,33 @@ AWDGeomUtil::build_geom(AWDMeshData *md)
         }
 
         vd = vd->next_exp;
+    }
+
+    // Smoothing (averaging of normals) required?
+    if (this->normal_threshold > 0) {
+        vd = this->col_first_vd;
+        while (vd) {
+            int num_influences;
+            double nx, ny, nz;
+            ninfluence *inf;
+
+            nx = ny = nz = 0.0;
+            num_influences = 0;
+            inf = vd->first_normal_influence;
+            while (inf) {
+                nx += inf->nx;
+                ny += inf->ny;
+                nz += inf->nz;
+                inf = inf->next;
+                num_influences++;
+            }
+
+            n_str.f64[vd->out_idx*3+0] = nx / num_influences;
+            n_str.f64[vd->out_idx*3+1] = ny / num_influences;
+            n_str.f64[vd->out_idx*3+2] = nz / num_influences;
+
+            vd = vd->next_col;
+        }
     }
 
     // TODO: Implement splitting of sub-meshes to avoid buffer overflows

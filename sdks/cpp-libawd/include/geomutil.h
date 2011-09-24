@@ -12,7 +12,8 @@ typedef struct _ninfluence {
 
 
 typedef struct _vdata {
-    unsigned int idx;
+    unsigned int orig_idx;
+    int out_idx;
     double x;
     double y;
     double z;
