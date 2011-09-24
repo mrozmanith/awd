@@ -3,19 +3,21 @@
 #include <awd/libawd.h>
 
 #include "AWDWriter.h"
+#include "utils.h"
 
+static PyMethodDef cpyawd_methods[] = {
+    {"util_build_geom", cpyawd_util_build_geom, METH_VARARGS, "Use the libawd AWDGeomUtil to build geometry." },
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
 
 #if PYTHON_VERSION == 3
 static struct PyModuleDef cpyawd_mod = {
     PyModuleDef_HEAD_INIT,
     "cpyawd",
-    "Module for reading/writing Away3D data format (AWD).",
+    "Back-end module for the PyAWD SDK. This module interfaces with the C++ libawd library.",
     -1,
-    NULL, NULL, NULL, NULL, NULL
-};
-#else // Python 2.6
-static PyMethodDef cpyawd_methods[] = {
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+    cpyawd_methods, 
+    NULL, NULL, NULL, NULL
 };
 #endif
 

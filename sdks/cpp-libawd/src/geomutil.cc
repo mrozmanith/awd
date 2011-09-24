@@ -35,6 +35,8 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
     vd->ny = ny;
     vd->nz = nz;
     vd->force_hard = force_hard;
+    vd->next_col = NULL;
+    vd->next_exp = NULL;
 
     if (!this->exp_first_vd)
         this->exp_first_vd = vd;

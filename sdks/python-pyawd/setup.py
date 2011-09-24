@@ -16,7 +16,8 @@ source_files = [
     'src/prepanim.cc',
     'src/prepattr.cc',
     'src/cpyawd.cc',
-    'src/AWDWriter.cc'
+    'src/AWDWriter.cc',
+    'src/utils/build_geom.cc'
 ]
 
 def parse_bool(str):
@@ -43,7 +44,7 @@ setup(name = 'pyawd',
     version = '0.1.0',
     description = 'Python package for dealing with Away3D AWD files',
     ext_modules = ext_modules,
-    package_dir = { 'pyawd': 'src/pyawd' },
-    packages = [ 'pyawd' ]
+    package_dir = { 'pyawd': 'src/pyawd', 'pyawd.utils': 'src/pyawd/utils' },
+    packages = [ 'pyawd', 'pyawd.utils' ]
     )
 

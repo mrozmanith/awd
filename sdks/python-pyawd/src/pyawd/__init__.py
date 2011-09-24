@@ -1,4 +1,4 @@
-__all__ = [ 'core', 'anim', 'geom', 'material', 'scene', 'utils' ]
+__all__ = [ 'core', 'anim', 'geom', 'material', 'scene' ]
 
 version = ('PyAWD', 2, 0, 0, 'a')
 
