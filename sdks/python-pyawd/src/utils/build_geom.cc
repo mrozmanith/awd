@@ -3,9 +3,10 @@
 #include <cstdio>
 
 #include "utils.h"
+#include "util.h"
 
 PyObject *
-cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
+cpyawd_util_build_geom(PyObject *self, PyObject *args)
 {
     int i, len;
     int ret;
@@ -14,6 +15,9 @@ cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
     AWDMeshData *lawd_md;
     AWDGeomUtil *lawd_util;
     AWDSubMesh *lawd_sub;
+    PyObject *geom_mod;
+    PyObject *sub_class;
+
 
     if (!PyArg_ParseTuple(args, "O!O", &PyList_Type, &verts_list, &py_md))
         return NULL;
@@ -46,6 +50,11 @@ cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
     lawd_md = new AWDMeshData("dummy", 5);
     ret = lawd_util->build_geom(lawd_md);
 
+    // Import pyawd.geom module and get the AWDSubMesh classobj, which
+    // will be used to instantiate new sub-meshes
+    geom_mod = PyImport_ImportModule("pyawd.geom");
+    sub_class = PyObject_GetAttrString(geom_mod, "AWDSubMesh");
+
     len = lawd_md->get_num_subs();
     for (i=0; i<len; i++) {
         int stream_idx;
@@ -53,12 +62,36 @@ cpyawd_lawd_util_build_geom(PyObject *self, PyObject *args)
 
         PyObject *py_sub;
 
+        py_sub = PyInstance_New(sub_class, NULL, NULL);
+        if (!py_sub)
+            return NULL;
+        PyObject_CallMethod(py_md, (char *)"add_sub_mesh", (char *)"O", py_sub);
+
         lawd_sub = lawd_md->get_sub_at(i);
         num_streams = lawd_sub->get_num_streams();
         for (stream_idx=0; stream_idx<num_streams; stream_idx++) {
+            AWD_mesh_str_type str_type;
             AWDDataStream *stream;
+            PyObject *py_list = NULL;
 
             stream = lawd_sub->get_stream_at(stream_idx);
+            str_type = (AWD_mesh_str_type)stream->type;
+            switch (str_type) {
+                case VERTICES:
+                case UVS:
+                case VERTEX_NORMALS:
+                case VERTEX_TANGENTS:
+                case VERTEX_WEIGHTS:
+                    py_list = pyawdutil_float64_to_pylist(stream->data.f64, stream->get_num_elements());
+                    break;
+
+                case TRIANGLES:
+                case JOINT_INDICES:
+                    py_list = pyawdutil_uint32_to_pylist(stream->data.ui32, stream->get_num_elements());
+                    break;
+            }
+
+            PyObject_CallMethod(py_sub, (char *)"add_stream", "iO", (int)str_type, py_list);
         }
     }
 

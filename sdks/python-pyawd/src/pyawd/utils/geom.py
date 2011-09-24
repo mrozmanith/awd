@@ -15,5 +15,5 @@ class AWDGeomUtil(object):
     def build_geom(self, mesh_data):
         from pyawd.cpyawd import util_build_geom
 
-        util_build_geom(self._vertices, mesh_data)
+        return util_build_geom(self._vertices, mesh_data)
 

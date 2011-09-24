@@ -15,6 +15,12 @@ class AWDSubMesh:
     def add_stream(self, type, data):
         self.__data_streams.append((type,data))
 
+    def __len__(self):
+        return len(self.__data_streams)
+
+    def __getitem__(self, index):
+        return self.__data_streams[index]
+
 
 class AWDMeshData(core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name=''):
