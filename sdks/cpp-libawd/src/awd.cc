@@ -14,10 +14,17 @@
 #include "LzmaEnc.h"
 
 
+const int AWD::VERSION_MAJOR = 2;
+const int AWD::VERSION_MINOR = 0;
+const int AWD::VERSION_BUILD = AWD_VERSION_BUILD; // Defined by build script
+const char AWD::VERSION_RELEASE = 'a';
+
+
+
 AWD::AWD(AWD_compression compression, awd_uint16 flags)
 {
-    this->major_version = AWD_VERSION_MAJOR;
-    this->minor_version = AWD_VERSION_MINOR;
+    this->major_version = VERSION_MAJOR;
+    this->minor_version = VERSION_MINOR;
     this->compression = compression;
     this->flags = flags;
     this->texture_blocks = new AWDBlockList();

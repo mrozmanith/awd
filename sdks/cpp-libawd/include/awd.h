@@ -16,11 +16,6 @@
 #include "meta.h"
 
 
-#define AWD_VERSION_MAJOR 2
-#define AWD_VERSION_MINOR 0
-#define AWD_VERSION_BUILD 0
-#define AWD_VERSION_RELEASE 'a'
-
 #define AWD_STREAMING               0x1
 #define AWD_WIDE_GEOM               0x2
 #define AWD_WIDE_MTX                0x4
@@ -63,6 +58,11 @@ class AWD
         awd_uint32 flush(int);
 
         bool has_flag(int);
+
+        static const int VERSION_MAJOR;
+        static const int VERSION_MINOR;
+        static const int VERSION_BUILD;
+        static const char VERSION_RELEASE;
 
         void set_metadata(AWDMetaData *);
 

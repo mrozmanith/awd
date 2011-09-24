@@ -1,3 +1,5 @@
+BUILDVERSION:=$(warning Getting build number from Mercurial)$(shell hg tip |head -n1 |cut -d : -f2 |cut -b4-)$(shell date -u "+%m%d")
+
 CXX=g++
 CC=gcc
 LD=ld
@@ -5,7 +7,7 @@ CXX_SRC=$(wildcard src/*.cc)
 C_SRC=$(wildcard lib/lzma/*.c lib/zlib/*.c)
 OBJ=$(CXX_SRC:.cc=.o) $(C_SRC:.c=.o)
 LDFLAGS=-lz
-CFLAGS=-Wall -g -L. -arch i386 -arch x86_64
+CFLAGS=-Wall -g -L. -arch i386 -arch x86_64 -DAWD_VERSION_BUILD=$(BUILDVERSION)
 INCLUDE=-Iinclude -Ilib/lzma/ -Ilib/zlib/
 DEFINES=-D_7ZIP_ST
 LIBVER=1.0
