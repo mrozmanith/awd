@@ -3,17 +3,17 @@ __all__ = [ 'core', 'anim', 'geom', 'material', 'scene' ]
 version = ('PyAWD', 2, 0, 0, 'a')
 
 try:
-    import pyawd.cio as io
+    from pyawd import cpyawd
 
     # Ignore release letter for final releases
-    release = chr(io.LIBAWD_VERSION_RELEASE)
+    release = chr(cpyawd.LIBAWD_VERSION_RELEASE)
     if release == 'f':
         release = ''
 
     backend = ('libawd',
-        io.LIBAWD_VERSION_MAJOR,
-        io.LIBAWD_VERSION_MINOR,
-        io.LIBAWD_VERSION_BUILD,
+        cpyawd.LIBAWD_VERSION_MAJOR,
+        cpyawd.LIBAWD_VERSION_MINOR,
+        cpyawd.LIBAWD_VERSION_BUILD,
         release)
 
     backend_str = '%s v%d.%d.%d%s' % backend
