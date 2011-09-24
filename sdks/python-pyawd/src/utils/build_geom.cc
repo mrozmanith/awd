@@ -6,10 +6,11 @@
 #include "util.h"
 
 PyObject *
-cpyawd_util_build_geom(PyObject *self, PyObject *args)
+cpyawd_util_build_geom(PyObject *self, PyObject *args, PyObject *kwds)
 {
     int i, len;
     int ret;
+    double normal_threshold;
     PyObject *verts_list;
     PyObject *py_md;
     AWDMeshData *lawd_md;
@@ -18,11 +19,16 @@ cpyawd_util_build_geom(PyObject *self, PyObject *args)
     PyObject *geom_mod;
     PyObject *sub_class;
 
+    static const char *kwlist[] = {"vertices", "mesh_data", "normal_threshold", NULL};
 
-    if (!PyArg_ParseTuple(args, "O!O", &PyList_Type, &verts_list, &py_md))
+    normal_threshold = 0.0;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O|d", (char**)kwlist, 
+                &PyList_Type, &verts_list, &py_md, &normal_threshold))
         return NULL;
 
     lawd_util = new AWDGeomUtil();
+    lawd_util->normal_threshold = normal_threshold;
+
     len = PyList_Size(verts_list);
     for (i=0; i<len; i++) {
         PyObject *vert_obj = PyList_GetItem(verts_list, i);

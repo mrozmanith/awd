@@ -3,6 +3,6 @@
 
 #include <Python.h>
 
-PyObject *cpyawd_util_build_geom(PyObject *, PyObject *);
+PyObject *cpyawd_util_build_geom(PyObject *, PyObject *, PyObject *);
 
 #endif
