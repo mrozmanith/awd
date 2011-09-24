@@ -10,7 +10,7 @@ AWDGeomUtil::AWDGeomUtil()
     this->col_last_vd = NULL;
     this->exp_first_vd = NULL;
     this->exp_last_vd = NULL;
-    this->normal_threshold = 3.14;
+    this->normal_threshold = 0;
 }
 
 AWDGeomUtil::~AWDGeomUtil()
@@ -37,6 +37,8 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
     vd->force_hard = force_hard;
     vd->next_col = NULL;
     vd->next_exp = NULL;
+    vd->first_normal_influence = NULL;
+    vd->last_normal_influence = NULL;
 
     if (!this->exp_first_vd)
         this->exp_first_vd = vd;
