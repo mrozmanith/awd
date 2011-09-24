@@ -62,7 +62,7 @@ cpyawd_util_build_geom(PyObject *self, PyObject *args)
 
         PyObject *py_sub;
 
-        py_sub = PyInstance_New(sub_class, NULL, NULL);
+        py_sub = PyObject_CallObject(sub_class, NULL);
         if (!py_sub)
             return NULL;
         PyObject_CallMethod(py_md, (char *)"add_sub_mesh", (char *)"O", py_sub);
