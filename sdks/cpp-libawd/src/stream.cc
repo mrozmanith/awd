@@ -25,6 +25,12 @@ AWDDataStream::~AWDDataStream()
 
 
 awd_uint32
+AWDDataStream::get_num_elements()
+{
+    return this->num_elements;
+}
+
+awd_uint32
 AWDDataStream::get_length(bool wide)
 {
     size_t elem_size;
