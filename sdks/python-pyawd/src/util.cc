@@ -54,6 +54,34 @@ pyawdutil_get_strattr(PyObject *o, const char *attr, const char **str, int *len)
     }
 }
 
+PyObject *
+pyawdutil_float64_to_pylist(awd_float64 *buf, unsigned int num_items)
+{
+    unsigned int i;
+    PyObject *list;
+
+    list = PyList_New(num_items);
+    for (i=0; i<num_items; i++) {
+        PyList_SetItem(list, i, PyFloat_FromDouble(buf[i]));
+    }
+
+    return list;
+}
+
+PyObject *
+pyawdutil_uint32_to_pylist(awd_uint32 *buf, unsigned int num_items)
+{
+    unsigned int i;
+    PyObject *list;
+
+    list = PyList_New(num_items);
+    for (i=0; i<num_items; i++) {
+        PyList_SetItem(list, i, PyLong_FromLong(buf[i]));
+    }
+
+    return list;
+}
+
 awd_float64 *
 pyawdutil_pylist_to_float64(PyObject *list, awd_float64 *buf, unsigned int num_items)
 {

@@ -10,5 +10,7 @@ awd_float64 *   pyawdutil_pylist_to_float64(PyObject *, awd_float64 *, unsigned 
 awd_float32 *   pyawdutil_pylist_to_float32(PyObject *, awd_float32 *, unsigned int);
 awd_uint32 *    pyawdutil_pylist_to_uint32(PyObject *, awd_uint32 *, unsigned int);
 awd_uint16 *    pyawdutil_pylist_to_uint16(PyObject *, awd_uint16 *, unsigned int);
+PyObject *      pyawdutil_float64_to_pylist(awd_float64 *, unsigned int);
+PyObject *      pyawdutil_uint32_to_pylist(awd_uint32 *, unsigned int);
 
 #endif
