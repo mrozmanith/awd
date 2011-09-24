@@ -6,7 +6,8 @@
 #include "utils.h"
 
 static PyMethodDef cpyawd_methods[] = {
-    {"util_build_geom", cpyawd_util_build_geom, METH_VARARGS, "Use the libawd AWDGeomUtil to build geometry." },
+    {"util_build_geom", (PyCFunction)cpyawd_util_build_geom, METH_VARARGS | METH_KEYWORDS, 
+        "Use the libawd AWDGeomUtil to build geometry." },
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

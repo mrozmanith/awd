@@ -1,6 +1,7 @@
 class AWDGeomUtil(object):
     def __init__(self):
         self._vertices = []
+        self.normal_threshold = 0.0
 
     def append_vert_data(self, index, pos, uv=None, norm=None, joint_wheights=None, joint_indices=None, force_hard = False):
         if uv is None:
@@ -15,5 +16,6 @@ class AWDGeomUtil(object):
     def build_geom(self, mesh_data):
         from pyawd.cpyawd import util_build_geom
 
-        return util_build_geom(self._vertices, mesh_data)
+
+        return util_build_geom(self._vertices, mesh_data, self.normal_threshold)
 
