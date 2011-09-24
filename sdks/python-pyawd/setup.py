@@ -15,7 +15,7 @@ source_files = [
     'src/prepmaterial.cc',
     'src/prepanim.cc',
     'src/prepattr.cc',
-    'src/cio.cc',
+    'src/cpyawd.cc',
     'src/AWDWriter.cc'
 ]
 
@@ -33,7 +33,7 @@ for opt in opts:
 
 ext_modules = []
 if use_libawd:
-    ext_modules.append(Extension('pyawd.cio', 
+    ext_modules.append(Extension('pyawd.cpyawd', 
         libraries = [ 'awd' ],
         include_dirs = [ 'include', '/usr/local/include' ],
         define_macros = [ version_macro ],
