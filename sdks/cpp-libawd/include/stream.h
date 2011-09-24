@@ -31,6 +31,7 @@ class AWDDataStream
         AWDDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
         ~AWDDataStream();
 
+        awd_uint32 get_num_elements();
         awd_uint32 get_length(bool);
         void write_stream(int, bool);
 };
