@@ -82,7 +82,7 @@ class AWD(object):
 
     def flush(self, file=sys.stdout):
         try:
-            from pyawd import cio as io
+            from pyawd import cpyawd as io
         except:
             print("Using pure python for writing. Build PyAWD with --use-libawd=true")
             print("to build using libawd for optimized writing performance.")
