@@ -1,9 +1,11 @@
-import bpy
-import bpy.path
-
 import re
 import os.path
 import functools
+import mathutils
+
+from math import radians
+
+import bpy
 
 import pyawd
 from pyawd.core import *
@@ -13,9 +15,6 @@ from pyawd.geom import *
 from pyawd.material import *
 from pyawd.utils.math import *
 from pyawd.utils.geom import AWDGeomUtil
-
-import mathutils
-from math import radians
 
 
 class AWDBlockCache(object):
@@ -42,9 +41,9 @@ class AWDBlockCache(object):
         
 
 
-class BlenderAWDExporter(object):
-    def __init__(self, path):
-        self.path = path
+class AWDExporter(object):
+
+    def __init__(self):
         self.block_cache = AWDBlockCache()
         self.exported_skeletons = []
         self.animation_sequences = []
@@ -53,16 +52,22 @@ class BlenderAWDExporter(object):
         
         # TODO: Don't hard code these
         self.compression = DEFLATE
-        self.include_attr = True
-        self.include_materials = True
-        self.embed_textures = True
         self.user_ns = AWDNamespace('default')
-        
-    
-    def export(self):
+
+
+    def export(self, context, filepath='',
+            include_materials = True,
+            embed_textures = True,
+            include_attr = True):
+
+        self.context = context
+        self.include_materials = include_materials
+        self.embed_textures = embed_textures
+        self.include_attr = include_attr
         self.awd = AWD(self.compression)
+
         
-        for o in bpy.context.scene.objects:
+        for o in self.context.scene.objects:
             if o.type == 'EMPTY':
                 self.export_container(o)
                 
@@ -99,7 +104,7 @@ class BlenderAWDExporter(object):
         # self.export_animation()
         
         
-        with open(self.path, 'wb') as f:
+        with open(filepath, 'wb') as f:
             self.awd.flush(f)
     
     
@@ -176,7 +181,7 @@ class BlenderAWDExporter(object):
             print('Exporting sequences %s (%d-%d)' % seq)
             
             for frame in range(seq[1], seq[2]):
-                bpy.context.scene.frame_set(frame)
+                self.context.scene.frame_set(frame)
                 for o in self.exported_skeletons:
                     skel_pose = AWDSkeletonPose()
                     
@@ -385,8 +390,8 @@ class BlenderAWDExporter(object):
     def set_attributes(self, ob, awd_elem):
         for key in ob.keys():
             if (key != '_RNA_UI'):
-                #print('setting prop %s.%s=%s' % (ob.name, key, ob[key]))
-                awd_elem.attributes[self.user_ns][str(key)] = ob[key]
+                print('setting prop %s.%s=%s' % (ob.name, key, ob[key]))
+                awd_elem.attributes[self.user_ns][str(key)] = str(ob[key])
                     
     def mtx_bl2awd(self, mtx):    
         # Decompose matrix
@@ -426,6 +431,7 @@ class BlenderAWDExporter(object):
         
         return AWDMatrix4x4(mtx_list)
     
+
 
 
 if __name__ == '__main__':
