@@ -1,4 +1,4 @@
-BLENPATH=/Applications/blender.app/Contents/MacOS/2.57/python/lib/python3.2
+BLENPATH=/Applications/blender.app/Contents/MacOS/2.59/python/lib/python3.2
 LIBPATH32=./build/lib.macosx-10.4-intel-3.2
 LIBPATH26=./build/lib.macosx-10.4-x86_64-2.6
 
