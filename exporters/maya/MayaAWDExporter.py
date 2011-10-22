@@ -272,7 +272,7 @@ class MayaAWDExporter:
                         elif api_type == 'kCamera' and self.include_cameras:
                             # Cameras for some reason are "shapes" in Maya
                             self.export_camera(transform, awd_parent)
-                    else:
+                    elif not dag_it.currentItem().hasFn(om.MFn.kJoint):
                         # Container!
                         mtx = mc.xform(transform, q=True, m=True)
 
@@ -380,7 +380,8 @@ class MayaAWDExporter:
                             # Normalize top weights
                             weight_objs = weight_objs[0:self.joints_per_vert]
                             sum_obj = reduce(lambda w0,w1: (0, w0[1]+w1[1]), weight_objs)
-                            weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
+                            if sum_obj[1] > 0.0:
+                                weight_objs = map(lambda w: (w[0], w[1] / sum_obj[1]), weight_objs)
  
                             # Add more empty weight objects if too few
                             if len(weight_objs) != self.joints_per_vert:
