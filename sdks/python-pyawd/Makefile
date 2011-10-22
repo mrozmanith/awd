@@ -30,5 +30,8 @@ blender_install: build32
 maya_install: build26
 	cp -R $(LIBPATH26)/pyawd $(MAYASITE)/
 
+c4d_install: build26
+	cp -R $(LIBPATH26)/pyawd ~richardolsson/Library/Preferences/MAXON/CINEMA\ 4D\ R13_DA28FA2D/library/python/packages/osx/
+
 clean:
 	rm -rf build
