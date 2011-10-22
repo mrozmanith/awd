@@ -341,9 +341,9 @@ class AWDExporter(object):
         
         # Generate expanded list of vertices
         for f in geom.faces:
-            inds_in_face = [0,1,2]
+            inds_in_face = [0,2,1]
             if len(f.vertices)==4:
-                inds_in_face.extend((0,2,3))
+                inds_in_face.extend((0,3,2))
                 
             for idx in inds_in_face:
                 vert = geom.vertices[f.vertices[idx]]
@@ -358,10 +358,10 @@ class AWDExporter(object):
                 if tex_data is not None and len(tex_data)>0:
                     # TODO: Implement secondary UV sets?
                     tex_face = tex_data[f.index]
-                    uv = tex_face.uv[idx]
+                    uv = [tex_face.uv[idx][0], 1.0-tex_face.uv[idx][1]]
 
-                v = [vert.co.x, vert.co.y, vert.co.z]
-                n = [f.normal.x, f.normal.y, f.normal.z] 
+                v = [vert.co.x, vert.co.z, vert.co.y]
+                n = [f.normal.x, f.normal.z, f.normal.y] 
                 geom_util.append_vert_data(vert.index, v, uv, n, has_hard_edge)
 
 
@@ -376,7 +376,7 @@ class AWDExporter(object):
         
         md = AWDMeshData(geom.name)
         if geom.use_auto_smooth:
-            geom_util.normal_threshold = radians(geom.auto_smooth_angle)
+            geom_util.normal_threshold = geom.auto_smooth_angle
         geom_util.build_geom(md)
 
         #md.add_sub_mesh(AWDSubMesh())
