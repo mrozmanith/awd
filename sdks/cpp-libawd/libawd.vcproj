@@ -24,6 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="hg tip --template &quot;{rev}&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -87,6 +88,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="hg tip --template &quot;#define AWD_VERSION_BUILD {rev}&quot; &gt; include/hgversion.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -366,6 +368,10 @@
 			</File>
 			<File
 				RelativePath=".\lib\zlib\deflate.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\geomutil.cc"
 				>
 			</File>
 			<File
