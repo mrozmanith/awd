@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd"
+				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -101,7 +101,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd"
+				CommandLine="if exist build\pyawd ( rmdir /S /Q build\pyawd );&#x0D;&#x0A;mkdir build\pyawd&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -211,7 +211,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\cio.cc"
+				RelativePath=".\src\utils\build_geom.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\src\cpyawd.cc"
 				>
 			</File>
 			<File
