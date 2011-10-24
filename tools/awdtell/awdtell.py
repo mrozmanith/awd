@@ -248,6 +248,7 @@ def print_mesh_data(data):
         printl('Length:      %d' % length)
         indent_level -= 1
 
+        offs += 4 # TODO: Read numeric properties
         sub_end = offs + length
 
         indent_level += 1
@@ -258,7 +259,7 @@ def print_mesh_data(data):
 
             if type < len(stream_types):
                 stream_type = stream_types[type]
-                if type == 1 or type == 3 or type==7:
+                if type == 1 or type == 3 or type==4 or type==5 or type==7:
                     if wide_geom:
                         elem_data_format = 'd'
                     else:
