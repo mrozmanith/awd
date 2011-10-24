@@ -17,6 +17,7 @@ from pyawd.scene import *
 from pyawd.geom import *
 from pyawd.material import *
 from pyawd.utils import *
+from pyawd.utils.math import *
 
 
 
