@@ -18,7 +18,7 @@ class AWDAttr
         virtual void write_metadata(int)=0;
 
     public:
-        void write_attr(int, bool, bool);
+        void write_attr(int, bool);
 
         void set_val(AWD_field_ptr, awd_uint16, AWD_field_type);
         AWD_field_ptr get_val(awd_uint16 *, AWD_field_type *);
@@ -63,8 +63,8 @@ class AWDUserAttrList {
         AWDUserAttrList();
         ~AWDUserAttrList();
 
-        awd_uint32 calc_length(bool, bool);
-        void write_attributes(int, bool, bool);
+        awd_uint32 calc_length(bool);
+        void write_attributes(int, bool);
 
         AWD_field_ptr get_val_ptr(AWDNamespace *ns, const char *, awd_uint16);
         bool get(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
@@ -103,8 +103,8 @@ class AWDNumAttrList {
     public:
         AWDNumAttrList();
         ~AWDNumAttrList();
-        awd_uint32 calc_length(bool, bool);
-        void write_attributes(int, bool, bool);
+        awd_uint32 calc_length(bool);
+        void write_attributes(int, bool);
 
         AWD_field_ptr get_val_ptr(awd_propkey);
         bool get(awd_propkey, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
@@ -127,7 +127,7 @@ class AWDAttrElement
         AWDNumAttrList *properties;
         AWDUserAttrList *user_attributes;
 
-        awd_uint32 calc_attr_length(bool, bool, bool, bool);
+        awd_uint32 calc_attr_length(bool, bool, bool);
 
     public:
         bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);

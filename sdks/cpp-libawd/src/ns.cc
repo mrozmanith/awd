@@ -41,14 +41,14 @@ AWDNamespace::get_uri(int *len)
 
 
 awd_uint32 
-AWDNamespace::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDNamespace::calc_body_length(bool wide_mtx)
 {
     return sizeof(awd_nsid) + sizeof(awd_uint16) + this->uri_len;
 }
 
 
 void 
-AWDNamespace::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDNamespace::write_body(int fd, bool wide_mtx)
 {
     write(fd, &(this->handle), sizeof(awd_nsid));
     awdutil_write_varstr(fd, this->uri, this->uri_len);

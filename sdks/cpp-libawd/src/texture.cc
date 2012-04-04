@@ -38,7 +38,7 @@ AWDBitmapTexture::set_url(const char *url, awd_uint16 url_len)
 
 
 awd_uint32
-AWDBitmapTexture::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDBitmapTexture::calc_body_length(bool wide_mtx)
 {
     awd_uint32 len;
 
@@ -52,7 +52,7 @@ AWDBitmapTexture::calc_body_length(bool wide_geom, bool wide_mtx)
         len += this->embed_data_len;
     }
 
-    len += this->calc_attr_length(true, true, wide_geom, wide_mtx);
+    len += this->calc_attr_length(true, true, wide_mtx);
 
     return len;
 }
@@ -89,7 +89,7 @@ AWDBitmapTexture::prepare_write()
 
 
 void
-AWDBitmapTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDBitmapTexture::write_body(int fd, bool wide_mtx)
 {
     awd_uint32 data_len;
 
@@ -107,8 +107,8 @@ AWDBitmapTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
         write(fd, this->embed_data, this->embed_data_len);
     }
 
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 
@@ -147,11 +147,11 @@ AWDCubeTexture::get_dir_tex(AWD_cube_dir dir)
 
 
 awd_uint32
-AWDCubeTexture::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDCubeTexture::calc_body_length(bool wide_mtx)
 {
     return (2 + this->get_name_length()) + 
         6 * sizeof(awd_baddr) + 
-        this->calc_attr_length(true, true, wide_geom, wide_mtx);
+        this->calc_attr_length(true, true, wide_mtx);
 }
 
 
@@ -176,7 +176,7 @@ AWDCubeTexture::write_dir_tex(int fd, AWD_cube_dir dir)
 
 
 void
-AWDCubeTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDCubeTexture::write_body(int fd, bool wide_mtx)
 {
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     this->write_dir_tex(fd, POS_X);
@@ -186,7 +186,7 @@ AWDCubeTexture::write_body(int fd, bool wide_geom, bool wide_mtx)
     this->write_dir_tex(fd, POS_Z);
     this->write_dir_tex(fd, NEG_Z);
 
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 

@@ -119,19 +119,19 @@ AWDScene::~AWDScene()
 }
 
 awd_uint32
-AWDScene::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDScene::calc_body_length(bool wide_mtx)
 {
     return this->calc_common_length(wide_mtx) + 
-        this->calc_attr_length(true,true, wide_geom, wide_mtx);
+        this->calc_attr_length(true,true, wide_mtx);
 }
 
 
 void
-AWDScene::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDScene::write_body(int fd, bool wide_mtx)
 {
     this->write_scene_common(fd, wide_mtx);
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 
@@ -152,18 +152,18 @@ AWDContainer::~AWDContainer()
 
 
 awd_uint32
-AWDContainer::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDContainer::calc_body_length(bool wide_mtx)
 {
-    return this->calc_common_length(wide_mtx) + this->calc_attr_length(true,true, wide_geom, wide_mtx);
+    return this->calc_common_length(wide_mtx) + this->calc_attr_length(true,true, wide_mtx);
 }
 
 
 void
-AWDContainer::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDContainer::write_body(int fd, bool wide_mtx)
 {
     this->write_scene_common(fd, wide_mtx);
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 

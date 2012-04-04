@@ -39,15 +39,15 @@ AWDMetaData::prepare_write()
 
 
 awd_uint32
-AWDMetaData::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDMetaData::calc_body_length(bool wide_mtx)
 {
-    return this->calc_attr_length(true, false, wide_geom, wide_mtx);
+    return this->calc_attr_length(true, false, wide_mtx);
 }
 
 
 void
-AWDMetaData::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDMetaData::write_body(int fd, bool wide_mtx)
 {
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
 }
 

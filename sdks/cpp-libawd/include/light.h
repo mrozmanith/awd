@@ -17,8 +17,8 @@ class AWDLight :
 
     protected:
         void prepare_write();
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDLight(const char *, awd_uint16, AWD_light_type);

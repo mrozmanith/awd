@@ -11,7 +11,7 @@
 
 
 void
-AWDAttr::write_attr(int fd, bool wide_geom, bool wide_mtx)
+AWDAttr::write_attr(int fd, bool wide_mtx)
 {
     AWD_field_ptr val;
     awd_uint16 bytes_written;
@@ -198,7 +198,7 @@ AWDUserAttrList::~AWDUserAttrList()
 
 
 awd_uint32
-AWDUserAttrList::calc_length(bool wide_geom, bool wide_mtx)
+AWDUserAttrList::calc_length(bool wide_mtx)
 {
     awd_uint32 len;
     AWDUserAttr *cur;
@@ -219,17 +219,17 @@ AWDUserAttrList::calc_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDUserAttrList::write_attributes(int fd, bool wide_geom, bool wide_mtx)
+AWDUserAttrList::write_attributes(int fd, bool wide_mtx)
 {
     awd_uint32 len_be;
     AWDUserAttr *cur;
 
-    len_be = UI32(this->calc_length(wide_geom, wide_mtx) - sizeof(awd_uint32));
+    len_be = UI32(this->calc_length(wide_mtx) - sizeof(awd_uint32));
     write(fd, &len_be, sizeof(awd_uint32));
 
     cur = this->first_attr;
     while (cur) {
-        cur->write_attr(fd, wide_geom, wide_mtx);
+        cur->write_attr(fd, wide_mtx);
         cur = cur->next;
     }
 }
@@ -374,7 +374,7 @@ AWDNumAttrList::~AWDNumAttrList()
 
 
 awd_uint32
-AWDNumAttrList::calc_length(bool wide_geom, bool wide_mtx)
+AWDNumAttrList::calc_length(bool wide_mtx)
 {
     awd_uint32 len;
     AWDNumAttr *cur;
@@ -394,17 +394,17 @@ AWDNumAttrList::calc_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDNumAttrList::write_attributes(int fd, bool wide_geom, bool wide_mtx)
+AWDNumAttrList::write_attributes(int fd, bool wide_mtx)
 {
     awd_uint32 len_be;
     AWDNumAttr *cur;
 
-    len_be = UI32(this->calc_length(wide_geom, wide_mtx) - sizeof(awd_uint32));
+    len_be = UI32(this->calc_length(wide_mtx) - sizeof(awd_uint32));
     write(fd, &len_be, sizeof(awd_uint32));
 
     cur = this->first_attr;
     while (cur) {
-        cur->write_attr(fd, wide_geom, wide_mtx);
+        cur->write_attr(fd, wide_mtx);
         cur = cur->next;
     }
 }
@@ -505,13 +505,13 @@ AWDAttrElement::add_dependencies(AWD *awd)
 
 
 awd_uint32 
-AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide_geom, bool wide_mtx)
+AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide_mtx)
 {
     awd_uint32 len;
 
     len = 0;
-    if (with_props) len += this->properties->calc_length(wide_geom, wide_mtx);
-    if (with_user_attr) len += this->user_attributes->calc_length(wide_geom, wide_mtx);
+    if (with_props) len += this->properties->calc_length(wide_mtx);
+    if (with_user_attr) len += this->user_attributes->calc_length(wide_mtx);
 
     return len;
 }

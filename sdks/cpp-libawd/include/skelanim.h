@@ -21,8 +21,8 @@ class AWDSkeletonPose : public AWDNamedElement,
         AWD_joint_tf *last_transform;
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDSkeletonPose(const char *, awd_uint16);
@@ -50,8 +50,8 @@ class AWDSkeletonAnimation : public AWDNamedElement,
         AWD_skelanim_fr *last_frame;
 
     protected:
-        awd_uint32 calc_body_length(bool,bool);
-        void write_body(int, bool,bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDSkeletonAnimation(const char *, awd_uint16);

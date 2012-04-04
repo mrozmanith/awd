@@ -25,9 +25,9 @@ class AWDBitmapTexture :
         awd_uint32 embed_data_len;
     
     protected:
-        awd_uint32 calc_body_length(bool, bool);
+        awd_uint32 calc_body_length(bool);
         void prepare_write();
-        void write_body(int, bool, bool);
+        void write_body(int, bool);
 
     public:
         AWDBitmapTexture(AWD_tex_type, const char *, awd_uint16);
@@ -62,9 +62,9 @@ class AWDCubeTexture :
         void write_dir_tex(int, AWD_cube_dir);
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
+        awd_uint32 calc_body_length(bool);
         void prepare_write();
-        void write_body(int, bool, bool);
+        void write_body(int, bool);
 
     public:
         AWDCubeTexture(const char *, awd_uint16);

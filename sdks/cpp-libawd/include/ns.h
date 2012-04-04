@@ -13,8 +13,8 @@ class AWDNamespace :
         awd_nsid handle;
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDNamespace(const char *, awd_uint16);

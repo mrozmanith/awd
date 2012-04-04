@@ -29,8 +29,8 @@ class AWDCamera :
 
     protected:
         void prepare_write();
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDCamera(const char *, awd_uint16, AWD_cam_type, AWD_lens_type);

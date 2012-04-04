@@ -76,7 +76,7 @@ AWDMaterial::add_method(AWDShadingMethod *method)
 
 
 awd_uint32
-AWDMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDMaterial::calc_body_length(bool wide_mtx)
 {
     AWD_mat_method *cur;
     awd_uint32 len;
@@ -84,11 +84,11 @@ AWDMaterial::calc_body_length(bool wide_geom, bool wide_mtx)
     len = 2; // type + method count 8-bit ints
 
     len += sizeof(awd_uint16) + this->get_name_length();
-    len += this->calc_attr_length(true, true, wide_geom, wide_mtx);
+    len += this->calc_attr_length(true, true, wide_mtx);
 
     cur = this->first_method;
     while (cur) {
-        len += cur->method->calc_method_length(wide_geom, wide_mtx);
+        len += cur->method->calc_method_length(wide_mtx);
         cur = cur->next;
     }
 
@@ -140,7 +140,7 @@ AWDMaterial::prepare_write()
 
 
 void
-AWDMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDMaterial::write_body(int fd, bool wide_mtx)
 {
     AWD_mat_method *cur;
 
@@ -148,13 +148,13 @@ AWDMaterial::write_body(int fd, bool wide_geom, bool wide_mtx)
     write(fd, &this->type, sizeof(awd_uint8));
     write(fd, &this->num_methods, sizeof(awd_uint8));
 
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
 
     cur = this->first_method;
     while (cur) {
-        cur->method->write_method(fd, wide_geom, wide_mtx);
+        cur->method->write_method(fd, wide_mtx);
         cur = cur->next;
     }
 
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
