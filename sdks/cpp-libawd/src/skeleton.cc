@@ -156,7 +156,7 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_mtx)
     write(fd, &id_be, sizeof(awd_uint32));
     write(fd, &par_id_be, sizeof(awd_uint32));
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
-    awdutil_write_mtx4x4(fd, this->bind_mtx, wide_mtx);
+    awdutil_write_floats(fd, this->bind_mtx, 12, wide_mtx);
 
     //  TODO: Write attributes
     this->properties->write_attributes(fd, wide_mtx);

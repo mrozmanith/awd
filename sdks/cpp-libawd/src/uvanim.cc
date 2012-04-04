@@ -66,7 +66,7 @@ AWDUVAnimation::write_body(int fd, bool wide_mtx)
     while (cur_fr) {
         awd_uint16 dur_be = UI16(cur_fr->duration);
 
-        awdutil_write_mtx3x2(fd, cur_fr->transform_mtx, wide_mtx);
+        awdutil_write_floats(fd, cur_fr->transform_mtx, 12, wide_mtx);
         write(fd, &dur_be, sizeof(awd_uint16));
 
         cur_fr = cur_fr->next;

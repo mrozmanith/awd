@@ -28,8 +28,6 @@ int             awdutil_mktmp(char **path);
 size_t          awdutil_get_type_size(AWD_field_type, bool);
 
 awd_uint32      awdutil_write_floats(int, awd_float64 *, int, bool);
-awd_uint32      awdutil_write_mtx4x4(int, awd_float64 *, bool);
-awd_uint32      awdutil_write_mtx3x2(int, awd_float64 *, bool);
 awd_uint32      awdutil_write_varstr(int, const char *, awd_uint16);
 
 awd_uint16      awdutil_swapui16(awd_uint16);

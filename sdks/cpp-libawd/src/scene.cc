@@ -42,7 +42,7 @@ AWDSceneBlock::write_scene_common(int fd, bool wide_mtx)
     // Write scene block common fields
     // TODO: Move this to separate base class
     write(fd, &parent_addr, sizeof(awd_baddr));
-    awdutil_write_mtx4x4(fd, this->transform_mtx, wide_mtx);
+    awdutil_write_floats(fd, this->transform_mtx, 12, wide_mtx);
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
 }
 
