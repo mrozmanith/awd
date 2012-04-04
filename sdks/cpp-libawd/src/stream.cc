@@ -94,12 +94,12 @@ AWDDataStream::write_stream(int fd, bool wide)
 
 
 
-AWDMeshDataStream::AWDMeshDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
+AWDGeomDataStream::AWDGeomDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
     : AWDDataStream((awd_uint8)type, data, num_elements)
 {}
 
 size_t
-AWDMeshDataStream::get_elem_size(awd_bool wide)
+AWDGeomDataStream::get_elem_size(awd_bool wide)
 {
     size_t elem_size;
 

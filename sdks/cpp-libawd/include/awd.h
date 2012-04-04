@@ -66,7 +66,7 @@ class AWD
 
         void add_texture(AWDTexture *);
         void add_material(AWDMaterial *);
-        void add_mesh_data(AWDMeshData *);
+        void add_mesh_data(AWDTriGeom *);
         void add_skeleton(AWDSkeleton *);
         void add_skeleton_pose(AWDSkeletonPose *);
         void add_skeleton_anim(AWDSkeletonAnimation *);
