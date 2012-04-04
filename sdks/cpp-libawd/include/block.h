@@ -10,12 +10,13 @@ class AWDBlock
 {
     private:
         awd_baddr addr;
+        awd_uint8 flags;
 
     protected:
         AWD_block_type type;
         virtual void prepare_write();
-        virtual awd_uint32 calc_body_length(bool, bool)=0;
-        virtual void write_body(int, bool, bool)=0;
+        virtual awd_uint32 calc_body_length()=0;
+        virtual void write_body(int)=0;
 
     public:
         AWDBlock * next;
@@ -27,7 +28,7 @@ class AWDBlock
 
         //virtual void add_dependencies(AWD *);
 
-        size_t write_block(int, bool, bool, awd_baddr);
+        size_t write_block(int, awd_baddr);
 };
 
 typedef struct _list_block

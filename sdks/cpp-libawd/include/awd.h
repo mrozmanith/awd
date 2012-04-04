@@ -17,8 +17,6 @@
 
 
 #define AWD_STREAMING               0x1
-#define AWD_WIDE_GEOM               0x2
-#define AWD_WIDE_MTX                0x4
 
 
 class AWD
