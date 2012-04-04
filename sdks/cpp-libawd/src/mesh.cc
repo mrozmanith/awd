@@ -9,7 +9,7 @@
 
 
 
-AWDSubMesh::AWDSubMesh() :
+AWDSubGeom::AWDSubGeom() :
     AWDAttrElement()
 {
     this->num_streams = 0;
@@ -18,7 +18,7 @@ AWDSubMesh::AWDSubMesh() :
     this->next = NULL;
 }
 
-AWDSubMesh::~AWDSubMesh()
+AWDSubGeom::~AWDSubGeom()
 {
     AWDDataStream *cur;
 
@@ -36,14 +36,14 @@ AWDSubMesh::~AWDSubMesh()
 
 
 unsigned int
-AWDSubMesh::get_num_streams()
+AWDSubGeom::get_num_streams()
 {
     return this->num_streams;
 }
 
 
 AWDDataStream *
-AWDSubMesh::get_stream_at(unsigned int idx)
+AWDSubGeom::get_stream_at(unsigned int idx)
 {
     if (idx < this->num_streams) {
         unsigned int cur_idx;
@@ -65,11 +65,11 @@ AWDSubMesh::get_stream_at(unsigned int idx)
 
 
 void 
-AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
+AWDSubGeom::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
 {
-    AWDMeshDataStream *str;
+    AWDDataStream *str;
 
-    str = new AWDMeshDataStream((awd_uint8)type, data, num_elements);
+    str = new AWDGeomDataStream((awd_uint8)type, data, num_elements);
 
     if (this->first_stream == NULL) {
         this->first_stream = str;
@@ -85,7 +85,7 @@ AWDSubMesh::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 
 
 awd_uint32
-AWDSubMesh::calc_streams_length(bool wide_geom)
+AWDSubGeom::calc_streams_length(bool wide_geom)
 {
     awd_uint32 len;
     AWDDataStream *str;
@@ -102,7 +102,7 @@ AWDSubMesh::calc_streams_length(bool wide_geom)
 
 
 awd_uint32
-AWDSubMesh::calc_sub_length(bool wide_geom, bool wide_mtx)
+AWDSubGeom::calc_sub_length(bool wide_geom, bool wide_mtx)
 {
     awd_uint32 len;
 
@@ -115,7 +115,7 @@ AWDSubMesh::calc_sub_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDSubMesh::write_sub(int fd, bool wide_geom, bool wide_mtx)
+AWDSubGeom::write_sub(int fd, bool wide_geom, bool wide_mtx)
 {
     AWDDataStream *str;
     awd_uint32 sub_len;
@@ -142,7 +142,7 @@ AWDSubMesh::write_sub(int fd, bool wide_geom, bool wide_mtx)
 
 
 
-AWDMeshData::AWDMeshData(const char *name, awd_uint16 name_len) :
+AWDTriGeom::AWDTriGeom(const char *name, awd_uint16 name_len) :
     AWDBlock(MESH_DATA),
     AWDNamedElement(name, name_len),
     AWDAttrElement() 
@@ -153,13 +153,13 @@ AWDMeshData::AWDMeshData(const char *name, awd_uint16 name_len) :
     this->num_subs = 0;
 }
 
-AWDMeshData::~AWDMeshData()
+AWDTriGeom::~AWDTriGeom()
 {
-    AWDSubMesh *cur;
+    AWDSubGeom *cur;
 
     cur = this->first_sub;
     while (cur) {
-        AWDSubMesh *next = cur->next;
+        AWDSubGeom *next = cur->next;
         cur->next = NULL;
         delete cur;
         cur = next;
@@ -176,7 +176,7 @@ AWDMeshData::~AWDMeshData()
 
 
 void 
-AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
+AWDTriGeom::add_sub_mesh(AWDSubGeom *sub)
 {
     if (this->first_sub == NULL) {
         this->first_sub = sub;
@@ -191,18 +191,18 @@ AWDMeshData::add_sub_mesh(AWDSubMesh *sub)
 
 
 unsigned int
-AWDMeshData::get_num_subs()
+AWDTriGeom::get_num_subs()
 {
     return this->num_subs;
 }
 
 
-AWDSubMesh *
-AWDMeshData::get_sub_at(unsigned int idx)
+AWDSubGeom *
+AWDTriGeom::get_sub_at(unsigned int idx)
 {
     if (idx < this->num_subs) {
         unsigned int cur_idx;
-        AWDSubMesh *cur;
+        AWDSubGeom *cur;
 
         cur_idx = 0;
         cur = this->first_sub;
@@ -221,23 +221,23 @@ AWDMeshData::get_sub_at(unsigned int idx)
 
 
 awd_float64 *
-AWDMeshData::get_bind_mtx()
+AWDTriGeom::get_bind_mtx()
 {
     return this->bind_mtx;
 }
 
 
 void
-AWDMeshData::set_bind_mtx(awd_float64 *bind_mtx)
+AWDTriGeom::set_bind_mtx(awd_float64 *bind_mtx)
 {
     this->bind_mtx = bind_mtx;
 }
 
 
 awd_uint32
-AWDMeshData::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDTriGeom::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    AWDSubMesh *sub;
+    AWDSubGeom *sub;
     awd_uint32 mesh_len;
 
     // Calculate length of entire mesh 
@@ -256,10 +256,10 @@ AWDMeshData::calc_body_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDMeshData::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDTriGeom::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     awd_uint16 num_subs_be;
-    AWDSubMesh *sub;
+    AWDSubGeom *sub;
 
     // Write name and sub count
     num_subs_be = UI16(this->num_subs);
@@ -284,7 +284,7 @@ AWDMeshData::write_body(int fd, bool wide_geom, bool wide_mtx)
 
 
 
-AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data) :
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *data) :
     AWDSceneBlock(MESH_INSTANCE, name, name_len, NULL)
 {
     this->set_data(data);
@@ -292,7 +292,7 @@ AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *dat
 }
 
 
-AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDMeshData *data, awd_float64 *mtx) :
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *data, awd_float64 *mtx) :
     AWDSceneBlock(MESH_INSTANCE, name, name_len, mtx)
 {
     this->set_data(data);
@@ -312,7 +312,7 @@ AWDMeshInst::add_material(AWDMaterial *material)
 }
 
 
-AWDMeshData *
+AWDTriGeom *
 AWDMeshInst::get_data()
 {
     return this->data;
@@ -320,7 +320,7 @@ AWDMeshInst::get_data()
 
 
 void
-AWDMeshInst::set_data(AWDMeshData *data)
+AWDMeshInst::set_data(AWDTriGeom *data)
 {
     this->data = data;
 }

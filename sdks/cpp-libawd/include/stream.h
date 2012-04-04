@@ -38,13 +38,13 @@ class AWDDataStream
 
 
 
-class AWDMeshDataStream : public AWDDataStream
+class AWDGeomDataStream : public AWDDataStream
 {
     protected:
         size_t get_elem_size(awd_bool);
 
     public:
-        AWDMeshDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
+        AWDGeomDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
 };
 
 

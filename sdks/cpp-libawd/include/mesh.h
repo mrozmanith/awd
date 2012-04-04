@@ -10,8 +10,6 @@
 #include "attr.h"
 
 
-#define PROP_MD_BIND_MTX 1
-
 
 /**
  * Data stream type
@@ -28,7 +26,7 @@ typedef enum {
 
 
 
-class AWDSubMesh :
+class AWDSubGeom :
     public AWDAttrElement
 {
     private:
@@ -38,10 +36,10 @@ class AWDSubMesh :
         awd_uint32 calc_streams_length(bool);
 
     public:
-        AWDSubMesh();
-        ~AWDSubMesh();
+        AWDSubGeom();
+        ~AWDSubGeom();
 
-        AWDSubMesh * next;
+        AWDSubGeom * next;
 
         unsigned int get_num_streams();
         AWDDataStream *get_stream_at(unsigned int);
@@ -52,15 +50,15 @@ class AWDSubMesh :
 };
 
 
-class AWDMeshData : 
+class AWDTriGeom : 
     public AWDBlock, 
     public AWDNamedElement,
     public AWDAttrElement
 {
     private:
         unsigned int num_subs;
-        AWDSubMesh * first_sub;
-        AWDSubMesh * last_sub;
+        AWDSubGeom * first_sub;
+        AWDSubGeom * last_sub;
 
         awd_float64 * bind_mtx;
 
@@ -69,12 +67,12 @@ class AWDMeshData :
         void write_body(int, bool, bool);
 
     public:
-        AWDMeshData(const char *, awd_uint16);
-        ~AWDMeshData();
+        AWDTriGeom(const char *, awd_uint16);
+        ~AWDTriGeom();
 
         unsigned int get_num_subs();
-        AWDSubMesh *get_sub_at(unsigned int);
-        void add_sub_mesh(AWDSubMesh *);
+        AWDSubGeom *get_sub_at(unsigned int);
+        void add_sub_mesh(AWDSubGeom *);
 
         awd_float64 *get_bind_mtx();
         void set_bind_mtx(awd_float64 *bind_mtx);
@@ -86,7 +84,7 @@ class AWDMeshInst :
     public AWDSceneBlock
 {
     private:
-        AWDMeshData * data;
+        AWDTriGeom * data;
         AWDBlockList * materials;
 
         void init();
@@ -96,14 +94,14 @@ class AWDMeshInst :
         void write_body(int, bool, bool);
 
     public:
-        AWDMeshInst(const char *, awd_uint16, AWDMeshData *);
-        AWDMeshInst(const char *, awd_uint16, AWDMeshData *, awd_float64 *);
+        AWDMeshInst(const char *, awd_uint16, AWDTriGeom *);
+        AWDMeshInst(const char *, awd_uint16, AWDTriGeom *, awd_float64 *);
         ~AWDMeshInst();
 
         void add_material(AWDMaterial *);
 
-        AWDMeshData * get_data();
-        void set_data(AWDMeshData *);
+        AWDTriGeom * get_data();
+        void set_data(AWDTriGeom *);
 };
 
 #endif

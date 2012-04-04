@@ -89,7 +89,7 @@ AWD::add_texture(AWDTexture *block)
 
 
 void
-AWD::add_mesh_data(AWDMeshData *block)
+AWD::add_mesh_data(AWDTriGeom *block)
 {
     this->mesh_data_blocks->append(block);
 }

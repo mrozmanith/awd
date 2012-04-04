@@ -163,10 +163,10 @@ next:
 
 
 int 
-AWDGeomUtil::build_geom(AWDMeshData *md)
+AWDGeomUtil::build_geom(AWDTriGeom *md)
 {
     vdata *vd;
-    AWDSubMesh *sub;
+    AWDSubGeom *sub;
 
     int v_idx, i_idx;
     AWD_str_ptr v_str;
@@ -174,7 +174,7 @@ AWDGeomUtil::build_geom(AWDMeshData *md)
     AWD_str_ptr n_str;
     AWD_str_ptr u_str;
 
-    sub = new AWDSubMesh();
+    sub = new AWDSubGeom();
     v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
     i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
     n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
@@ -241,7 +241,7 @@ AWDGeomUtil::build_geom(AWDMeshData *md)
     }
 
     // TODO: Implement splitting of sub-meshes to avoid buffer overflows
-    sub = new AWDSubMesh();
+    sub = new AWDSubGeom();
     sub->add_stream(VERTICES, v_str, v_idx*3);
     sub->add_stream(TRIANGLES, i_str, i_idx);
     sub->add_stream(VERTEX_NORMALS, n_str, v_idx*3);
