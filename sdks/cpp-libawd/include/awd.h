@@ -32,6 +32,7 @@ class AWD
 
         AWDBlockList * namespace_blocks;
         AWDBlockList * texture_blocks;
+        AWDBlockList * cubetex_blocks;
         AWDBlockList * material_blocks;
         AWDBlockList * skelpose_blocks;
         AWDBlockList * skelanim_blocks;
@@ -64,7 +65,8 @@ class AWD
 
         void set_metadata(AWDMetaData *);
 
-        void add_texture(AWDTexture *);
+        void add_texture(AWDBitmapTexture *);
+        void add_cube_texture(AWDCubeTexture *);
         void add_material(AWDMaterial *);
         void add_mesh_data(AWDTriGeom *);
         void add_skeleton(AWDSkeleton *);

@@ -41,14 +41,14 @@ AWDMaterial::set_type(AWD_mat_type type)
 
 
 
-AWDTexture *
+AWDBitmapTexture *
 AWDMaterial::get_texture()
 {
     return this->texture;
 }
 
 void
-AWDMaterial::set_texture(AWDTexture *texture)
+AWDMaterial::set_texture(AWDBitmapTexture *texture)
 {
     this->texture = texture;
 }

@@ -28,6 +28,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
     this->compression = compression;
     this->flags = flags;
     this->texture_blocks = new AWDBlockList();
+    this->cubetex_blocks = new AWDBlockList();
     this->material_blocks = new AWDBlockList();
     this->mesh_data_blocks = new AWDBlockList();
     this->skeleton_blocks = new AWDBlockList();
@@ -48,6 +49,7 @@ AWD::AWD(AWD_compression compression, awd_uint16 flags)
 AWD::~AWD()
 {
     delete this->texture_blocks;
+    delete this->cubetex_blocks;
     delete this->material_blocks;
     delete this->mesh_data_blocks;
     delete this->skeleton_blocks;
@@ -82,9 +84,16 @@ AWD::add_material(AWDMaterial *block)
 
 
 void
-AWD::add_texture(AWDTexture *block)
+AWD::add_texture(AWDBitmapTexture *block)
 {
     this->texture_blocks->append(block);
+}
+
+
+void
+AWD::add_cube_texture(AWDCubeTexture *block)
+{
+    this->cubetex_blocks->append(block);
 }
 
 

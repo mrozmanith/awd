@@ -108,7 +108,8 @@ typedef enum {
 
     // Materials
     SIMPLE_MATERIAL=81,
-    TEXTURE=82,
+    BITMAP_TEXTURE=82,
+    CUBE_TEXTURE=83,
 
     // Animation
     SKELETON=101,
