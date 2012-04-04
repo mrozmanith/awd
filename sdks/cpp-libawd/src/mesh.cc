@@ -93,7 +93,7 @@ AWDSubGeom::calc_streams_length(bool wide_geom)
     len = 0;
     str = this->first_stream;
     while (str) {
-        len += 5 + str->get_length(wide_geom);
+        len += 5 + str->get_length();
         str = str->next;
     }
 
@@ -130,7 +130,7 @@ AWDSubGeom::write_sub(int fd, bool wide_geom, bool wide_mtx)
 
     str = this->first_stream;
     while(str) {
-        str->write_stream(fd, wide_geom);
+        str->write_stream(fd);
         str = str->next;
     }
 
@@ -329,7 +329,7 @@ AWDMeshInst::set_data(AWDTriGeom *data)
 awd_uint32
 AWDMeshInst::calc_body_length(bool wide_geom, bool wide_mtx)
 {
-    return 8 + MTX4_SIZE(wide_mtx) + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
+    return 8 + MTX44_SIZE(wide_mtx) + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
         + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_geom,wide_mtx);
 }
 

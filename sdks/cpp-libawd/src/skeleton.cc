@@ -104,7 +104,7 @@ AWDSkeletonJoint::calc_length(bool wide_geom, bool wide_mtx)
     // id + parent + name varstr + matrix
     len = sizeof(awd_uint32) + sizeof(awd_uint32) + 
         sizeof(awd_uint16) + this->get_name_length() + 
-        MTX4_SIZE(wide_mtx);
+        MTX44_SIZE(wide_mtx);
 
     len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
 

@@ -24,6 +24,76 @@ awdutil_id_mtx4x4(awd_float64 *mtx)
 }
 
 
+//TODO: Consider replacing with macro
+size_t
+awdutil_get_type_size(AWD_field_type type, bool wide_mtx)
+{
+    size_t elem_size;
+
+    switch (type) {
+        case AWD_FIELD_INT8:
+        case AWD_FIELD_BOOL:
+        case AWD_FIELD_UINT8:
+            elem_size = sizeof(awd_int8);
+            break;
+
+        case AWD_FIELD_INT16:
+        case AWD_FIELD_UINT16:
+            elem_size = sizeof(awd_int16);
+            break;
+
+        case AWD_FIELD_INT32:
+        case AWD_FIELD_UINT32:
+        case AWD_FIELD_FLOAT32:
+        case AWD_FIELD_COLOR:
+        case AWD_FIELD_BADDR:
+            elem_size = sizeof(awd_int32);
+            break;
+
+        case AWD_FIELD_FLOAT64:
+            elem_size = sizeof(awd_float64);
+            break;
+
+        case AWD_FIELD_VECTOR2x1:
+            elem_size = VEC2_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_VECTOR3x1:
+            elem_size = VEC3_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_VECTOR4x1:
+            elem_size = VEC4_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_MTX3x2:
+            elem_size = MTX32_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_MTX3x3:
+            elem_size = MTX33_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_MTX4x3:
+            elem_size = MTX43_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_MTX4x4:
+            elem_size = MTX44_SIZE(wide_mtx);
+            break;
+
+        case AWD_FIELD_STRING:
+        case AWD_FIELD_BYTEARRAY:
+            // Can't know
+            elem_size = 0;
+            break;
+    }
+
+    return elem_size;
+
+}
+
+
 awd_uint32
 awdutil_write_floats(int fd, awd_float64 *list, int len, bool wide)
 {
