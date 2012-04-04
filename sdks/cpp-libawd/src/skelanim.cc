@@ -98,7 +98,7 @@ AWDSkeletonPose::write_body(int fd, bool wide_mtx)
     while (cur) {
         if (cur->transform_mtx) {
             write(fd, &bt, 1);
-            awdutil_write_mtx4x4(fd, cur->transform_mtx, wide_mtx);
+            awdutil_write_floats(fd, cur->transform_mtx, 12, wide_mtx);
         }
         else {
             write(fd, &bf, 1);

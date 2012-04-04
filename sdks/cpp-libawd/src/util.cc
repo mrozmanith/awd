@@ -118,18 +118,6 @@ awdutil_write_floats(int fd, awd_float64 *list, int len, bool wide)
     return bytes_written;
 }
 
-awd_uint32
-awdutil_write_mtx3x2(int fd, awd_float64 *mtx, bool wide)
-{
-    return awdutil_write_floats(fd, mtx, 6, wide);
-}
-
-awd_uint32
-awdutil_write_mtx4x4(int fd, awd_float64 *mtx, bool wide)
-{
-    return awdutil_write_floats(fd, mtx, 16, wide);
-}
-
 
 awd_uint32
 awdutil_write_varstr(int fd, const char *str, awd_uint16 str_len)
