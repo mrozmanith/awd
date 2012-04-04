@@ -23,7 +23,9 @@ typedef enum {
 
 
 class AWDPrimitive :
-    public AWDSceneBlock
+    public AWDBlock,
+    public AWDNamedElement,
+    public AWDAttrElement
 {
     private:
         AWD_primitive_type type;

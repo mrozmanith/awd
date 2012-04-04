@@ -143,7 +143,7 @@ AWDSubGeom::write_sub(int fd, bool wide_geom, bool wide_mtx)
 
 
 AWDTriGeom::AWDTriGeom(const char *name, awd_uint16 name_len) :
-    AWDBlock(MESH_DATA),
+    AWDBlock(TRI_GEOM),
     AWDNamedElement(name, name_len),
     AWDAttrElement() 
 {

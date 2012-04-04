@@ -90,15 +90,13 @@ typedef enum {
     NULL_REF=0,
 
     // Geometry/data
-    MESH_DATA=1,
-    PATH_DATA=2,
+    TRI_GEOM=1,
+    PRIM_GEOM=2,
 
     // Scene objects
     SCENE=21,
     CONTAINER=22,
-    PRIMITIVE=23,
-    MESH_INSTANCE=24,
-    PATH_INSTANCE=25,
+    MESH_INSTANCE=23,
 
     LIGHT=41,
     CAMERA=42,
