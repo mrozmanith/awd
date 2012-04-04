@@ -50,7 +50,7 @@ AWDSceneBlock::write_scene_common(int fd, bool wide_mtx)
 awd_uint32
 AWDSceneBlock::calc_common_length(bool wide_mtx)
 {
-    return 4 + MTX4_SIZE(wide_mtx) + sizeof(awd_uint16) + this->get_name_length();
+    return 4 + MTX44_SIZE(wide_mtx) + sizeof(awd_uint16) + this->get_name_length();
 }
 
 

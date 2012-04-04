@@ -12,13 +12,20 @@
 #endif
 
 // Macros to calculate matrix size depending on width (optimized for size or accuracy)
-#define MTX4_SIZE(wide) (wide? (16*sizeof(awd_float64)):(16*sizeof(awd_float32)))
+#define VEC2_SIZE(wide) (wide? (2*sizeof(awd_float64)):(2*sizeof(awd_float32)))
+#define VEC3_SIZE(wide) (wide? (3*sizeof(awd_float64)):(3*sizeof(awd_float32)))
+#define VEC4_SIZE(wide) (wide? (4*sizeof(awd_float64)):(4*sizeof(awd_float32)))
 #define MTX32_SIZE(wide) (wide? (6*sizeof(awd_float64)):(6*sizeof(awd_float32)))
+#define MTX33_SIZE(wide) (wide? (9*sizeof(awd_float64)):(9*sizeof(awd_float32)))
+#define MTX43_SIZE(wide) (wide? (12*sizeof(awd_float64)):(12*sizeof(awd_float32)))
+#define MTX44_SIZE(wide) (wide? (16*sizeof(awd_float64)):(16*sizeof(awd_float32)))
 
 
 // Utility functions
 awd_float64 *   awdutil_id_mtx4x4(awd_float64 *);
 int             awdutil_mktmp(char **path);
+
+size_t          awdutil_get_type_size(AWD_field_type, bool);
 
 awd_uint32      awdutil_write_floats(int, awd_float64 *, int, bool);
 awd_uint32      awdutil_write_mtx4x4(int, awd_float64 *, bool);

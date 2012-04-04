@@ -8,6 +8,7 @@
 */
 typedef union {
     void *v;
+    awd_int32 *i32;
     awd_uint32 *ui32;
     awd_float64 *f64;
 } AWD_str_ptr;
@@ -19,11 +20,9 @@ class AWDDataStream
     private:
         awd_uint32 num_elements;
 
-    protected:
-        virtual size_t get_elem_size(awd_bool)=0;
-
     public:
         awd_uint8 type;
+        AWD_field_type data_type;
         AWD_str_ptr data;
 
         AWDDataStream * next;
@@ -32,17 +31,14 @@ class AWDDataStream
         ~AWDDataStream();
 
         awd_uint32 get_num_elements();
-        awd_uint32 get_length(bool);
-        void write_stream(int, bool);
+        awd_uint32 get_length();
+        void write_stream(int);
 };
 
 
 
 class AWDGeomDataStream : public AWDDataStream
 {
-    protected:
-        size_t get_elem_size(awd_bool);
-
     public:
         AWDGeomDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
 };
@@ -50,9 +46,6 @@ class AWDGeomDataStream : public AWDDataStream
 
 class AWDPathDataStream : public AWDDataStream
 {
-    protected:
-        size_t get_elem_size(awd_bool);
-
     public:
         AWDPathDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
 };

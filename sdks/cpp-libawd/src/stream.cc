@@ -31,60 +31,86 @@ AWDDataStream::get_num_elements()
 }
 
 awd_uint32
-AWDDataStream::get_length(bool wide)
+AWDDataStream::get_length()
 {
     size_t elem_size;
 
-    elem_size = this->get_elem_size(wide);
+    elem_size = awdutil_get_type_size(this->data_type, false);
     return (this->num_elements * elem_size);
 }
 
 
 
 void
-AWDDataStream::write_stream(int fd, bool wide)
+AWDDataStream::write_stream(int fd)
 {
     unsigned int e;
     awd_uint32 num;
     awd_uint32 str_len;
     
-    str_len = UI32(this->get_length(wide));
+    str_len = UI32(this->get_length());
     
     write(fd, (awd_uint8*)&this->type, sizeof(awd_uint8));
+    write(fd, (awd_uint8*)&this->data_type, sizeof(awd_uint8));
     write(fd, &str_len, sizeof(awd_uint32));
     
     num = this->num_elements;
-    // TODO: Consider making this nicer by storing 
-    // data type in class somehow.
-    if (this->type == VERTICES || this->type == UVS || this->type == VERTEX_WEIGHTS || this->type == VERTEX_NORMALS) {
+
+    // Encode according to data type field
+    if (this->data_type == AWD_FIELD_INT8) {
         for (e=0; e<num; e++) {
-            awd_float64 *p = (this->data.f64 + e);
-            if (wide) {
-                awd_float64 elem;
-                elem = F64((awd_float64)*p);
-                write(fd, &elem, sizeof(awd_float64));
-            }
-            else {
-                awd_float32 elem;
-                elem = F32((awd_float32)*p);
-                write(fd, &elem, sizeof(awd_float32));
-            }
+            awd_int32 *p = (this->data.i32 + e);
+            awd_int8 elem = (awd_int8)*p;
+            write(fd, &elem, sizeof(awd_int8));
         }
     }
-    else if (this->type == TRIANGLES || this->type == JOINT_INDICES) {
+    else if (this->type == AWD_FIELD_INT16) {
+        for (e=0; e<num; e++) {
+            awd_int32 *p = (this->data.i32 + e);
+            awd_int16 elem = UI16((awd_int16)*p);
+            write(fd, &elem, sizeof(awd_int16));
+        }
+    }
+    else if (this->type == AWD_FIELD_INT32) {
+        for (e=0; e<num; e++) {
+            awd_int32 *p = (this->data.i32 + e);
+            awd_int32 elem = UI32((awd_int32)*p);
+            write(fd, &elem, sizeof(awd_int32));
+        }
+    }
+    else if (this->type == AWD_FIELD_UINT8) {
         for (e=0; e<num; e++) {
             awd_uint32 *p = (this->data.ui32 + e);
-
-            if (wide) {
-                awd_uint32 elem;
-                elem = UI32((awd_uint32)*p);
-                write(fd, &elem, sizeof(awd_uint32));
-            }
-            else {
-                awd_uint16 elem;
-                elem = UI16((awd_uint16)*p);
-                write(fd, &elem, sizeof(awd_uint16));
-            }
+            awd_uint8 elem = (awd_uint8)*p;
+            write(fd, &elem, sizeof(awd_uint8));
+        }
+    }
+    else if (this->type == AWD_FIELD_UINT16) {
+        for (e=0; e<num; e++) {
+            awd_uint32 *p = (this->data.ui32 + e);
+            awd_uint16 elem = UI16((awd_uint8)*p);
+            write(fd, &elem, sizeof(awd_uint8));
+        }
+    }
+    else if (this->type == AWD_FIELD_UINT32) {
+        for (e=0; e<num; e++) {
+            awd_uint32 *p = (this->data.ui32 + e);
+            awd_uint32 elem = UI32((awd_uint32)*p);
+            write(fd, &elem, sizeof(awd_uint32));
+        }
+    }
+    else if (this->type == AWD_FIELD_FLOAT32) {
+        for (e=0; e<num; e++) {
+            awd_float64 *p = (this->data.f64 + e);
+            awd_float32 elem = F32((awd_float32)*p);
+            write(fd, &elem, sizeof(awd_float32));
+        }
+    }
+    else if (this->type == AWD_FIELD_FLOAT64) {
+        for (e=0; e<num; e++) {
+            awd_float64 *p = (this->data.f64 + e);
+            awd_float64 elem = F64((awd_float64)*p);
+            write(fd, &elem, sizeof(awd_float64));
         }
     }
 }
@@ -98,49 +124,8 @@ AWDGeomDataStream::AWDGeomDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint3
     : AWDDataStream((awd_uint8)type, data, num_elements)
 {}
 
-size_t
-AWDGeomDataStream::get_elem_size(awd_bool wide)
-{
-    size_t elem_size;
-
-    switch ((AWD_mesh_str_type)this->type) {
-        case VERTICES:
-            elem_size = sizeof(awd_float32);
-            break;
-        case TRIANGLES:
-            elem_size = sizeof(awd_uint16);
-            break;
-        case UVS:
-            elem_size = sizeof(awd_float32);
-            break;
-        case VERTEX_NORMALS:
-            elem_size = sizeof(awd_float32);
-            break;
-        case VERTEX_TANGENTS:
-            elem_size = sizeof(awd_float32);
-            break;
-        case JOINT_INDICES:
-            elem_size = sizeof(awd_uint16);
-            break;
-        case VERTEX_WEIGHTS:
-            elem_size = sizeof(awd_float32);
-            break;
-    }
-
-    if (wide == AWD_TRUE)
-        elem_size *= 2;
-
-    return elem_size;
-}
-
 
 
 AWDPathDataStream::AWDPathDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
     : AWDDataStream(type, data, num_elements)
 {}
-
-size_t
-AWDPathDataStream::get_elem_size(awd_bool wide)
-{
-    return 0;
-}
