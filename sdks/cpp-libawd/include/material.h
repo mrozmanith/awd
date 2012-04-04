@@ -31,7 +31,7 @@ class AWDMaterial :
 {
     private:
         AWD_mat_type type;
-        AWDTexture *texture;
+        AWDBitmapTexture *texture;
         AWD_mat_method *first_method;
         AWD_mat_method *last_method;
         awd_uint8 num_methods;
@@ -53,8 +53,8 @@ class AWDMaterial :
         void set_type(AWD_mat_type);
         AWD_mat_type get_type();
 
-        void set_texture(AWDTexture *);
-        AWDTexture *get_texture();
+        void set_texture(AWDBitmapTexture *);
+        AWDBitmapTexture *get_texture();
 
         void add_method(AWDShadingMethod *);
 };

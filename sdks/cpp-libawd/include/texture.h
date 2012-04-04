@@ -9,11 +9,10 @@
 
 typedef enum {
     EXTERNAL=0,
-    EMBEDDED_JPEG,
-    EMBEDDED_PNG
+    EMBEDDED
 } AWD_tex_type;
 
-class AWDTexture : 
+class AWDBitmapTexture : 
     public AWDBlock, 
     public AWDNamedElement, 
     public AWDAttrElement
@@ -31,7 +30,7 @@ class AWDTexture :
         void write_body(int, bool, bool);
 
     public:
-        AWDTexture(AWD_tex_type, const char *, awd_uint16);
+        AWDBitmapTexture(AWD_tex_type, const char *, awd_uint16);
 
         void set_embed_data(awd_uint8 *, awd_uint32);
         void set_embed_file_data(int);
@@ -39,6 +38,40 @@ class AWDTexture :
         const char *get_url();
         awd_uint16 get_url_length();
         void set_url(const char *, awd_uint16);
+};
+
+
+typedef enum {
+    POS_X=0,
+    NEG_X,
+    POS_Y,
+    NEG_Y,
+    POS_Z,
+    NEG_Z
+} AWD_cube_dir;
+
+
+class AWDCubeTexture :
+    public AWDBlock,
+    public AWDNamedElement,
+    public AWDAttrElement
+{
+    private:
+        AWDBlock **sides; // Array of textures
+
+        void write_dir_tex(int, AWD_cube_dir);
+
+    protected:
+        awd_uint32 calc_body_length(bool, bool);
+        void prepare_write();
+        void write_body(int, bool, bool);
+
+    public:
+        AWDCubeTexture(const char *, awd_uint16);
+        ~AWDCubeTexture();
+
+        void set_dir_tex(AWD_cube_dir, AWDBlock *);
+        AWDBlock *get_dir_tex(AWD_cube_dir);
 };
 
 #endif
