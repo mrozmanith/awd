@@ -84,7 +84,7 @@ class AWDMeshInst :
     public AWDSceneBlock
 {
     private:
-        AWDTriGeom * data;
+        AWDBlock * geom;
         AWDBlockList * materials;
 
         void init();
@@ -100,8 +100,8 @@ class AWDMeshInst :
 
         void add_material(AWDMaterial *);
 
-        AWDTriGeom * get_data();
-        void set_data(AWDTriGeom *);
+        AWDBlock * get_geom();
+        void set_geom(AWDBlock *);
 };
 
 #endif
