@@ -187,11 +187,7 @@ AWD::write_blocks(AWDBlockList *blocks, int fd)
 
     len = 0;
     while ((block = it.next()) != NULL) {
-        bool wide_mtx, wide_geom;
-
-        wide_mtx = this->has_flag(AWD_WIDE_MTX);
-        wide_geom = this->has_flag(AWD_WIDE_GEOM);
-        len += block->write_block(fd, wide_geom, wide_mtx, ++this->last_used_baddr);
+        len += block->write_block(fd, ++this->last_used_baddr);
     }
 
     return len;
@@ -250,11 +246,7 @@ AWD::flush(int out_fd)
     }
 
     if (this->metadata) {
-        bool wide_mtx, wide_geom;
-
-        wide_mtx = this->has_flag(AWD_WIDE_MTX);
-        wide_geom = this->has_flag(AWD_WIDE_GEOM);
-        tmp_len += this->metadata->write_block(tmp_fd, wide_geom, wide_mtx, ++this->last_used_baddr);
+        tmp_len += this->metadata->write_block(tmp_fd, ++this->last_used_baddr);
     }
 
     tmp_len += this->write_blocks(this->namespace_blocks, tmp_fd);
