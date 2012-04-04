@@ -284,18 +284,18 @@ AWDTriGeom::write_body(int fd, bool wide_geom, bool wide_mtx)
 
 
 
-AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *data) :
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *geom) :
     AWDSceneBlock(MESH_INSTANCE, name, name_len, NULL)
 {
-    this->set_data(data);
+    this->set_geom(geom);
     this->materials = new AWDBlockList();
 }
 
 
-AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *data, awd_float64 *mtx) :
+AWDMeshInst::AWDMeshInst(const char *name, awd_uint16 name_len, AWDTriGeom *geom, awd_float64 *mtx) :
     AWDSceneBlock(MESH_INSTANCE, name, name_len, mtx)
 {
-    this->set_data(data);
+    this->set_geom(geom);
     this->materials = new AWDBlockList();
 }
 
@@ -312,17 +312,17 @@ AWDMeshInst::add_material(AWDMaterial *material)
 }
 
 
-AWDTriGeom *
-AWDMeshInst::get_data()
+AWDBlock *
+AWDMeshInst::get_geom()
 {
-    return this->data;
+    return this->geom;
 }
 
 
 void
-AWDMeshInst::set_data(AWDTriGeom *data)
+AWDMeshInst::set_geom(AWDBlock *geom)
 {
-    this->data = data;
+    this->geom = geom;
 }
 
 
@@ -340,14 +340,14 @@ AWDMeshInst::write_body(int fd, bool wide_geom, bool wide_mtx)
 {
     AWDBlock *block;
     AWDBlockIterator *it;
-    awd_baddr data_addr;
+    awd_baddr geom_addr;
     awd_uint16 num_materials;
 
     this->write_scene_common(fd, wide_mtx);
 
-    // Write mesh data address
-    data_addr = UI32(this->data->get_addr());
-    write(fd, &data_addr, sizeof(awd_uint32));
+    // Write mesh geom address
+    geom_addr = UI32(this->geom->get_addr());
+    write(fd, &geom_addr, sizeof(awd_uint32));
 
     // Write materials list. First write material count, and then
     // iterate over materials block list and write all addresses
