@@ -18,21 +18,21 @@ inline void __set_tex_prop(AWDNumAttrList *properties, awd_uint16 prop, AWDBlock
 
 
 awd_uint32
-AWDShadingMethod::calc_method_length(bool wide_geom, bool wide_mtx)
+AWDShadingMethod::calc_method_length(bool wide_mtx)
 {
-    return sizeof(awd_uint16) + this->calc_attr_length(true,true, wide_geom,wide_mtx);
+    return sizeof(awd_uint16) + this->calc_attr_length(true,true, wide_mtx);
 }
 
 
 void
-AWDShadingMethod::write_method(int fd, bool wide_geom, bool wide_mtx)
+AWDShadingMethod::write_method(int fd, bool wide_mtx)
 {
     awd_uint16 type_be;
 
     type_be = UI16(this->type);
     write(fd, &type_be, sizeof(awd_uint16));
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 

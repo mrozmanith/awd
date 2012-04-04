@@ -41,8 +41,8 @@ class AWDScene :
     public AWDSceneBlock
 {
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDScene(const char *, awd_uint16);
@@ -54,8 +54,8 @@ class AWDContainer :
     public AWDSceneBlock
 {
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDContainer(const char *, awd_uint16);

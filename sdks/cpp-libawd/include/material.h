@@ -37,9 +37,9 @@ class AWDMaterial :
         awd_uint8 num_methods;
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
+        awd_uint32 calc_body_length(bool);
         void prepare_write();
-        void write_body(int, bool, bool);
+        void write_body(int, bool);
 
     public:
         AWDMaterial(AWD_mat_type, const char *, awd_uint16);

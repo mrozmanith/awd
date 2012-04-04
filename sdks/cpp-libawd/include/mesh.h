@@ -33,7 +33,7 @@ class AWDSubGeom :
         unsigned int num_streams;
         AWDDataStream * first_stream;
         AWDDataStream * last_stream;
-        awd_uint32 calc_streams_length(bool);
+        awd_uint32 calc_streams_length();
 
     public:
         AWDSubGeom();
@@ -45,8 +45,8 @@ class AWDSubGeom :
         AWDDataStream *get_stream_at(unsigned int);
         void add_stream(AWD_mesh_str_type, AWD_str_ptr, awd_uint32);
 
-        awd_uint32 calc_sub_length(bool, bool);
-        void write_sub(int, bool, bool);
+        awd_uint32 calc_sub_length(bool);
+        void write_sub(int, bool);
 };
 
 
@@ -63,8 +63,8 @@ class AWDTriGeom :
         awd_float64 * bind_mtx;
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDTriGeom(const char *, awd_uint16);
@@ -90,8 +90,8 @@ class AWDMeshInst :
         void init();
 
     protected:
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDMeshInst(const char *, awd_uint16, AWDTriGeom *);

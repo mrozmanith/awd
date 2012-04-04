@@ -25,8 +25,8 @@ class AWDSkeletonJoint :
         AWDSkeletonJoint(const char *, awd_uint16, awd_float64 *);
         ~AWDSkeletonJoint();
 
-        int write_joint(int, awd_uint32, bool, bool);
-        int calc_length(bool, bool);
+        int write_joint(int, awd_uint32, bool);
+        int calc_length(bool);
         int calc_num_children();
 
         awd_uint32 get_id();
@@ -45,8 +45,8 @@ class AWDSkeleton :
         AWDSkeletonJoint *root_joint;
 
     protected:
-        awd_uint32 calc_body_length(bool,bool);
-        void write_body(int, bool,bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDSkeleton(const char *, awd_uint16);

@@ -85,7 +85,7 @@ AWDSubGeom::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_
 
 
 awd_uint32
-AWDSubGeom::calc_streams_length(bool wide_geom)
+AWDSubGeom::calc_streams_length()
 {
     awd_uint32 len;
     AWDDataStream *str;
@@ -102,31 +102,31 @@ AWDSubGeom::calc_streams_length(bool wide_geom)
 
 
 awd_uint32
-AWDSubGeom::calc_sub_length(bool wide_geom, bool wide_mtx)
+AWDSubGeom::calc_sub_length(bool wide_mtx)
 {
     awd_uint32 len;
 
     len = 4; // Sub-mesh header
-    len += this->calc_streams_length(wide_geom);
-    len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
+    len += this->calc_streams_length();
+    len += this->calc_attr_length(true,true, wide_mtx);
 
     return len;
 }
 
 
 void
-AWDSubGeom::write_sub(int fd, bool wide_geom, bool wide_mtx)
+AWDSubGeom::write_sub(int fd, bool wide_mtx)
 {
     AWDDataStream *str;
     awd_uint32 sub_len;
 
     // Verify byte-order
-    sub_len = UI32(this->calc_streams_length(wide_geom));
+    sub_len = UI32(this->calc_streams_length());
 
     // Write sub-mesh header
     write(fd, &sub_len, sizeof(awd_uint32));
 
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
 
     str = this->first_stream;
     while(str) {
@@ -134,7 +134,7 @@ AWDSubGeom::write_sub(int fd, bool wide_geom, bool wide_mtx)
         str = str->next;
     }
 
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 
@@ -235,7 +235,7 @@ AWDTriGeom::set_bind_mtx(awd_float64 *bind_mtx)
 
 
 awd_uint32
-AWDTriGeom::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDTriGeom::calc_body_length(bool wide_mtx)
 {
     AWDSubGeom *sub;
     awd_uint32 mesh_len;
@@ -244,10 +244,10 @@ AWDTriGeom::calc_body_length(bool wide_geom, bool wide_mtx)
     // data (not block header)
     mesh_len = sizeof(awd_uint16); // Num subs
     mesh_len += sizeof(awd_uint16) + this->get_name_length();
-    mesh_len += this->calc_attr_length(true,true, wide_geom, wide_mtx);
+    mesh_len += this->calc_attr_length(true,true, wide_mtx);
     sub = this->first_sub;
     while (sub) {
-        mesh_len += sub->calc_sub_length(wide_geom, wide_mtx);
+        mesh_len += sub->calc_sub_length(wide_mtx);
         sub = sub->next;
     }
 
@@ -256,7 +256,7 @@ AWDTriGeom::calc_body_length(bool wide_geom, bool wide_mtx)
 
 
 void
-AWDTriGeom::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDTriGeom::write_body(int fd, bool wide_mtx)
 {
     awd_uint16 num_subs_be;
     AWDSubGeom *sub;
@@ -267,17 +267,17 @@ AWDTriGeom::write_body(int fd, bool wide_geom, bool wide_mtx)
     write(fd, &num_subs_be, sizeof(awd_uint16));
 
     // Write list of optional properties
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
 
     // Write all sub-meshes
     sub = this->first_sub;
     while (sub) {
-        sub->write_sub(fd, wide_geom, wide_mtx);
+        sub->write_sub(fd, wide_mtx);
         sub = sub->next;
     }
     
     // Write list of user attributes
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }
 
 
@@ -327,16 +327,16 @@ AWDMeshInst::set_geom(AWDBlock *geom)
 
 
 awd_uint32
-AWDMeshInst::calc_body_length(bool wide_geom, bool wide_mtx)
+AWDMeshInst::calc_body_length(bool wide_mtx)
 {
     return 8 + MTX44_SIZE(wide_mtx) + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
-        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_geom,wide_mtx);
+        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_mtx);
 }
 
 
 
 void
-AWDMeshInst::write_body(int fd, bool wide_geom, bool wide_mtx)
+AWDMeshInst::write_body(int fd, bool wide_mtx)
 {
     AWDBlock *block;
     AWDBlockIterator *it;
@@ -360,6 +360,6 @@ AWDMeshInst::write_body(int fd, bool wide_geom, bool wide_mtx)
         write(fd, &addr, sizeof(awd_baddr));
     }
 
-    this->properties->write_attributes(fd, wide_geom, wide_mtx);
-    this->user_attributes->write_attributes(fd, wide_geom, wide_mtx);
+    this->properties->write_attributes(fd, wide_mtx);
+    this->user_attributes->write_attributes(fd, wide_mtx);
 }

@@ -57,8 +57,8 @@ class AWDShadingMethod :
         virtual void prepare_write()=0;
 
     public:
-        awd_uint32 calc_method_length(bool, bool);
-        void write_method(int, bool, bool);
+        awd_uint32 calc_method_length(bool);
+        void write_method(int, bool);
 };
 
 

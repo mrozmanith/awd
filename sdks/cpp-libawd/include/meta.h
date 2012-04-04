@@ -21,8 +21,8 @@ class AWDMetaData :
         char *encoder_name;
         char *encoder_version;
         void prepare_write();
-        awd_uint32 calc_body_length(bool, bool);
-        void write_body(int, bool, bool);
+        awd_uint32 calc_body_length(bool);
+        void write_body(int, bool);
 
     public:
         AWDMetaData();
