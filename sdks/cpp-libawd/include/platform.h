@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "hgversion.h"
 
 #define open _open
 #define lseek _lseek
