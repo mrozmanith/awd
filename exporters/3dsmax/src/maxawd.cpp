@@ -48,13 +48,13 @@ class MaxAWDExporterClassDesc : public ClassDesc2
 {
 public:
 	virtual int IsPublic() 							{ return TRUE; }
-	virtual void* Create(BOOL /*loading = FALSE*/) 		{ return new MaxAWDExporter(); }
+	virtual void* Create(BOOL /*loading = FALSE*/) 	{ return new MaxAWDExporter(); }
 	virtual const TCHAR *	ClassName() 			{ return GetString(IDS_CLASS_NAME); }
 	virtual SClass_ID SuperClassID() 				{ return SCENE_EXPORT_CLASS_ID; }
 	virtual Class_ID ClassID() 						{ return MaxAWDExporter_CLASS_ID; }
 	virtual const TCHAR* Category() 				{ return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR* InternalName() 			{ return _T("MaxAWDExporter"); }	// returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR* InternalName() 			{ return _T("MaxAWDExporter"); }		// returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE HInstance() 					{ return hInstance; }					// returns owning module handle
 	
 
@@ -100,55 +100,46 @@ MaxAWDExporter::~MaxAWDExporter()
 
 int MaxAWDExporter::ExtCount()
 {
-	#pragma message(TODO("Returns the number of file name extensions supported by the plug-in."))
 	return 1;
 }
 
 const TCHAR *MaxAWDExporter::Ext(int n)
 {		
-	#pragma message(TODO("Return the 'i-th' file name extension (i.e. \"3DS\")."))
-	return _T("");
+	return _T("AWD");
 }
 
 const TCHAR *MaxAWDExporter::LongDesc()
 {
-	#pragma message(TODO("Return long ASCII description (i.e. \"Targa 2.0 Image File\")"))
-	return _T("");
+	return _T("Away3D AWD File");
 }
 	
 const TCHAR *MaxAWDExporter::ShortDesc() 
-{			
-	#pragma message(TODO("Return short ASCII description (i.e. \"Targa\")"))
-	return _T("");
+{
+	return _T("AWD");
 }
 
 const TCHAR *MaxAWDExporter::AuthorName()
 {			
-	#pragma message(TODO("Return ASCII Author name"))
-	return _T("");
+	return _T("Away3D");
 }
 
 const TCHAR *MaxAWDExporter::CopyrightMessage() 
 {	
-	#pragma message(TODO("Return ASCII Copyright message"))
-	return _T("");
+	return _T("Copyright 2012 The Away3D Team");
 }
 
 const TCHAR *MaxAWDExporter::OtherMessage1() 
 {		
-	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
 const TCHAR *MaxAWDExporter::OtherMessage2() 
 {		
-	//TODO: Return other message #2 in any
 	return _T("");
 }
 
 unsigned int MaxAWDExporter::Version()
 {				
-	#pragma message(TODO("Return Version number * 100 (i.e. v3.01 = 301)"))
 	return 100;
 }
 
@@ -166,18 +157,18 @@ BOOL MaxAWDExporter::SupportsOptions(int ext, DWORD options)
 
 int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
-	#pragma message(TODO("Implement the actual file Export here and"))
-
 	AWD *awd = new AWD(UNCOMPRESSED, 0);
 
+	/*
 	if(!suppressPrompts)
 		DialogBoxParam(hInstance, 
 				MAKEINTRESOURCE(IDD_PANEL), 
 				GetActiveWindow(), 
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
+	*/
 
-	#pragma message(TODO("return TRUE If the file is exported properly"))
-	return FALSE;
+	// Export worked
+	return TRUE;
 }
 
 
