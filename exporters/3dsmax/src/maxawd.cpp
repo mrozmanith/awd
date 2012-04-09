@@ -191,5 +191,41 @@ void MaxAWDExporter::ExportNode(INode *node)
 
 void MaxAWDExporter::ExportTriObject(TriObject *obj)
 {
-	// jidder
+	int i;
+	int numVerts, numTris;
+	AWD_str_ptr vertData;
+	AWD_str_ptr indexData;
+
+	Mesh& mesh = obj->GetMesh();
+
+	numVerts = mesh.getNumVerts();
+	vertData.v = malloc(3 * numVerts * sizeof(double));
+
+	for (i=0; i<numVerts; i++) {
+		Point3& vtx = mesh.getVert(i);
+		vertData.f64[i*3+0] = vtx.x;
+		vertData.f64[i*3+1] = vtx.y;
+		vertData.f64[i*3+2] = vtx.z;
+	}
+
+	numTris = mesh.getNumFaces();
+	indexData.v = malloc(3 * numTris * sizeof(int));
+
+	for (i=0; i<numTris; i++) {
+		Face& face = mesh.faces[i];
+		DWORD *inds = face.getAllVerts();
+
+		indexData.ui32[i*3+0] = inds[0];
+		indexData.ui32[i*3+1] = inds[1];
+		indexData.ui32[i*3+2] = inds[2];
+	}
+
+	AWDSubGeom *sub = new AWDSubGeom();
+	sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
+	sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
+
+	AWDTriGeom *geom = new AWDTriGeom("geom", 4);
+	geom->add_sub_mesh(sub);
+
+	awd->add_mesh_data(geom);
 }
