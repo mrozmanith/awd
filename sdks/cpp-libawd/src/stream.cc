@@ -7,10 +7,11 @@
 
 #include "platform.h"
 
-AWDDataStream::AWDDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
+AWDDataStream::AWDDataStream(awd_uint8 type, AWD_field_type data_type, AWD_str_ptr data, awd_uint32 num_elements)
 {
     this->type = type;
     this->data = data;
+	this->data_type = data_type;
     this->num_elements = num_elements;
     this->next = NULL;
 }
@@ -120,12 +121,12 @@ AWDDataStream::write_stream(int fd)
 
 
 
-AWDGeomDataStream::AWDGeomDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
-    : AWDDataStream((awd_uint8)type, data, num_elements)
+AWDGeomDataStream::AWDGeomDataStream(awd_uint8 type, AWD_field_type data_type, AWD_str_ptr data, awd_uint32 num_elements)
+    : AWDDataStream(type, data_type, data, num_elements)
 {}
 
 
 
-AWDPathDataStream::AWDPathDataStream(awd_uint8 type, AWD_str_ptr data, awd_uint32 num_elements)
-    : AWDDataStream(type, data, num_elements)
+AWDPathDataStream::AWDPathDataStream(awd_uint8 type, AWD_field_type data_type, AWD_str_ptr data, awd_uint32 num_elements)
+    : AWDDataStream(type, data_type, data, num_elements)
 {}

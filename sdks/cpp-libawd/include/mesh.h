@@ -43,7 +43,7 @@ class AWDSubGeom :
 
         unsigned int get_num_streams();
         AWDDataStream *get_stream_at(unsigned int);
-        void add_stream(AWD_mesh_str_type, AWD_str_ptr, awd_uint32);
+        void add_stream(AWD_mesh_str_type, AWD_field_type, AWD_str_ptr, awd_uint32);
 
         awd_uint32 calc_sub_length(bool);
         void write_sub(int, bool);

@@ -242,10 +242,10 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
 
     // TODO: Implement splitting of sub-meshes to avoid buffer overflows
     sub = new AWDSubGeom();
-    sub->add_stream(VERTICES, v_str, v_idx*3);
-    sub->add_stream(TRIANGLES, i_str, i_idx);
-    sub->add_stream(VERTEX_NORMALS, n_str, v_idx*3);
-    sub->add_stream(UVS, u_str, v_idx*2);
+    sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, v_str, v_idx*3);
+    sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, i_str, i_idx);
+    sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
+    sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
     md->add_sub_mesh(sub);
 
     return 1;
