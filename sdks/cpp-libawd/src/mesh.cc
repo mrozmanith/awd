@@ -65,11 +65,11 @@ AWDSubGeom::get_stream_at(unsigned int idx)
 
 
 void 
-AWDSubGeom::add_stream(AWD_mesh_str_type type, AWD_str_ptr data, awd_uint32 num_elements)
+AWDSubGeom::add_stream(AWD_mesh_str_type type, AWD_field_type data_type, AWD_str_ptr data, awd_uint32 num_elements)
 {
     AWDDataStream *str;
 
-    str = new AWDGeomDataStream((awd_uint8)type, data, num_elements);
+    str = new AWDGeomDataStream((awd_uint8)type, data_type, data, num_elements);
 
     if (this->first_stream == NULL) {
         this->first_stream = str;

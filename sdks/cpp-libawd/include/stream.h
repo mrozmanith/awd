@@ -27,7 +27,7 @@ class AWDDataStream
 
         AWDDataStream * next;
         
-        AWDDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
+        AWDDataStream(awd_uint8, AWD_field_type, AWD_str_ptr, awd_uint32);
         ~AWDDataStream();
 
         awd_uint32 get_num_elements();
@@ -40,14 +40,14 @@ class AWDDataStream
 class AWDGeomDataStream : public AWDDataStream
 {
     public:
-        AWDGeomDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
+        AWDGeomDataStream(awd_uint8, AWD_field_type, AWD_str_ptr, awd_uint32);
 };
 
 
 class AWDPathDataStream : public AWDDataStream
 {
     public:
-        AWDPathDataStream(awd_uint8, AWD_str_ptr, awd_uint32);
+        AWDPathDataStream(awd_uint8, AWD_field_type, AWD_str_ptr, awd_uint32);
 };
 
 
