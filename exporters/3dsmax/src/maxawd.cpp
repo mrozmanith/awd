@@ -173,7 +173,8 @@ void MaxAWDExporter::ExportNode(INode *node)
 		if (obj->CanConvertToType(triObjectClassID)) {
 			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
 			if (triObject != NULL) {
-				ExportTriObject(triObject);
+				char *name = node->GetName();
+				ExportTriObject(triObject, name);
 
 				// If conversion created a new object, dispose it
 				if (triObject != obj) 
@@ -189,7 +190,7 @@ void MaxAWDExporter::ExportNode(INode *node)
 }
 
 
-void MaxAWDExporter::ExportTriObject(TriObject *obj)
+void MaxAWDExporter::ExportTriObject(TriObject *obj, char *name)
 {
 	int i;
 	int numVerts, numTris;
@@ -224,8 +225,11 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj)
 	sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
 	sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
 
-	AWDTriGeom *geom = new AWDTriGeom("geom", 4);
+	// TODO: Use another name for the geometry
+	AWDTriGeom *geom = new AWDTriGeom(name, strlen(name));
 	geom->add_sub_mesh(sub);
-
 	awd->add_mesh_data(geom);
+
+	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom);
+	awd->add_scene_block(inst);
 }
