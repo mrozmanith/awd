@@ -13,34 +13,12 @@
 //***************************************************************************/
 
 #include "awd/awd.h"
+#include "awd/platform.h"
 #include "maxawd.h"
 
 #define MaxAWDExporter_CLASS_ID	Class_ID(0xa8e047f2, 0x81e112c0)
 
-class MaxAWDExporter : public SceneExport {
-	public:
-		
-		static HWND hParams;
-		
-		int				ExtCount();					// Number of extensions supported
-		const TCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
-		const TCHAR *	LongDesc();					// Long ASCII description (i.e. "Autodesk 3D Studio File")
-		const TCHAR *	ShortDesc();				// Short ASCII description (i.e. "3D Studio")
-		const TCHAR *	AuthorName();				// ASCII Author name
-		const TCHAR *	CopyrightMessage();			// ASCII Copyright message
-		const TCHAR *	OtherMessage1();			// Other message #1
-		const TCHAR *	OtherMessage2();			// Other message #2
-		unsigned int	Version();					// Version number * 100 (i.e. v3.01 = 301)
-		void			ShowAbout(HWND hWnd);		// Show DLL's "About..." box
 
-		BOOL SupportsOptions(int ext, DWORD options);
-		int				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
-
-		//Constructor/Destructor
-		MaxAWDExporter();
-		~MaxAWDExporter();		
-
-};
 
 
 
@@ -115,7 +93,7 @@ const TCHAR *MaxAWDExporter::LongDesc()
 	
 const TCHAR *MaxAWDExporter::ShortDesc() 
 {
-	return _T("AWD");
+	return _T("Away3D");
 }
 
 const TCHAR *MaxAWDExporter::AuthorName()
@@ -157,8 +135,6 @@ BOOL MaxAWDExporter::SupportsOptions(int ext, DWORD options)
 
 int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
-	AWD *awd = new AWD(UNCOMPRESSED, 0);
-
 	/*
 	if(!suppressPrompts)
 		DialogBoxParam(hInstance, 
@@ -167,8 +143,53 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
 	*/
 
+	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR);
+
+	awd = new AWD(UNCOMPRESSED, 0);
+
+	INode *root = i->GetRootNode();
+	ExportNode(root);
+
+	awd->flush(fd);
+
+	close(fd);
+
 	// Export worked
 	return TRUE;
 }
 
 
+void MaxAWDExporter::ExportNode(INode *node)
+{
+	int i;
+	int numChildren;
+	Object *obj;
+
+	obj = node->GetObjectRef();
+	if (obj) {
+		SClass_ID scid = obj->SuperClassID();
+		Class_ID cid = obj->ClassID();
+
+		if (obj->CanConvertToType(triObjectClassID)) {
+			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
+			if (triObject != NULL) {
+				ExportTriObject(triObject);
+
+				// If conversion created a new object, dispose it
+				if (triObject != obj) 
+					triObject->DeleteMe();
+			}
+		}
+	}
+
+	numChildren = node->NumberOfChildren();
+	for (i=0; i<numChildren; i++) {
+		ExportNode(node->GetChildNode(i));
+	}
+}
+
+
+void MaxAWDExporter::ExportTriObject(TriObject *obj)
+{
+	// jidder
+}
