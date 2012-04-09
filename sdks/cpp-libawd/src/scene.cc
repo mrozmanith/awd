@@ -13,7 +13,7 @@ AWDSceneBlock::AWDSceneBlock(AWD_block_type type, const char *name, awd_uint16 n
     this->parent = NULL;
     this->children = new AWDBlockList();
 
-    if (mtx == NULL);
+    if (mtx == NULL)
         mtx = awdutil_id_mtx4x4(NULL);
     this->set_transform(mtx);
 }
