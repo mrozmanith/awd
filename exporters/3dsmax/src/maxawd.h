@@ -57,6 +57,6 @@ class MaxAWDExporter : public SceneExport {
 
 
 		void ExportNode(INode *node);
-		void ExportTriObject(TriObject *obj, char *name);
+		void ExportTriObject(TriObject *obj, INode *node);
 
 };

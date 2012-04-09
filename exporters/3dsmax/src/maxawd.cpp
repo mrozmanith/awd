@@ -65,6 +65,33 @@ INT_PTR CALLBACK MaxAWDExporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 }
 
 
+//--- Utilities ------------------------------------------------------------
+static void SerializeMatrix3(Matrix3 &mtx, double *output)
+{
+	Point3 row;
+	
+	row = mtx.GetRow(0);
+	output[0] = row.x;
+	output[1] = row.y;
+	output[2] = row.z;
+
+	row = mtx.GetRow(1);
+	output[3] = row.x;
+	output[4] = row.y;
+	output[5] = row.z;
+
+	row = mtx.GetRow(2);
+	output[6] = row.x;
+	output[7] = row.y;
+	output[8] = row.z;
+
+	row = mtx.GetRow(3);
+	output[9] = row.x;
+	output[10] = row.y;
+	output[11] = row.z;
+
+}
+
 //--- MaxAWDExporter -------------------------------------------------------
 MaxAWDExporter::MaxAWDExporter()
 {
@@ -173,8 +200,7 @@ void MaxAWDExporter::ExportNode(INode *node)
 		if (obj->CanConvertToType(triObjectClassID)) {
 			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
 			if (triObject != NULL) {
-				char *name = node->GetName();
-				ExportTriObject(triObject, name);
+				ExportTriObject(triObject, node);
 
 				// If conversion created a new object, dispose it
 				if (triObject != obj) 
@@ -190,7 +216,7 @@ void MaxAWDExporter::ExportNode(INode *node)
 }
 
 
-void MaxAWDExporter::ExportTriObject(TriObject *obj, char *name)
+void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 {
 	int i;
 	int numVerts, numTris;
@@ -225,11 +251,17 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, char *name)
 	sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
 	sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
 
+	char *name = node->GetName();
+
 	// TODO: Use another name for the geometry
 	AWDTriGeom *geom = new AWDTriGeom(name, strlen(name));
 	geom->add_sub_mesh(sub);
 	awd->add_mesh_data(geom);
 
-	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom);
+	Matrix3 mtx = node->GetNodeTM(0);
+	double *mtxData = (double *)malloc(12*sizeof(double));
+	SerializeMatrix3(mtx, mtxData);
+
+	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
 	awd->add_scene_block(inst);
 }
