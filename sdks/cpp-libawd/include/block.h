@@ -15,8 +15,8 @@ class AWDBlock
     protected:
         AWD_block_type type;
         virtual void prepare_write();
-        virtual awd_uint32 calc_body_length()=0;
-        virtual void write_body(int)=0;
+        virtual awd_uint32 calc_body_length(bool)=0;
+        virtual void write_body(int,bool)=0;
 
     public:
         AWDBlock * next;
