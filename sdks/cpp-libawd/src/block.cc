@@ -27,10 +27,13 @@ AWDBlock::write_block(int fd, awd_baddr addr)
     awd_uint32 length_be;
     awd_baddr block_addr_be;
 
+	// TODO: Don't hard-code!
+	bool wide_mtx = false;
+
     this->addr = addr;
 
     this->prepare_write();
-    length = this->calc_body_length();
+    length = this->calc_body_length(wide_mtx);
 
     //TODO: Get addr of actual namespace
     ns_addr = 0;
@@ -48,7 +51,7 @@ AWDBlock::write_block(int fd, awd_baddr addr)
 
     // Write body using concrete implementation
     // in block sub-classes
-    this->write_body(fd);
+    this->write_body(fd, wide_mtx);
 
 
     return (size_t)length + 10;
