@@ -263,22 +263,24 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	SerializeMatrix3(mtx, mtxData);
 
 	// Export material
-	ExportNodeMaterial(node);
+	AWDMaterial *awdMtl = ExportNodeMaterial(node);
 
 	// Export instance
 	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
+	inst->add_material(awdMtl);
 	awd->add_scene_block(inst);
 }
 
 
-void MaxAWDExporter::ExportNodeMaterial(INode *node) 
+AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node) 
 {
 	Mtl *mtl = node->GetMtl();
 
 	if (mtl == NULL) {
-		DWORD color = node->GetWireColor();
+		AWDMaterial *awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, "", 0);
+		awdMtl->color = node->GetWireColor();
 
-		// TODO: Create simple color material
+		return awdMtl;
 	}
 	else {
 		AWDMaterial *awdMtl;
@@ -301,9 +303,12 @@ void MaxAWDExporter::ExportNodeMaterial(INode *node)
 				const MSTR diff = _M("Diffuse Color");
 
 				if (slotName == diff) {
-					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+					AWDBitmapTexture *awdDiffTex;
+					
+					awdDiffTex = ExportBitmapTexture((BitmapTex *)tex);
 
-					ExportBitmapTexture((BitmapTex *)tex);
+					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+					awdMtl->set_texture(awdDiffTex);
 				}
 			}
 		}
@@ -314,11 +319,13 @@ void MaxAWDExporter::ExportNodeMaterial(INode *node)
 			awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, name.data(), name.Length());
 
 		awd->add_material(awdMtl);
+
+		return awdMtl;
 	}
 }
 
 
-void MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
+AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 {
 	AWDBitmapTexture *awdTex;
 	MSTR name;
@@ -332,4 +339,6 @@ void MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	awdTex->set_url(path, strlen(path));
 
 	awd->add_texture(awdTex);
+
+	return awdTex;
 }
