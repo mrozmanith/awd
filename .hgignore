@@ -1,0 +1,6 @@
+syntax: glob
+*.o
+*.pyc
+*.swp
+sdks/python-pyawd/build
+sdks/cpp-libawd/build
