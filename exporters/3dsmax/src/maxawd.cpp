@@ -262,6 +262,74 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	double *mtxData = (double *)malloc(12*sizeof(double));
 	SerializeMatrix3(mtx, mtxData);
 
+	// Export material
+	ExportNodeMaterial(node);
+
+	// Export instance
 	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
 	awd->add_scene_block(inst);
+}
+
+
+void MaxAWDExporter::ExportNodeMaterial(INode *node) 
+{
+	Mtl *mtl = node->GetMtl();
+
+	if (mtl == NULL) {
+		DWORD color = node->GetWireColor();
+
+		// TODO: Create simple color material
+	}
+	else {
+		AWDMaterial *awdMtl;
+		const MSTR &name = mtl->GetName();
+		
+		awdMtl = NULL;
+
+		if (mtl->IsSubClassOf(Class_ID(DMTL_CLASS_ID, 0))) {
+			StdMat *stdMtl = (StdMat *)mtl;
+		}
+
+		int i;
+
+		for (i=0; i<mtl->NumSubTexmaps(); i++) {
+			Texmap *tex = mtl->GetSubTexmap(i);
+
+			// If there is a texture, AND that texture is a plain bitmap
+			if (tex != NULL && tex->ClassID() == Class_ID(BMTEX_CLASS_ID, 0)) {
+				MSTR slotName = mtl->GetSubTexmapSlotName(i);
+				const MSTR diff = _M("Diffuse Color");
+
+				if (slotName == diff) {
+					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+
+					ExportBitmapTexture((BitmapTex *)tex);
+				}
+			}
+		}
+
+		// If no material was created during the texture search loop, this
+		// is a plain color material.
+		if (awdMtl == NULL) 
+			awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, name.data(), name.Length());
+
+		awd->add_material(awdMtl);
+	}
+}
+
+
+void MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
+{
+	AWDBitmapTexture *awdTex;
+	MSTR name;
+	char *path;
+
+	name = tex->GetName();
+	path = tex->GetMapName();
+
+	// TODO: Deal differently with embedded textures
+	awdTex = new AWDBitmapTexture(EXTERNAL, name.data(), name.length());
+	awdTex->set_url(path, strlen(path));
+
+	awd->add_texture(awdTex);
 }
