@@ -170,7 +170,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
 	*/
 
-	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR);
+	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 
 	awd = new AWD(UNCOMPRESSED, 0);
 
