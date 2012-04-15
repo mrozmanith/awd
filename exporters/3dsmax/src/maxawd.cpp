@@ -89,7 +89,28 @@ static void SerializeMatrix3(Matrix3 &mtx, double *output)
 	output[9] = row.x;
 	output[10] = row.y;
 	output[11] = row.z;
+}
 
+
+static int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
+{
+	if (obj != NULL && obj->SuperClassID() == GEN_DERIVOB_CLASS_ID) {
+		int i;
+
+		IDerivedObject *derived = (IDerivedObject *)obj;
+
+		for (i=0; i < derived->NumModifiers(); i++) {
+			Modifier *mod = derived->GetModifier(i);
+
+			void *skin = mod->GetInterface(I_SKIN);
+			if (skin != NULL) {
+				*derivedObject = derived;
+				return i;
+			}
+		}
+	}
+	
+	return -1;
 }
 
 //--- MaxAWDExporter -------------------------------------------------------
@@ -189,8 +210,25 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 void MaxAWDExporter::ExportNode(INode *node)
 {
 	int i;
+	int skinIdx;
 	int numChildren;
+	IDerivedObject *derivedObject;
+	ObjectState os;
 	Object *obj;
+
+	derivedObject = NULL;
+	skinIdx = IndexOfSkinMod(node->GetObjectRef(), &derivedObject);
+	if (skinIdx >= 0) {
+		// Flatten all modifiers up to but not including
+		// the skin modifier.
+		os = derivedObject->Eval(0, skinIdx + 1);
+	}
+	else {
+		// Flatten entire modifier stack
+		os = node->EvalWorldState(0);
+	}
+	
+	obj = os.obj;
 
 	obj = node->GetObjectRef();
 	if (obj) {
@@ -205,6 +243,10 @@ void MaxAWDExporter::ExportNode(INode *node)
 				// If conversion created a new object, dispose it
 				if (triObject != obj) 
 					triObject->DeleteMe();
+			}
+
+			if (derivedObject != NULL && skinIdx >= 0) {
+				// TODO: Export actual skin
 			}
 		}
 	}
