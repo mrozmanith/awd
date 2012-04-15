@@ -93,7 +93,7 @@ AWDSubGeom::calc_streams_length()
     len = 0;
     str = this->first_stream;
     while (str) {
-        len += 5 + str->get_length();
+        len += 6 + str->get_length();
         str = str->next;
     }
 
