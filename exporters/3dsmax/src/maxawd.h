@@ -25,7 +25,8 @@
 #include "awd/awd.h"
 
 #include <stdmat.h>
-
+#include <iskin.h>
+#include <modstack.h>
 
 extern TCHAR *GetString(int id);
 
