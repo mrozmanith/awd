@@ -25,7 +25,8 @@
 #include "awd/awd.h"
 
 #include <stdmat.h>
-
+#include <iskin.h>
+#include <modstack.h>
 
 extern TCHAR *GetString(int id);
 
@@ -57,8 +58,8 @@ class MaxAWDExporter : public SceneExport {
 		~MaxAWDExporter();
 
 
-		void ExportNode(INode *node);
-		void ExportTriObject(TriObject *obj, INode *node);
-		void ExportNodeMaterial(INode *node);
-		void ExportBitmapTexture(BitmapTex *tex);
+		void				ExportNode(INode *node, AWDSceneBlock *parent);
+		AWDMeshInst *		ExportTriObject(TriObject *obj, INode *node);
+		AWDMaterial	*		ExportNodeMaterial(INode *node);
+		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
 };

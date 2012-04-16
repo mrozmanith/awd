@@ -72,24 +72,45 @@ static void SerializeMatrix3(Matrix3 &mtx, double *output)
 	
 	row = mtx.GetRow(0);
 	output[0] = row.x;
-	output[1] = row.y;
-	output[2] = row.z;
-
-	row = mtx.GetRow(1);
-	output[3] = row.x;
-	output[4] = row.y;
-	output[5] = row.z;
+	output[1] = -row.z;
+	output[2] = -row.y;
 
 	row = mtx.GetRow(2);
-	output[6] = row.x;
-	output[7] = row.y;
-	output[8] = row.z;
+	output[3] = -row.x;
+	output[4] = row.z;
+	output[5] = row.y;
+
+	row = mtx.GetRow(1);
+	output[6] = -row.x;
+	output[7] = row.z;
+	output[8] = row.y;
 
 	row = mtx.GetRow(3);
-	output[9] = row.x;
-	output[10] = row.y;
-	output[11] = row.z;
+	output[9] = -row.x;
+	output[10] = row.z;
+	output[11] = row.y;
+}
 
+
+static int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
+{
+	if (obj != NULL && obj->SuperClassID() == GEN_DERIVOB_CLASS_ID) {
+		int i;
+
+		IDerivedObject *derived = (IDerivedObject *)obj;
+
+		for (i=0; i < derived->NumModifiers(); i++) {
+			Modifier *mod = derived->GetModifier(i);
+
+			void *skin = mod->GetInterface(I_SKIN);
+			if (skin != NULL) {
+				*derivedObject = derived;
+				return i;
+			}
+		}
+	}
+	
+	return -1;
 }
 
 //--- MaxAWDExporter -------------------------------------------------------
@@ -170,12 +191,12 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
 	*/
 
-	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR);
+	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 
 	awd = new AWD(UNCOMPRESSED, 0);
 
 	INode *root = i->GetRootNode();
-	ExportNode(root);
+	ExportNode(root, NULL);
 
 	awd->flush(fd);
 
@@ -186,13 +207,30 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 }
 
 
-void MaxAWDExporter::ExportNode(INode *node)
+void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 {
 	int i;
+	int skinIdx;
 	int numChildren;
+	IDerivedObject *derivedObject;
+	ObjectState os;
 	Object *obj;
 
-	obj = node->GetObjectRef();
+	AWDSceneBlock *awdParent = NULL;
+
+	derivedObject = NULL;
+	skinIdx = IndexOfSkinMod(node->GetObjectRef(), &derivedObject);
+	if (skinIdx >= 0) {
+		// Flatten all modifiers up to but not including
+		// the skin modifier.
+		os = derivedObject->Eval(0, skinIdx + 1);
+	}
+	else {
+		// Flatten entire modifier stack
+		os = node->EvalWorldState(0);
+	}
+	
+	obj = os.obj;
 	if (obj) {
 		SClass_ID scid = obj->SuperClassID();
 		Class_ID cid = obj->ClassID();
@@ -200,23 +238,40 @@ void MaxAWDExporter::ExportNode(INode *node)
 		if (obj->CanConvertToType(triObjectClassID)) {
 			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
 			if (triObject != NULL) {
-				ExportTriObject(triObject, node);
+				AWDMeshInst *awdMesh;
+
+				awdMesh = ExportTriObject(triObject, node);
+
+				if (parent) {
+					parent->add_child(awdMesh);
+				}
+				else {
+					awd->add_scene_block(awdMesh);
+				}
+
+				// Store the new block as parent to be used for
+				// blocks that represent children of this Max node.
+				awdParent = awdMesh;
 
 				// If conversion created a new object, dispose it
 				if (triObject != obj) 
 					triObject->DeleteMe();
+			}
+
+			if (derivedObject != NULL && skinIdx >= 0) {
+				// TODO: Export actual skin
 			}
 		}
 	}
 
 	numChildren = node->NumberOfChildren();
 	for (i=0; i<numChildren; i++) {
-		ExportNode(node->GetChildNode(i));
+		ExportNode(node->GetChildNode(i), awdParent);
 	}
 }
 
 
-void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
+AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 {
 	int i;
 	int numVerts, numTris;
@@ -225,14 +280,20 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 
 	Mesh& mesh = obj->GetMesh();
 
+	// Calculate offset matrix from the object TM (which includes geometry
+	// offset) and the node TM (which doesn't.) This will be used to transform
+	// all vertices into node space.
+	Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
+
 	numVerts = mesh.getNumVerts();
 	vertData.v = malloc(3 * numVerts * sizeof(double));
 
 	for (i=0; i<numVerts; i++) {
-		Point3& vtx = mesh.getVert(i);
-		vertData.f64[i*3+0] = vtx.x;
-		vertData.f64[i*3+1] = vtx.y;
-		vertData.f64[i*3+2] = vtx.z;
+		// Transform vertex into node space
+		Point3& vtx = offsMtx * mesh.getVert(i);
+		vertData.f64[i*3+0] = -vtx.x;
+		vertData.f64[i*3+1] = vtx.z;
+		vertData.f64[i*3+2] = vtx.y;
 	}
 
 	numTris = mesh.getNumFaces();
@@ -243,8 +304,8 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 		DWORD *inds = face.getAllVerts();
 
 		indexData.ui32[i*3+0] = inds[0];
-		indexData.ui32[i*3+1] = inds[1];
-		indexData.ui32[i*3+2] = inds[2];
+		indexData.ui32[i*3+1] = inds[2];
+		indexData.ui32[i*3+2] = inds[1];
 	}
 
 	AWDSubGeom *sub = new AWDSubGeom();
@@ -258,27 +319,32 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	geom->add_sub_mesh(sub);
 	awd->add_mesh_data(geom);
 
-	Matrix3 mtx = node->GetNodeTM(0);
+	Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
 	double *mtxData = (double *)malloc(12*sizeof(double));
 	SerializeMatrix3(mtx, mtxData);
 
 	// Export material
-	ExportNodeMaterial(node);
+	AWDMaterial *awdMtl = ExportNodeMaterial(node);
 
 	// Export instance
 	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
-	awd->add_scene_block(inst);
+	inst->add_material(awdMtl);
+	
+	return inst;
 }
 
 
-void MaxAWDExporter::ExportNodeMaterial(INode *node) 
+AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node) 
 {
 	Mtl *mtl = node->GetMtl();
 
 	if (mtl == NULL) {
-		DWORD color = node->GetWireColor();
+		AWDMaterial *awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, "", 0);
+		awdMtl->color = node->GetWireColor();
 
-		// TODO: Create simple color material
+		awd->add_material(awdMtl);
+
+		return awdMtl;
 	}
 	else {
 		AWDMaterial *awdMtl;
@@ -301,9 +367,12 @@ void MaxAWDExporter::ExportNodeMaterial(INode *node)
 				const MSTR diff = _M("Diffuse Color");
 
 				if (slotName == diff) {
-					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+					AWDBitmapTexture *awdDiffTex;
+					
+					awdDiffTex = ExportBitmapTexture((BitmapTex *)tex);
 
-					ExportBitmapTexture((BitmapTex *)tex);
+					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+					awdMtl->set_texture(awdDiffTex);
 				}
 			}
 		}
@@ -314,11 +383,13 @@ void MaxAWDExporter::ExportNodeMaterial(INode *node)
 			awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, name.data(), name.Length());
 
 		awd->add_material(awdMtl);
+
+		return awdMtl;
 	}
 }
 
 
-void MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
+AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 {
 	AWDBitmapTexture *awdTex;
 	MSTR name;
@@ -332,4 +403,6 @@ void MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	awdTex->set_url(path, strlen(path));
 
 	awd->add_texture(awdTex);
+
+	return awdTex;
 }

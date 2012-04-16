@@ -16,7 +16,7 @@
 
 typedef enum {
     AWD_MATTYPE_COLOR=1,
-    AWD_MATTYPE_BITMAP=2
+    AWD_MATTYPE_TEXTURE=2
 } AWD_mat_type;
 
 typedef struct _AWD_mat_method {
