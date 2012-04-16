@@ -320,6 +320,8 @@ AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node)
 		AWDMaterial *awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, "", 0);
 		awdMtl->color = node->GetWireColor();
 
+		awd->add_material(awdMtl);
+
 		return awdMtl;
 	}
 	else {
