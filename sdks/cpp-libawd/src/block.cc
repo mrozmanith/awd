@@ -8,6 +8,9 @@
 AWDBlock::AWDBlock(AWD_block_type type) 
 {
     this->type = type;
+    
+    // TODO: Allow setting flags
+    this->flags = 0;
 }
 
 
