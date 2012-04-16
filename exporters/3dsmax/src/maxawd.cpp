@@ -72,23 +72,23 @@ static void SerializeMatrix3(Matrix3 &mtx, double *output)
 	
 	row = mtx.GetRow(0);
 	output[0] = row.x;
-	output[1] = row.y;
-	output[2] = row.z;
-
-	row = mtx.GetRow(1);
-	output[3] = row.x;
-	output[4] = row.y;
-	output[5] = row.z;
+	output[1] = -row.z;
+	output[2] = -row.y;
 
 	row = mtx.GetRow(2);
-	output[6] = row.x;
-	output[7] = row.y;
-	output[8] = row.z;
+	output[3] = -row.x;
+	output[4] = row.z;
+	output[5] = row.y;
+
+	row = mtx.GetRow(1);
+	output[6] = -row.x;
+	output[7] = row.z;
+	output[8] = row.y;
 
 	row = mtx.GetRow(3);
-	output[9] = row.x;
-	output[10] = row.y;
-	output[11] = row.z;
+	output[9] = -row.x;
+	output[10] = row.z;
+	output[11] = row.y;
 }
 
 
@@ -280,11 +280,17 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 
 	Mesh& mesh = obj->GetMesh();
 
+	// Calculate offset matrix from the object TM (which includes geometry
+	// offset) and the node TM (which doesn't.) This will be used to transform
+	// all vertices into node space.
+	Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
+
 	numVerts = mesh.getNumVerts();
 	vertData.v = malloc(3 * numVerts * sizeof(double));
 
 	for (i=0; i<numVerts; i++) {
-		Point3& vtx = mesh.getVert(i);
+		// Transform vertex into node space
+		Point3& vtx = offsMtx * mesh.getVert(i);
 		vertData.f64[i*3+0] = vtx.x;
 		vertData.f64[i*3+1] = vtx.y;
 		vertData.f64[i*3+2] = vtx.z;
@@ -298,8 +304,8 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 		DWORD *inds = face.getAllVerts();
 
 		indexData.ui32[i*3+0] = inds[0];
-		indexData.ui32[i*3+1] = inds[1];
-		indexData.ui32[i*3+2] = inds[2];
+		indexData.ui32[i*3+1] = inds[2];
+		indexData.ui32[i*3+2] = inds[1];
 	}
 
 	AWDSubGeom *sub = new AWDSubGeom();
