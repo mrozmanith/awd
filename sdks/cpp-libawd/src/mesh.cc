@@ -329,8 +329,9 @@ AWDMeshInst::set_geom(AWDBlock *geom)
 awd_uint32
 AWDMeshInst::calc_body_length(bool wide_mtx)
 {
-    return 8 + MTX44_SIZE(wide_mtx) + sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr))
-        + sizeof(awd_uint16) + this->get_name_length() + this->calc_attr_length(true,true, wide_mtx);
+	return calc_common_length(wide_mtx) + sizeof(awd_baddr) + 
+		sizeof(awd_uint16) + (this->materials->get_num_blocks() * sizeof(awd_baddr)) + 
+		this->calc_attr_length(true, true, wide_mtx);
 }
 
 
