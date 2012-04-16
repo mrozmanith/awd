@@ -58,8 +58,8 @@ class MaxAWDExporter : public SceneExport {
 		~MaxAWDExporter();
 
 
-		void				ExportNode(INode *node);
-		void				ExportTriObject(TriObject *obj, INode *node);
+		void				ExportNode(INode *node, AWDSceneBlock *parent);
+		AWDMeshInst *		ExportTriObject(TriObject *obj, INode *node);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
 };

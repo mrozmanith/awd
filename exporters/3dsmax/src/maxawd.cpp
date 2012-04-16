@@ -196,7 +196,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 	awd = new AWD(UNCOMPRESSED, 0);
 
 	INode *root = i->GetRootNode();
-	ExportNode(root);
+	ExportNode(root, NULL);
 
 	awd->flush(fd);
 
@@ -207,7 +207,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 }
 
 
-void MaxAWDExporter::ExportNode(INode *node)
+void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 {
 	int i;
 	int skinIdx;
@@ -215,6 +215,8 @@ void MaxAWDExporter::ExportNode(INode *node)
 	IDerivedObject *derivedObject;
 	ObjectState os;
 	Object *obj;
+
+	AWDSceneBlock *awdParent = NULL;
 
 	derivedObject = NULL;
 	skinIdx = IndexOfSkinMod(node->GetObjectRef(), &derivedObject);
@@ -236,7 +238,20 @@ void MaxAWDExporter::ExportNode(INode *node)
 		if (obj->CanConvertToType(triObjectClassID)) {
 			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
 			if (triObject != NULL) {
-				ExportTriObject(triObject, node);
+				AWDMeshInst *awdMesh;
+
+				awdMesh = ExportTriObject(triObject, node);
+
+				if (parent) {
+					parent->add_child(awdMesh);
+				}
+				else {
+					awd->add_scene_block(awdMesh);
+				}
+
+				// Store the new block as parent to be used for
+				// blocks that represent children of this Max node.
+				awdParent = awdMesh;
 
 				// If conversion created a new object, dispose it
 				if (triObject != obj) 
@@ -251,12 +266,12 @@ void MaxAWDExporter::ExportNode(INode *node)
 
 	numChildren = node->NumberOfChildren();
 	for (i=0; i<numChildren; i++) {
-		ExportNode(node->GetChildNode(i));
+		ExportNode(node->GetChildNode(i), awdParent);
 	}
 }
 
 
-void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
+AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 {
 	int i;
 	int numVerts, numTris;
@@ -308,7 +323,8 @@ void MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	// Export instance
 	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
 	inst->add_material(awdMtl);
-	awd->add_scene_block(inst);
+	
+	return inst;
 }
 
 
