@@ -291,9 +291,9 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	for (i=0; i<numVerts; i++) {
 		// Transform vertex into node space
 		Point3& vtx = offsMtx * mesh.getVert(i);
-		vertData.f64[i*3+0] = vtx.x;
-		vertData.f64[i*3+1] = vtx.y;
-		vertData.f64[i*3+2] = vtx.z;
+		vertData.f64[i*3+0] = -vtx.x;
+		vertData.f64[i*3+1] = vtx.z;
+		vertData.f64[i*3+2] = vtx.y;
 	}
 
 	numTris = mesh.getNumFaces();
