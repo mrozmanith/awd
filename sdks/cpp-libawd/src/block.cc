@@ -54,7 +54,7 @@ AWDBlock::write_block(int fd, awd_baddr addr)
     this->write_body(fd, wide_mtx);
 
 
-    return (size_t)length + 10;
+    return (size_t)length + 11;
 }
 
 
