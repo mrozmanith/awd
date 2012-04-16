@@ -313,7 +313,7 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	geom->add_sub_mesh(sub);
 	awd->add_mesh_data(geom);
 
-	Matrix3 mtx = node->GetNodeTM(0);
+	Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
 	double *mtxData = (double *)malloc(12*sizeof(double));
 	SerializeMatrix3(mtx, mtxData);
 
