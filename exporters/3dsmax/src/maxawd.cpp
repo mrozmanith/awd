@@ -229,8 +229,6 @@ void MaxAWDExporter::ExportNode(INode *node)
 	}
 	
 	obj = os.obj;
-
-	obj = node->GetObjectRef();
 	if (obj) {
 		SClass_ID scid = obj->SuperClassID();
 		Class_ID cid = obj->ClassID();
