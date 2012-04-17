@@ -12,6 +12,8 @@
 // AUTHOR: 
 //***************************************************************************/
 
+#include <Windows.h>
+
 #include "awd/awd.h"
 #include "awd/platform.h"
 #include "maxawd.h"
@@ -191,7 +193,11 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
 	*/
 
-	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
+	// Copy viewer HTML and SWF template to output directory
+	// TODO: Make this optional and configurable
+	CopyViewer(name);
+
+ 	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 
 	awd = new AWD(UNCOMPRESSED, 0);
 
@@ -204,6 +210,48 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 
 	// Export worked
 	return TRUE;
+}
+
+
+void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
+{
+	char awdDrive[4];
+	char awdPath[1024];
+	char awdName[256];
+	char maxExe[1024];
+	char maxDrive[4];
+	char maxPath[1024];
+	char tplHtmlPath[1024];
+	char tplSwfPath[1024];
+	char tplJsPath[1024];
+	char outHtmlPath[1024];
+	char outSwfPath[1024];
+	char outJsPath[1024];
+
+	HMODULE mod = GetModuleHandle(NULL);
+	GetModuleFileName(mod, maxExe, 1024);
+
+	_splitpath_s(maxExe, maxDrive, 4, maxPath, 1024, NULL, 0, NULL, 0);
+	_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, awdName, 256, NULL, 0);
+
+	// Assemble paths for inputs (templates)
+	_makepath_s(tplHtmlPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\template", "html");
+	_makepath_s(tplSwfPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\viewer", "swf");
+	_makepath_s(tplJsPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\swfobject", "js");
+
+	// Assemble paths for outputs
+	_makepath_s(outHtmlPath, 1024, awdDrive, awdPath, awdName, "html");
+	_makepath_s(outSwfPath, 1024, awdDrive, awdPath, "viewer", "swf");
+	_makepath_s(outJsPath, 1024, awdDrive, awdPath, "swfobject", "js");
+
+	// TODO: Replace with read/write op that changes variables
+	CopyFile(tplHtmlPath, outHtmlPath, false);
+
+	// Copy SWF and JS files as-is
+	CopyFile(tplSwfPath, outSwfPath, true);
+	CopyFile(tplJsPath, outJsPath, true);
+
+	return;
 }
 
 

@@ -49,7 +49,7 @@ class MaxAWDExporter : public SceneExport {
 		void			ShowAbout(HWND hWnd);		// Show DLL's "About..." box
 
 		BOOL SupportsOptions(int ext, DWORD options);
-		int				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		int	 DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
 		AWD *awd;
 
@@ -57,6 +57,7 @@ class MaxAWDExporter : public SceneExport {
 		MaxAWDExporter();
 		~MaxAWDExporter();
 
+		void				CopyViewer(const TCHAR *awdName);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);
 		AWDMeshInst *		ExportTriObject(TriObject *obj, INode *node);
