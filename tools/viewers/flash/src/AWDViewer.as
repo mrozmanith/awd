@@ -13,6 +13,7 @@ package
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.geom.Vector3D;
 	import flash.net.URLRequest;
 	
 	[SWF(width="800", height="600")]
@@ -25,16 +26,20 @@ package
 		{
 			_view = new View3D();
 			_view.antiAlias = 4;
-			_view.camera.z = -400;
 			addChild(_view);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
+			load(loaderInfo.parameters['awd'] || 'default.awd');
+		}
+		
+		
+		private function load(url : String) : void
+		{
 			Loader3D.enableParser(AWD2Parser);
-			
 			_loader = new Loader3D(false);
 			_loader.addEventListener(AssetEvent.ASSET_COMPLETE, onAssetComplete);
 			_loader.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceComplete);
-			_loader.load(new URLRequest('test.awd'), new AssetLoaderContext(false));
+			_loader.load(new URLRequest(url), new AssetLoaderContext(false));
 		}
 		
 		
@@ -55,6 +60,18 @@ package
 		
 		private function onResourceComplete(ev : LoaderEvent) : void
 		{
+			var scale : Number;
+			var max : Vector3D;
+			var min : Vector3D;
+			var d : Vector3D;
+			
+			max = new Vector3D(_loader.maxX, _loader.maxY, _loader.maxZ);
+			min = new Vector3D(_loader.minX, _loader.minY, _loader.minZ);
+			d = max.subtract(min);
+			
+			scale = 300 / d.length;
+			_loader.scale(scale);
+			
 			_view.scene.addChild(_loader);
 		}
 		
