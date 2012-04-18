@@ -251,7 +251,7 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 	CopyFile(tplSwfPath, outSwfPath, true);
 	CopyFile(tplJsPath, outJsPath, true);
 
-	return;
+	ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, S_SHOWNORMAL);
 }
 
 
