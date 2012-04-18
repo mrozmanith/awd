@@ -115,6 +115,41 @@ static int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
 	return -1;
 }
 
+int ReplaceString(char *buf, int *size, char *find, char *rep)
+{
+    char *p;
+    char *tmp;
+    int findLen;
+    int repLen;
+    int endLen;
+
+    p = strstr(buf, find);
+    if (p == NULL)
+        return 0;
+
+    // Take trailing part and store temporarily
+    findLen = strlen(find);
+    endLen = strlen(p) - findLen;
+    tmp = (char *)malloc(endLen);
+    memcpy(tmp, p+findLen, endLen);
+
+    // Replace string in buffer and move to end
+    // of replaced string
+    repLen = strlen(rep);
+    memcpy(p, rep, repLen);
+    p += repLen;
+
+    // Append trailing string
+    memcpy(p, tmp, endLen);
+
+    free(tmp);
+
+	// Save new size of buffer
+    *size = (p-buf) + endLen;
+
+	return 1;
+}
+
 //--- MaxAWDExporter -------------------------------------------------------
 MaxAWDExporter::MaxAWDExporter()
 {
@@ -213,6 +248,29 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 }
 
 
+void MaxAWDExporter::CopyViewerHTML(char *templatePath, char *outPath, char *name)
+{
+	char *buf;
+	int bufLen;
+
+	bufLen = 0xffff;
+	buf = (char *)malloc(bufLen);
+
+    FILE *in = fopen(templatePath, "r");
+    bufLen = fread((void *)buf, sizeof(char), bufLen, in);
+	memset((void *)(buf + bufLen), 0, 1);
+    fclose(in);
+
+    ReplaceString(buf, &bufLen, "%NAME%", name);
+
+    FILE *out = fopen(outPath, "w");
+    fwrite(buf, sizeof(char), bufLen, out);
+    fclose(out);
+
+	free(buf);
+}
+
+
 void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 {
 	char awdDrive[4];
@@ -244,14 +302,14 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 	_makepath_s(outSwfPath, 1024, awdDrive, awdPath, "viewer", "swf");
 	_makepath_s(outJsPath, 1024, awdDrive, awdPath, "swfobject", "js");
 
-	// TODO: Replace with read/write op that changes variables
-	CopyFile(tplHtmlPath, outHtmlPath, false);
+	// Copy HTML, and evaluate any variables in the template
+	CopyViewerHTML(tplHtmlPath, outHtmlPath, awdName);
 
 	// Copy SWF and JS files as-is
 	CopyFile(tplSwfPath, outSwfPath, true);
 	CopyFile(tplJsPath, outJsPath, true);
 
-	ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, S_SHOWNORMAL);
+	ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, SW_SHOWNORMAL);
 }
 
 
