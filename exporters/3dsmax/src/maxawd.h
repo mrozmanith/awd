@@ -60,6 +60,9 @@ class MaxAWDExporter : public SceneExport {
 		MaxAWDExporter();
 		~MaxAWDExporter();
 
+		void				PrepareExport();
+		void				CleanUp();
+
 		void				CopyViewer(const TCHAR *awdName);
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
