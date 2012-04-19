@@ -318,54 +318,59 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 {
 	int i;
-	int skinIdx;
 	int numChildren;
-	IDerivedObject *derivedObject;
-	ObjectState os;
 	Object *obj;
 
 	AWDSceneBlock *awdParent = NULL;
 
-	derivedObject = NULL;
-	skinIdx = IndexOfSkinMod(node->GetObjectRef(), &derivedObject);
-	if (skinIdx >= 0) {
-		// Flatten all modifiers up to but not including
-		// the skin modifier.
-		os = derivedObject->Eval(0, skinIdx + 1);
+	obj = node->GetObjectRef();
+	if (obj && obj->ClassID()==BONE_OBJ_CLASSID) {
+		// This is a bone that isn't necessarily bound to a skin. Ignore this
+		// for now. Bones that are bound will be exported as part of the skin.
+		// TODO: Add option to GUI allowing export of un-bound bones.
 	}
 	else {
-		// Flatten entire modifier stack
-		os = node->EvalWorldState(0);
-	}
+		int skinIdx;
+		ObjectState os;
+
+		IDerivedObject *derivedObject = NULL;
+		skinIdx = IndexOfSkinMod(node->GetObjectRef(), &derivedObject);
+		if (skinIdx >= 0) {
+			// Flatten all modifiers up to but not including
+			// the skin modifier.
+			os = derivedObject->Eval(0, skinIdx + 1);
+		}
+		else {
+			// Flatten entire modifier stack
+			os = node->EvalWorldState(0);
+		}
 	
-	obj = os.obj;
-	if (obj) {
-		SClass_ID scid = obj->SuperClassID();
-		Class_ID cid = obj->ClassID();
-
-		if (obj->CanConvertToType(triObjectClassID)) {
-			AWDMeshInst *awdMesh;
+		obj = os.obj;
+		if (obj) {
+			if (obj->CanConvertToType(triObjectClassID)) {
+				AWDMeshInst *awdMesh;
 			
-			// Check if there is a skin, that can be
-			// exported as part of the geometry.
-			ISkin *skin = NULL;
-			if (derivedObject != NULL && skinIdx >= 0) {
-				Modifier *mod = derivedObject->GetModifier(skinIdx);
-				skin = (ISkin *)mod->GetInterface(I_SKIN);
-			}
+				// Check if there is a skin, that can be
+				// exported as part of the geometry.
+				ISkin *skin = NULL;
+				if (derivedObject != NULL && skinIdx >= 0) {
+					Modifier *mod = derivedObject->GetModifier(skinIdx);
+					skin = (ISkin *)mod->GetInterface(I_SKIN);
+				}
 
-			awdMesh = ExportTriObject(obj, node, skin);
+				awdMesh = ExportTriObject(obj, node, skin);
 
-			if (parent) {
-				parent->add_child(awdMesh);
-			}
-			else {
-				awd->add_scene_block(awdMesh);
-			}
+				if (parent) {
+					parent->add_child(awdMesh);
+				}
+				else {
+					awd->add_scene_block(awdMesh);
+				}
 
-			// Store the new block as parent to be used for
-			// blocks that represent children of this Max node.
-			awdParent = awdMesh;
+				// Store the new block as parent to be used for
+				// blocks that represent children of this Max node.
+				awdParent = awdMesh;
+			}
 		}
 	}
 
