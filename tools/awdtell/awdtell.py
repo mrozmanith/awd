@@ -4,9 +4,8 @@ import sys
 import getopt
 import struct
 import zlib
-import pylzma
 
-from pyawd import core
+#from pyawd import core
 
 
 BLOCKS      = 0x1
@@ -22,7 +21,7 @@ wide_geom = True
 
 BT_MESH_DATA = 1
 BT_CONTAINER = 22
-BT_MESH_INST = 24
+BT_MESH_INST = 23
 BT_SKELETON = 101
 BT_SKELPOSE = 102
 BT_SKELANIM = 103
@@ -117,8 +116,8 @@ def print_skeleton(data):
     indent_level += 1
     joints_printed = 0
     while offs < len(data) and joints_printed < num_joints:
-        joint_id, parent_id = struct.unpack_from('>II', data, offs)
-        offs += 8
+        joint_id, parent_id = struct.unpack_from('>HH', data, offs)
+        offs += 4
 
         joint_name = read_var_str(data, offs)
         printl('JOINT %s (id=%d, parent=%d)' % (
@@ -129,8 +128,8 @@ def print_skeleton(data):
 
         indent_level += 1
         print_matrix(mtx)
-        offs += 64
-        offs += 4
+        offs += 48
+        offs += 4 # (No properties)
         offs += print_user_attributes(data[offs:])
         indent_level -= 1
 
@@ -182,9 +181,9 @@ def print_skelpose(data):
 def read_scene_data(data):
     parent = struct.unpack_from('>I', data)[0]
     matrix = read_mtx(data, 4)
-    name = read_var_str(data, 68)
+    name = read_var_str(data, 52)
 
-    return (parent, matrix, name, 70+len(name))
+    return (parent, matrix, name, 54+len(name))
 
 def print_container(data):
     global indent_level
@@ -211,15 +210,15 @@ def print_mesh_instance(data):
 
 def read_mtx(data, offset):
     if wide_mtx:
-        matrix = struct.unpack_from('>16d', data, offset) 
+        matrix = struct.unpack_from('>12d', data, offset) 
     else:
-        matrix = struct.unpack_from('>16f', data, offset) 
+        matrix = struct.unpack_from('>12f', data, offset) 
 
     return matrix
 
 def print_matrix(matrix):
-    for i in range(0, 15, 4):
-        printl('%f %f %f %f' % (matrix[i], matrix[i+1], matrix[i+2], matrix[i+3]))
+    for i in range(0, 11, 3):
+        printl('%f %f %f' % (matrix[i], matrix[i+1], matrix[i+2]))
 
 
 def print_mesh_data(data):
@@ -254,8 +253,8 @@ def print_mesh_data(data):
         indent_level += 1
         while offs < sub_end:
             stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', 'VERTEX_NORMALS', 'VERTEX_TANGENTS', 'JOINT_INDICES', 'VERTEX_WEIGHTS')
-            type, str_len = struct.unpack_from('>BI', data, offs)
-            offs += 5
+            type, data_type, str_len = struct.unpack_from('>BBI', data, offs)
+            offs += 6
 
             if type < len(stream_types):
                 stream_type = stream_types[type]
@@ -307,41 +306,43 @@ def print_next_block(data):
     block_types[BT_SKELPOSE] =  'SkeletonPose'
     block_types[BT_SKELANIM] =  'SkeletonAnimation'
 
-    block_header = struct.unpack_from('>IBBI', data, offset)
+    block_header = struct.unpack_from('>IBBBI', data, offset)
 
     type = block_header[2]
-    length = block_header[3]
+    flags = block_header[3]
+    length = block_header[4]
 
     if type in block_types:
         block_type = block_types[type]
     else:
-        block_type = '<error> %s' % type
+        block_type = '<error> %s (%x)' % (type, type)
 
     printl('BLOCK %s' % block_type)
     indent_level += 1
     printl('NS: %d, ID: %d' % (block_header[1], block_header[0]))
+    printl('Flags: %x' % flags)
     printl('Length: %d' % length)
 
     if type == BT_MESH_INST and include&SCENE:
         printl()
-        print_mesh_instance(data[offset+10 : offset+10+length])
+        print_mesh_instance(data[offset+11 : offset+11+length])
     elif type == BT_CONTAINER and include &SCENE:
         printl()
-        print_container(data[offset+10 : offset+10+length])
+        print_container(data[offset+11 : offset+11+length])
     elif type == BT_MESH_DATA and include&GEOMETRY:
         printl()
-        print_mesh_data(data[offset+10 : offset+10+length])
+        print_mesh_data(data[offset+11 : offset+11+length])
     elif type == BT_SKELETON and include&ANIMATION:
         printl()
-        print_skeleton(data[offset+10 : offset+10+length])
+        print_skeleton(data[offset+11 : offset+11+length])
     elif type == BT_SKELPOSE and include&ANIMATION:
         printl()
-        print_skelpose(data[offset+10 : offset+10+length])
+        print_skelpose(data[offset+11 : offset+11+length])
 
 
     printl()
     indent_level -= 1
-    return 10 + length
+    return 11 + length
 
 
 if __name__ == '__main__':
@@ -377,6 +378,8 @@ if __name__ == '__main__':
             data = data[12:]
             uncompressed_data = zlib.decompress(data)
         elif compression == core.LZMA:
+            import pylzma
+
             offset = 0
             uncompressed_len = struct.unpack_from('>I', data, 12)[0]
             data = data[16:]
