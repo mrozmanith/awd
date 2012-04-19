@@ -53,6 +53,7 @@ class MaxAWDExporter : public SceneExport {
 		int	 DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
 		AWD *awd;
+		BlockCache *cache;
 
 		//Constructor/Destructor
 		MaxAWDExporter();
@@ -62,7 +63,8 @@ class MaxAWDExporter : public SceneExport {
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);
-		AWDMeshInst *		ExportTriObject(TriObject *obj, INode *node);
+		AWDTriGeom *		ExportTriGeom(Object *obj, INode *node);
+		AWDMeshInst *		ExportTriObject(Object *obj, INode *node);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
 		void				ExportSkin(INode *node, ISkin *skin);
