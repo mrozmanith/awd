@@ -64,10 +64,10 @@ class MaxAWDExporter : public SceneExport {
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);
-		AWDTriGeom *		ExportTriGeom(Object *obj, INode *node);
-		AWDMeshInst *		ExportTriObject(Object *obj, INode *node);
+		AWDTriGeom *		ExportTriGeom(Object *obj, INode *node, ISkin *skin);
+		AWDMeshInst *		ExportTriObject(Object *obj, INode *node, ISkin *skin);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
-		void				ExportSkin(INode *node, ISkin *skin);
+		void				ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub);
 		void				ExportSkeleton(ISkin *skin);
 };

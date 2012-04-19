@@ -345,8 +345,16 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 		if (obj->CanConvertToType(triObjectClassID)) {
 			AWDMeshInst *awdMesh;
+			
+			// Check if there is a skin, that can be
+			// exported as part of the geometry.
+			ISkin *skin = NULL;
+			if (derivedObject != NULL && skinIdx >= 0) {
+				Modifier *mod = derivedObject->GetModifier(skinIdx);
+				skin = (ISkin *)mod->GetInterface(I_SKIN);
+			}
 
-			awdMesh = ExportTriObject(obj, node);
+			awdMesh = ExportTriObject(obj, node, skin);
 
 			if (parent) {
 				parent->add_child(awdMesh);
@@ -358,13 +366,6 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 			// Store the new block as parent to be used for
 			// blocks that represent children of this Max node.
 			awdParent = awdMesh;
-
-			if (derivedObject != NULL && skinIdx >= 0) {
-				// TODO: Export actual skin
-				Modifier *mod = derivedObject->GetModifier(skinIdx);
-				ISkin *skin = (ISkin *)mod->GetInterface(I_SKIN);
-				ExportSkin(node, skin);
-			}
 		}
 	}
 
@@ -375,9 +376,9 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 }
 
 
-AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node)
+AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *skin)
 {
-	AWDTriGeom *awdGeom = ExportTriGeom(obj, node);
+	AWDTriGeom *awdGeom = ExportTriGeom(obj, node, skin);
 
 	Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
 	double *mtxData = (double *)malloc(12*sizeof(double));
@@ -395,7 +396,7 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node)
 }
 
 
-AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node)
+AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 {
 	AWDTriGeom *awdGeom;
 
@@ -441,6 +442,10 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node)
 		AWDSubGeom *sub = new AWDSubGeom();
 		sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
 		sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
+
+		if (skin) {
+			ExportSkin(node, skin, sub);
+		}
 
 		char *name = node->GetName();
 
@@ -542,7 +547,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 }
 
 
-void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin)
+void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 {
 	int iVtx;
 	awd_float64 *weights;
@@ -594,7 +599,12 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin)
 		}
 	}
 
-	return;
+	AWD_str_ptr weightPtr;
+	AWD_str_ptr indexPtr;
+	weightPtr.f64 = weights;
+	indexPtr.ui32 = indices;
+	sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, weightPtr, numVerts*jointsPerVertex);
+	sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, indexPtr, numVerts*jointsPerVertex);
 }
 
 
