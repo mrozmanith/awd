@@ -544,9 +544,57 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin)
 {
+	int iVtx;
+	awd_float64 *weights;
+	awd_uint32 *indices;
+
+	// First export skeleton block
+	ExportSkeleton(skin);
+
+	// TODO: Replace with option
+	const int jointsPerVertex = 2;
+
 	ISkinContextData *context = skin->GetContextInterface(node);
 
-	ExportSkeleton(skin);
+	int numVerts = context->GetNumPoints();
+	weights = (awd_float64*)malloc(jointsPerVertex * numVerts * sizeof(awd_float64));
+	indices = (awd_uint32*)malloc(jointsPerVertex * numVerts * sizeof(awd_uint32));
+
+	for (iVtx=0; iVtx<numVerts; iVtx++) {
+		int iBone;
+		int numBones;
+		double weightSum = 0;
+
+		numBones = context->GetNumAssignedBones(iVtx);
+
+		// For each weight/index slot, retrieve weight/index values
+		// from skin, or after having run out of assigned bones for
+		// a vertex, set weight to zero.
+		for (iBone=0; iBone<jointsPerVertex; iBone++) {
+
+			// Calculate index in stream
+			int strIdx = iVtx*jointsPerVertex + iBone;
+
+			if (iBone < numBones) {
+				weights[strIdx] = context->GetBoneWeight(iVtx, iBone);
+				indices[strIdx] = context->GetAssignedBone(iVtx, iBone);
+
+				weightSum += weights[iBone];
+			}
+			else {
+				weights[strIdx] = 0.0;
+				indices[strIdx] = 0;
+			}
+		}
+
+		// Normalize weights (sum must be 1.0)
+		double scale = 1/weightSum;
+		for (iBone=0; iBone<jointsPerVertex; iBone++) {
+			weights[iVtx*jointsPerVertex + iBone] *= scale;
+		}
+	}
+
+	return;
 }
 
 
