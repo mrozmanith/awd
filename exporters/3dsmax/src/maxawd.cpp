@@ -153,13 +153,10 @@ int ReplaceString(char *buf, int *size, char *find, char *rep)
 //--- MaxAWDExporter -------------------------------------------------------
 MaxAWDExporter::MaxAWDExporter()
 {
-	cache = new BlockCache();
-	colMtlCache = new ColorMaterialCache();
 }
 
 MaxAWDExporter::~MaxAWDExporter() 
 {
-	// TODO: Free caches
 }
 
 int MaxAWDExporter::ExtCount()
@@ -229,23 +226,42 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
 	*/
 
+	PrepareExport();
+
+	// Traverse MAX nodes and add to AWD structure.
+	INode *root = i->GetRootNode();
+	ExportNode(root, NULL);
+
+	// Flush serialized AWD structure to file
+	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
+	awd->flush(fd);
+	close(fd);
+
 	// Copy viewer HTML and SWF template to output directory
 	// TODO: Make this optional and configurable
 	CopyViewer(name);
 
- 	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
-
-	awd = new AWD(UNCOMPRESSED, 0);
-
-	INode *root = i->GetRootNode();
-	ExportNode(root, NULL);
-
-	awd->flush(fd);
-
-	close(fd);
+	// Free used memory
+	CleanUp();
 
 	// Export worked
 	return TRUE;
+}
+
+
+void MaxAWDExporter::PrepareExport()
+{
+	cache = new BlockCache();
+	colMtlCache = new ColorMaterialCache();
+	awd = new AWD(UNCOMPRESSED, 0);
+}
+
+
+void MaxAWDExporter::CleanUp()
+{
+	delete cache;
+	delete colMtlCache;
+	delete awd;
 }
 
 
