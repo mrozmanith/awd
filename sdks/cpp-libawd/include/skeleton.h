@@ -11,7 +11,7 @@ class AWDSkeletonJoint :
     public AWDAttrElement
 {
     private:
-        awd_uint32 id;
+        awd_uint16 id;
         awd_float64 *bind_mtx;
         int num_children;
 
