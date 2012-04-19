@@ -102,9 +102,9 @@ AWDSkeletonJoint::calc_length(bool wide_mtx)
     AWDSkeletonJoint *child;
     
     // id + parent + name varstr + matrix
-    len = sizeof(awd_uint32) + sizeof(awd_uint32) + 
+    len = sizeof(awd_uint16) + sizeof(awd_uint16) + 
         sizeof(awd_uint16) + this->get_name_length() + 
-        MTX44_SIZE(wide_mtx);
+        MTX43_SIZE(wide_mtx);
 
     len += this->calc_attr_length(true,true, wide_mtx);
 
@@ -141,20 +141,20 @@ AWDSkeletonJoint::write_joint(int fd, awd_uint32 id, bool wide_mtx)
     int num_written;
     awd_uint32 child_id;
     AWDSkeletonJoint *child;
-    awd_uint32 par_id_be;
-    awd_uint32 id_be;
+    awd_uint16 par_id_be;
+    awd_uint16 id_be;
 
     this->id = id;
 
     // Convert numbers to big-endian
-    id_be = UI32(this->id);
+    id_be = UI16(this->id);
     if (this->parent) 
-        par_id_be = UI32(this->parent->id);
+        par_id_be = UI16(this->parent->id);
     else par_id_be = 0;
 
     // Write this joint
-    write(fd, &id_be, sizeof(awd_uint32));
-    write(fd, &par_id_be, sizeof(awd_uint32));
+    write(fd, &id_be, sizeof(awd_uint16));
+    write(fd, &par_id_be, sizeof(awd_uint16));
     awdutil_write_varstr(fd, this->get_name(), this->get_name_length());
     awdutil_write_floats(fd, this->bind_mtx, 12, wide_mtx);
 
