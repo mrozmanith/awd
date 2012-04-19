@@ -93,8 +93,8 @@ AWDBlockList::~AWDBlockList()
     while(cur) {
         list_block *next = cur->next;
         cur->next = NULL;
-        delete cur;
         delete cur->block;
+		delete cur;
         cur = next;
     }
 
