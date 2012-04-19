@@ -153,12 +153,13 @@ int ReplaceString(char *buf, int *size, char *find, char *rep)
 //--- MaxAWDExporter -------------------------------------------------------
 MaxAWDExporter::MaxAWDExporter()
 {
-
+	cache = new BlockCache();
+	colMtlCache = new ColorMaterialCache();
 }
 
 MaxAWDExporter::~MaxAWDExporter() 
 {
-
+	// TODO: Free caches
 }
 
 int MaxAWDExporter::ExtCount()
@@ -235,7 +236,6 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
  	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 
 	awd = new AWD(UNCOMPRESSED, 0);
-	cache = new BlockCache();
 
 	INode *root = i->GetRootNode();
 	ExportNode(root, NULL);
@@ -462,56 +462,64 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node)
 
 AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node) 
 {
+	AWDMaterial *awdMtl;
 	Mtl *mtl = node->GetMtl();
 
 	if (mtl == NULL) {
-		AWDMaterial *awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, "", 0);
-		awdMtl->color = node->GetWireColor();
+		awd_color color = node->GetWireColor();
 
-		awd->add_material(awdMtl);
+		// Look in the cache for an existing "default" color material
+		// that matches the color of this object. If none exists,
+		// create a new one and store it in the cache.
+		awdMtl = colMtlCache->Get(color);
+		if (awdMtl == NULL) {
+			awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, "", 0);
+			awdMtl->color = color;
+			awd->add_material(awdMtl);
 
-		return awdMtl;
+			colMtlCache->Set(color, awdMtl);
+		}
 	}
 	else {
-		AWDMaterial *awdMtl;
-		const MSTR &name = mtl->GetName();
-		
-		awdMtl = NULL;
+		awdMtl = (AWDMaterial *)cache->Get(mtl);
+		if (awdMtl == NULL) {
+			int i;
+			const MSTR &name = mtl->GetName();
 
-		if (mtl->IsSubClassOf(Class_ID(DMTL_CLASS_ID, 0))) {
-			StdMat *stdMtl = (StdMat *)mtl;
-		}
+			if (mtl->IsSubClassOf(Class_ID(DMTL_CLASS_ID, 0))) {
+				StdMat *stdMtl = (StdMat *)mtl;
+			}
 
-		int i;
+			for (i=0; i<mtl->NumSubTexmaps(); i++) {
+				Texmap *tex = mtl->GetSubTexmap(i);
 
-		for (i=0; i<mtl->NumSubTexmaps(); i++) {
-			Texmap *tex = mtl->GetSubTexmap(i);
+				// If there is a texture, AND that texture is a plain bitmap
+				if (tex != NULL && tex->ClassID() == Class_ID(BMTEX_CLASS_ID, 0)) {
+					MSTR slotName = mtl->GetSubTexmapSlotName(i);
+					const MSTR diff = _M("Diffuse Color");
 
-			// If there is a texture, AND that texture is a plain bitmap
-			if (tex != NULL && tex->ClassID() == Class_ID(BMTEX_CLASS_ID, 0)) {
-				MSTR slotName = mtl->GetSubTexmapSlotName(i);
-				const MSTR diff = _M("Diffuse Color");
-
-				if (slotName == diff) {
-					AWDBitmapTexture *awdDiffTex;
+					if (slotName == diff) {
+						AWDBitmapTexture *awdDiffTex;
 					
-					awdDiffTex = ExportBitmapTexture((BitmapTex *)tex);
+						awdDiffTex = ExportBitmapTexture((BitmapTex *)tex);
 
-					awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
-					awdMtl->set_texture(awdDiffTex);
+						awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
+						awdMtl->set_texture(awdDiffTex);
+					}
 				}
 			}
+
+			// If no material was created during the texture search loop, this
+			// is a plain color material.
+			if (awdMtl == NULL) 
+				awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, name.data(), name.Length());
+
+			awd->add_material(awdMtl);
+			cache->Set(mtl, awdMtl);
 		}
-
-		// If no material was created during the texture search loop, this
-		// is a plain color material.
-		if (awdMtl == NULL) 
-			awdMtl = new AWDMaterial(AWD_MATTYPE_COLOR, name.data(), name.Length());
-
-		awd->add_material(awdMtl);
-
-		return awdMtl;
 	}
+
+	return awdMtl;
 }
 
 

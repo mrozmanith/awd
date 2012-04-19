@@ -54,6 +54,7 @@ class MaxAWDExporter : public SceneExport {
 
 		AWD *awd;
 		BlockCache *cache;
+		ColorMaterialCache *colMtlCache;
 
 		//Constructor/Destructor
 		MaxAWDExporter();
