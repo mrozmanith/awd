@@ -235,6 +235,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
  	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 
 	awd = new AWD(UNCOMPRESSED, 0);
+	cache = new BlockCache();
 
 	INode *root = i->GetRootNode();
 	ExportNode(root, NULL);
@@ -343,27 +344,20 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 		Class_ID cid = obj->ClassID();
 
 		if (obj->CanConvertToType(triObjectClassID)) {
-			TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);
-			if (triObject != NULL) {
-				AWDMeshInst *awdMesh;
+			AWDMeshInst *awdMesh;
 
-				awdMesh = ExportTriObject(triObject, node);
+			awdMesh = ExportTriObject(obj, node);
 
-				if (parent) {
-					parent->add_child(awdMesh);
-				}
-				else {
-					awd->add_scene_block(awdMesh);
-				}
-
-				// Store the new block as parent to be used for
-				// blocks that represent children of this Max node.
-				awdParent = awdMesh;
-
-				// If conversion created a new object, dispose it
-				if (triObject != obj) 
-					triObject->DeleteMe();
+			if (parent) {
+				parent->add_child(awdMesh);
 			}
+			else {
+				awd->add_scene_block(awdMesh);
+			}
+
+			// Store the new block as parent to be used for
+			// blocks that represent children of this Max node.
+			awdParent = awdMesh;
 
 			if (derivedObject != NULL && skinIdx >= 0) {
 				// TODO: Export actual skin
@@ -381,53 +375,9 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 }
 
 
-AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
+AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node)
 {
-	int i;
-	int numVerts, numTris;
-	AWD_str_ptr vertData;
-	AWD_str_ptr indexData;
-
-	Mesh& mesh = obj->GetMesh();
-
-	// Calculate offset matrix from the object TM (which includes geometry
-	// offset) and the node TM (which doesn't.) This will be used to transform
-	// all vertices into node space.
-	Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
-
-	numVerts = mesh.getNumVerts();
-	vertData.v = malloc(3 * numVerts * sizeof(double));
-
-	for (i=0; i<numVerts; i++) {
-		// Transform vertex into node space
-		Point3& vtx = offsMtx * mesh.getVert(i);
-		vertData.f64[i*3+0] = -vtx.x;
-		vertData.f64[i*3+1] = vtx.z;
-		vertData.f64[i*3+2] = vtx.y;
-	}
-
-	numTris = mesh.getNumFaces();
-	indexData.v = malloc(3 * numTris * sizeof(int));
-
-	for (i=0; i<numTris; i++) {
-		Face& face = mesh.faces[i];
-		DWORD *inds = face.getAllVerts();
-
-		indexData.ui32[i*3+0] = inds[0];
-		indexData.ui32[i*3+1] = inds[2];
-		indexData.ui32[i*3+2] = inds[1];
-	}
-
-	AWDSubGeom *sub = new AWDSubGeom();
-	sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
-	sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
-
-	char *name = node->GetName();
-
-	// TODO: Use another name for the geometry
-	AWDTriGeom *geom = new AWDTriGeom(name, strlen(name));
-	geom->add_sub_mesh(sub);
-	awd->add_mesh_data(geom);
+	AWDTriGeom *awdGeom = ExportTriGeom(obj, node);
 
 	Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
 	double *mtxData = (double *)malloc(12*sizeof(double));
@@ -437,10 +387,76 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(TriObject *obj, INode *node)
 	AWDMaterial *awdMtl = ExportNodeMaterial(node);
 
 	// Export instance
-	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), geom, mtxData);
+	char *name = node->GetName();
+	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), awdGeom, mtxData);
 	inst->add_material(awdMtl);
 	
 	return inst;
+}
+
+
+AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node)
+{
+	AWDTriGeom *awdGeom;
+
+	awdGeom = (AWDTriGeom *)cache->Get(obj);
+	if (awdGeom == NULL) {
+		int i;
+		int numVerts, numTris;
+		AWD_str_ptr vertData;
+		AWD_str_ptr indexData;
+
+		TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);	
+
+		Mesh& mesh = triObject->GetMesh();
+
+		// Calculate offset matrix from the object TM (which includes geometry
+		// offset) and the node TM (which doesn't.) This will be used to transform
+		// all vertices into node space.
+		Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
+
+		numVerts = mesh.getNumVerts();
+		vertData.v = malloc(3 * numVerts * sizeof(double));
+
+		for (i=0; i<numVerts; i++) {
+			// Transform vertex into node space
+			Point3& vtx = offsMtx * mesh.getVert(i);
+			vertData.f64[i*3+0] = -vtx.x;
+			vertData.f64[i*3+1] = vtx.z;
+			vertData.f64[i*3+2] = vtx.y;
+		}
+
+		numTris = mesh.getNumFaces();
+		indexData.v = malloc(3 * numTris * sizeof(int));
+
+		for (i=0; i<numTris; i++) {
+			Face& face = mesh.faces[i];
+			DWORD *inds = face.getAllVerts();
+
+			indexData.ui32[i*3+0] = inds[0];
+			indexData.ui32[i*3+1] = inds[2];
+			indexData.ui32[i*3+2] = inds[1];
+		}
+
+		AWDSubGeom *sub = new AWDSubGeom();
+		sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
+		sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
+
+		char *name = node->GetName();
+
+		// TODO: Use another name for the geometry
+		awdGeom = new AWDTriGeom(name, strlen(name));
+		awdGeom->add_sub_mesh(sub);
+		awd->add_mesh_data(awdGeom);
+
+		cache->Set(obj, awdGeom);
+
+		// If conversion created a new object, dispose it
+		if (triObject != obj) 
+			triObject->DeleteMe();
+	}
+
+	return awdGeom;
 }
 
 
