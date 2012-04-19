@@ -23,6 +23,7 @@
 //SIMPLE TYPE
 
 #include "awd/awd.h"
+#include "cache.h"
 
 #include <stdmat.h>
 #include <iskin.h>
@@ -64,4 +65,6 @@ class MaxAWDExporter : public SceneExport {
 		AWDMeshInst *		ExportTriObject(TriObject *obj, INode *node);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
+		void				ExportSkin(INode *node, ISkin *skin);
+		void				ExportSkeleton(ISkin *skin);
 };

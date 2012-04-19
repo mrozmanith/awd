@@ -309,7 +309,8 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 	CopyFile(tplSwfPath, outSwfPath, true);
 	CopyFile(tplJsPath, outJsPath, true);
 
-	ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, SW_SHOWNORMAL);
+	//TODO: Move to end of export operation and make optional
+	//ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, SW_SHOWNORMAL);
 }
 
 
@@ -366,6 +367,9 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 			if (derivedObject != NULL && skinIdx >= 0) {
 				// TODO: Export actual skin
+				Modifier *mod = derivedObject->GetModifier(skinIdx);
+				ISkin *skin = (ISkin *)mod->GetInterface(I_SKIN);
+				ExportSkin(node, skin);
 			}
 		}
 	}
@@ -511,4 +515,56 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	awd->add_texture(awdTex);
 
 	return awdTex;
+}
+
+
+void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin)
+{
+	ISkinContextData *context = skin->GetContextInterface(node);
+
+	ExportSkeleton(skin);
+}
+
+
+void MaxAWDExporter::ExportSkeleton(ISkin *skin)
+{
+	int i;
+	int numBones = skin->GetNumBones();
+	BlockCache skelCache;
+
+	AWDSkeleton *awdSkel;
+
+	// TODO: Find proper name
+	awdSkel = new AWDSkeleton("skel", 4);
+
+	for (i=0; i<numBones; i++) {
+		INode *bone;
+		char *name;
+		AWDSkeletonJoint *awdJoint;
+		Matrix3 invBindTM;
+		awd_float64 *invBindMtx;
+
+		bone = skin->GetBone(i);
+
+		skin->GetBoneInitTM(bone, invBindTM);
+		invBindTM = Inverse(invBindTM);
+
+		invBindMtx = (awd_float64*)malloc(sizeof(awd_float64) * 12);
+		SerializeMatrix3(invBindTM, invBindMtx);
+
+		name = bone->GetName();
+		awdJoint = new AWDSkeletonJoint(name, strlen(name), invBindMtx);
+
+		AWDSkeletonJoint *awdParent = (AWDSkeletonJoint *)skelCache.Get(bone->GetParentNode());
+		if (awdParent != NULL) {
+			awdParent->add_child_joint(awdJoint);
+		}
+		else {
+			awdSkel->set_root_joint(awdJoint);
+		}
+
+		skelCache.Set(bone, awdJoint);
+	}
+
+	awd->add_skeleton(awdSkel);
 }
