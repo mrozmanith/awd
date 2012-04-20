@@ -33,6 +33,13 @@ extern TCHAR *GetString(int id);
 
 extern HINSTANCE hInstance;
 
+typedef struct SequenceMetaData_struct {
+	int start;
+	int stop;
+	char *name;
+	struct SequenceMetaData_struct *next;
+} SequenceMetaData;
+
 class MaxAWDExporter : public SceneExport {
 	public:
 		
@@ -73,4 +80,5 @@ class MaxAWDExporter : public SceneExport {
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
 		void				ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub);
 		void				ExportSkeleton(ISkin *skin);
+		void				ExportAnimation(SequenceMetaData *sequences);
 };

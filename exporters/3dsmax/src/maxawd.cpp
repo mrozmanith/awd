@@ -115,6 +115,85 @@ static int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
 	return -1;
 }
 
+
+static SequenceMetaData *ParseSequenceFile(const char *path)
+{
+	FILE *fp;
+
+	fp = fopen(path, "r");
+	if (fp) {
+		char line[256];
+		SequenceMetaData *first, *last;
+
+		first = NULL;
+		last = NULL;
+
+		while (fgets(line, 256, fp) != NULL) {
+			SequenceMetaData *cur;
+			int nameLen;
+			char *name, *start, *end;
+
+			// Read name and skip if missing.
+			name = strtok(line, " ");
+			if (!name) continue;
+			nameLen = strlen(name);
+
+			// Read start frame and skip if missing.
+			start = strtok(NULL, " ");
+			if (!start) continue;
+
+			// Read end frame and skip if missing.
+			end = strtok(NULL, " ");
+			if (!end) continue;
+
+			cur = (SequenceMetaData*)malloc(sizeof(SequenceMetaData));
+			cur->start = strtol(start, NULL, 10);
+			cur->stop = strtol(end, NULL, 10);
+			cur->name = (char*)malloc(nameLen+1);
+			memcpy(cur->name, name, nameLen+1);
+
+			if (!first) {
+				first = cur;
+			}
+			else {
+				last->next = cur;
+			}
+
+			last = cur;
+			last->next = NULL;
+		}
+
+		return first;
+	}
+
+	return NULL;
+}
+
+
+static bool FileExists(const char *path)
+{
+  DWORD dwAttrib = GetFileAttributes(path);
+
+  return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+         !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+static SequenceMetaData *LoadSequenceFile(const char *awdFullPath)
+{
+	char awdDrive[4];
+	char awdPath[1024];
+	char txtPath[1024];
+
+	_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, NULL, 0, NULL, 0);
+	_makepath_s(txtPath, 1024, awdDrive, awdPath, "sequences", "txt");
+
+	if (!FileExists(txtPath))
+		return NULL;
+	
+	return ParseSequenceFile(txtPath);
+}
+
+
 int ReplaceString(char *buf, int *size, char *find, char *rep)
 {
     char *p;
@@ -231,6 +310,11 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 	// Traverse MAX nodes and add to AWD structure.
 	INode *root = i->GetRootNode();
 	ExportNode(root, NULL);
+
+	// Export animation if a sequences.txt file was found
+	SequenceMetaData *sequences = LoadSequenceFile(name);
+	if (sequences != NULL)
+		ExportAnimation(sequences);
 
 	// Flush serialized AWD structure to file
 	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
@@ -670,4 +754,11 @@ void MaxAWDExporter::ExportSkeleton(ISkin *skin)
 	}
 
 	awd->add_skeleton(awdSkel);
+}
+
+
+void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
+{
+	// TODO: Sample and export animation sequences
+	return;
 }
