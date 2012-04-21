@@ -80,6 +80,7 @@ public:
 	~SkeletonCache(void);
 
 	void Add(AWDSkeleton *awdSkel, INode *maxRootBone);
+	bool HasItems();
 	void IterReset();
 	SkeletonCacheItem *IterNext();
 };

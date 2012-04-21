@@ -131,6 +131,12 @@ void SkeletonCache::Add(AWDSkeleton *awdSkel, INode *maxRootBone)
 }
 
 
+bool SkeletonCache::HasItems()
+{
+	return (firstItem != NULL);
+}
+
+
 void SkeletonCache::IterReset()
 {
 	cur = firstItem;
