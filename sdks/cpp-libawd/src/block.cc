@@ -11,6 +11,7 @@ AWDBlock::AWDBlock(AWD_block_type type)
     
     // TODO: Allow setting flags
     this->flags = 0;
+	this->addr = 0;
 }
 
 
