@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Max.h"
 #include "awd/awd.h"
 
 /**
@@ -52,4 +53,33 @@ public:
 
 	void Set(awd_color color, AWDMaterial *mtl);
 	AWDMaterial *Get(awd_color color);
+};
+
+
+
+/**
+ * SkeletonCache
+ * Used by animation export to look up skeletons that need to be sampled
+ * for animation export.
+*/
+typedef struct SkeletonCacheItem_struct {
+	AWDSkeleton *awdSkel;
+	INode *maxRootBone;
+	struct SkeletonCacheItem_struct *next;
+} SkeletonCacheItem;
+
+class SkeletonCache
+{
+private:
+	SkeletonCacheItem *cur;
+	SkeletonCacheItem *firstItem;
+	SkeletonCacheItem *lastItem;
+
+public:
+	SkeletonCache(void);
+	~SkeletonCache(void);
+
+	void Add(AWDSkeleton *awdSkel, INode *maxRootBone);
+	void IterReset();
+	SkeletonCacheItem *IterNext();
 };
