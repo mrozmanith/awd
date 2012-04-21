@@ -94,3 +94,56 @@ AWDMaterial *ColorMaterialCache::Get(awd_color color)
 
 	return NULL;
 }
+
+
+
+SkeletonCache::SkeletonCache(void)
+{
+	firstItem = NULL;
+	lastItem = NULL;
+	cur = NULL;
+}
+
+
+SkeletonCache::~SkeletonCache(void)
+{
+	// TODO: Free all items
+}
+
+
+void SkeletonCache::Add(AWDSkeleton *awdSkel, INode *maxRootBone)
+{
+	SkeletonCacheItem *item;
+
+	item = (SkeletonCacheItem*)malloc(sizeof(SkeletonCacheItem));
+	item->awdSkel = awdSkel;
+	item->maxRootBone = maxRootBone;
+	item->next = NULL;
+
+	if (!firstItem) {
+		firstItem = item;
+	}
+	else {
+		lastItem->next = item;
+	}
+
+	lastItem = item;
+}
+
+
+void SkeletonCache::IterReset()
+{
+	cur = firstItem;
+}
+
+
+SkeletonCacheItem *SkeletonCache::IterNext()
+{
+	// Stop if end was reached
+	if (!cur) 
+		return NULL;
+
+	SkeletonCacheItem *ret = cur;
+	cur = cur->next;
+	return ret;
+}

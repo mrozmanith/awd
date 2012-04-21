@@ -337,15 +337,17 @@ void MaxAWDExporter::PrepareExport()
 {
 	cache = new BlockCache();
 	colMtlCache = new ColorMaterialCache();
+	skeletonCache = new SkeletonCache();
 	awd = new AWD(UNCOMPRESSED, 0);
 }
 
 
 void MaxAWDExporter::CleanUp()
 {
+	delete awd;
 	delete cache;
 	delete colMtlCache;
-	delete awd;
+	delete skeletonCache;
 }
 
 
@@ -718,6 +720,7 @@ void MaxAWDExporter::ExportSkeleton(ISkin *skin)
 	int i;
 	int numBones = skin->GetNumBones();
 	BlockCache skelCache;
+	INode *maxRootBone;
 
 	AWDSkeleton *awdSkel;
 
@@ -745,6 +748,7 @@ void MaxAWDExporter::ExportSkeleton(ISkin *skin)
 		AWDSkeletonJoint *awdParent = (AWDSkeletonJoint *)skelCache.Get(bone->GetParentNode());
 		if (awdParent != NULL) {
 			awdParent->add_child_joint(awdJoint);
+			maxRootBone = bone;
 		}
 		else {
 			awdSkel->set_root_joint(awdJoint);
@@ -753,12 +757,23 @@ void MaxAWDExporter::ExportSkeleton(ISkin *skin)
 		skelCache.Set(bone, awdJoint);
 	}
 
+	// Add to skeleton cache so that animation export can find
+	// this skeleton and sample it's animation.
+	skeletonCache->Add(awdSkel, maxRootBone);
+
 	awd->add_skeleton(awdSkel);
 }
 
 
 void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 {
-	// TODO: Sample and export animation sequences
+	SkeletonCacheItem *cur;
+
+	skeletonCache->IterReset();
+	while ((cur = skeletonCache->IterNext()) != NULL) {
+		// TODO: Sample and export animation sequences
+		continue;
+	}
+
 	return;
 }

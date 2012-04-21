@@ -40,7 +40,15 @@ typedef struct SequenceMetaData_struct {
 	struct SequenceMetaData_struct *next;
 } SequenceMetaData;
 
+
+
 class MaxAWDExporter : public SceneExport {
+	private:
+		AWD *awd;
+		BlockCache *cache;
+		SkeletonCache *skeletonCache;
+		ColorMaterialCache *colMtlCache;
+
 	public:
 		
 		static HWND hParams;
@@ -58,10 +66,6 @@ class MaxAWDExporter : public SceneExport {
 
 		BOOL SupportsOptions(int ext, DWORD options);
 		int	 DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
-
-		AWD *awd;
-		BlockCache *cache;
-		ColorMaterialCache *colMtlCache;
 
 		//Constructor/Destructor
 		MaxAWDExporter();
