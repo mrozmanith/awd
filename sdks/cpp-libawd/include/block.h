@@ -19,8 +19,6 @@ class AWDBlock
         virtual void write_body(int,bool)=0;
 
     public:
-        AWDBlock * next;
-
         AWDBlock(AWD_block_type);
 
         awd_baddr get_addr();
