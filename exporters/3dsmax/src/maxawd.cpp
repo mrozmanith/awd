@@ -767,13 +767,43 @@ void MaxAWDExporter::ExportSkeleton(ISkin *skin)
 
 void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 {
-	SkeletonCacheItem *cur;
+	if (skeletonCache->HasItems() && sequences != NULL) {
+		int ticksPerFrame;
+		int frameDur;
+		SkeletonCacheItem *curSkel;
 
-	skeletonCache->IterReset();
-	while ((cur = skeletonCache->IterNext()) != NULL) {
-		// TODO: Sample and export animation sequences
-		continue;
+		ticksPerFrame = GetTicksPerFrame();
+		frameDur = floor(TicksToSec(ticksPerFrame) * 1000.0 + 0.5); // ms
+
+		skeletonCache->IterReset();
+		while ((curSkel = skeletonCache->IterNext()) != NULL) {
+			SequenceMetaData *curSeq = sequences;
+
+			while (curSeq) {
+				int f;
+				AWDSkeletonAnimation *awdAnim;
+
+				// TODO: Consider concatenating names if >1 skeleton
+				awdAnim = new AWDSkeletonAnimation(curSeq->name, strlen(curSeq->name));
+				awd->add_skeleton_anim(awdAnim);
+
+				// Loop through frames for this sequence and create poses
+				for (f=curSeq->start; f<curSeq->stop; f++) {
+					AWDSkeletonPose *pose;
+
+					// TODO: Consider coming  up with a proper name
+					pose = new AWDSkeletonPose("", 0);
+
+					// TODO: Sample all bones for this pose
+
+					// Store pose in AWD document
+					awdAnim->set_next_frame_pose(pose, frameDur);
+					awd->add_skeleton_pose(pose);
+				}
+
+				// Proceed to next sequence
+				curSeq = curSeq->next;
+			}
+		}
 	}
-
-	return;
 }
