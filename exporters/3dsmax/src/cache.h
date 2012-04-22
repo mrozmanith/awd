@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iskin.h>
 #include "Max.h"
 #include "awd/awd.h"
 
@@ -88,6 +89,7 @@ public:
 	AWDSkeleton *awdSkel;
 	SkeletonCacheItem *next;
 
+	void ConfigureForSkin(ISkin *skin);
 	int IndexOfBone(INode *bone);
 };
 
