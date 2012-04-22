@@ -419,17 +419,21 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 
 void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 {
-	int i;
-	int numChildren;
 	Object *obj;
+	bool goDeeper;
 
 	AWDSceneBlock *awdParent = NULL;
 
+	// By default, also parse children of this node
+	goDeeper = true;
+
 	obj = node->GetObjectRef();
 	if (obj && obj->ClassID()==BONE_OBJ_CLASSID) {
-		// This is a bone that isn't necessarily bound to a skin. Ignore this
-		// for now. Bones that are bound will be exported as part of the skin.
-		// TODO: Add option to GUI allowing export of un-bound bones.
+		// Export skeleton, which will traverse the children of
+		// this node internally, so there is no need to continue
+		// going deeper in this function.
+		ExportSkeleton(node);
+		goDeeper = false;
 	}
 	else {
 		int skinIdx;
@@ -476,9 +480,12 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 		}
 	}
 
-	numChildren = node->NumberOfChildren();
-	for (i=0; i<numChildren; i++) {
-		ExportNode(node->GetChildNode(i), awdParent);
+	if (goDeeper) {
+		int i;
+		int numChildren = node->NumberOfChildren();
+		for (i=0; i<numChildren; i++) {
+			ExportNode(node->GetChildNode(i), awdParent);
+		}
 	}
 }
 
@@ -660,9 +667,6 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 	awd_float64 *weights;
 	awd_uint32 *indices;
 
-	// First export skeleton block
-	ExportSkeleton(skin);
-
 	// TODO: Replace with option
 	const int jointsPerVertex = 2;
 
@@ -715,52 +719,13 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 }
 
 
-void MaxAWDExporter::ExportSkeleton(ISkin *skin)
+void MaxAWDExporter::ExportSkeleton(INode *rootBone)
 {
-	int i;
-	int numBones = skin->GetNumBones();
-	BlockCache skelCache;
-	INode *maxRootBone;
-
-	AWDSkeleton *awdSkel;
-
-	// TODO: Find proper name
-	awdSkel = new AWDSkeleton("skel", 4);
-
-	for (i=0; i<numBones; i++) {
-		INode *bone;
-		char *name;
-		AWDSkeletonJoint *awdJoint;
-		Matrix3 invBindTM;
-		awd_float64 *invBindMtx;
-
-		bone = skin->GetBone(i);
-
-		skin->GetBoneInitTM(bone, invBindTM);
-		invBindTM = Inverse(invBindTM);
-
-		invBindMtx = (awd_float64*)malloc(sizeof(awd_float64) * 12);
-		SerializeMatrix3(invBindTM, invBindMtx);
-
-		name = bone->GetName();
-		awdJoint = new AWDSkeletonJoint(name, strlen(name), invBindMtx);
-
-		AWDSkeletonJoint *awdParent = (AWDSkeletonJoint *)skelCache.Get(bone->GetParentNode());
-		if (awdParent != NULL) {
-			awdParent->add_child_joint(awdJoint);
-			maxRootBone = bone;
-		}
-		else {
-			awdSkel->set_root_joint(awdJoint);
-		}
-
-		skelCache.Set(bone, awdJoint);
-	}
-
 	// Add to skeleton cache so that animation export can find
-	// this skeleton and sample it's animation.
-	skeletonCache->Add(awdSkel, maxRootBone);
-
+	// this skeleton and sample it's animation. This will also
+	// construct an intermediate structure that can be used to
+	// look-up joint indices and more.
+	AWDSkeleton *awdSkel = skeletonCache->Add(rootBone);
 	awd->add_skeleton(awdSkel);
 }
 
