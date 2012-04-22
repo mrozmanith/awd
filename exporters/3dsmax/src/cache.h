@@ -62,11 +62,34 @@ public:
  * Used by animation export to look up skeletons that need to be sampled
  * for animation export.
 */
-typedef struct SkeletonCacheItem_struct {
+typedef struct SkeletonCacheJoint_struct
+{
+	int index;
+	INode *maxBone;
+	AWDSkeletonJoint *awdJoint;
+	struct SkeletonCacheJoint_struct *next;
+} SkeletonCacheJoint;
+
+class SkeletonCacheItem
+{
+private:
+	INode *rootBone;
+	SkeletonCacheJoint *firstJoint;
+	SkeletonCacheJoint *lastJoint;
+	int numJoints;
+
+	void GatherJoint(INode *parentNode, AWDSkeletonJoint *awdParent);
+	void AppendCacheJoint(SkeletonCacheJoint *cacheJoint);
+
+public:
+	SkeletonCacheItem(INode *rootBone);
+	~SkeletonCacheItem(void);
+
 	AWDSkeleton *awdSkel;
-	INode *maxRootBone;
-	struct SkeletonCacheItem_struct *next;
-} SkeletonCacheItem;
+	SkeletonCacheItem *next;
+
+	int IndexOfBone(INode *bone);
+};
 
 class SkeletonCache
 {
@@ -79,7 +102,7 @@ public:
 	SkeletonCache(void);
 	~SkeletonCache(void);
 
-	void Add(AWDSkeleton *awdSkel, INode *maxRootBone);
+	AWDSkeleton *Add(INode *maxRootBone);
 	bool HasItems();
 	void IterReset();
 	SkeletonCacheItem *IterNext();
