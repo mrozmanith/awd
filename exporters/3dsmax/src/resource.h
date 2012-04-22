@@ -11,14 +11,29 @@
 #define IDD_PANEL                       101
 #define IDD_AWD_MISC_OPTS               104
 #define IDD_AWD_MTL_OPTS                105
+#define IDD_AWD_VIEWER_OPTS             106
+#define IDD_AWD_ANIM_OPTS               107
 #define IDC_CLOSEBUTTON                 1000
 #define IDC_DOSTUFF                     1000
 #define IDC_CANCEL                      1000
 #define IDC_TABPANEL                    1002
 #define IDC_OK                          1003
+#define IDC_INC_GEOM                    1005
+#define IDC_INC_SCENE                   1006
+#define IDC_INC_MTL                     1006
+#define IDC_EMBED_TEX                   1007
+#define IDC_SWFSB_LOCAL                 1008
+#define IDC_SWFSB_NETWORK               1009
+#define IDC_SWF_ENABLE                  1010
+#define IDC_SWF_LAUNCH                  1011
+#define IDC_INC_SKEL                    1012
+#define IDC_INC_SKELANIM                1013
+#define IDC_EDIT1                       1014
+#define IDC_SEQ_TXT                     1014
 #define IDC_COLOR                       1456
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
+#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 
@@ -26,7 +41,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

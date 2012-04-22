@@ -19,6 +19,8 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 MaxAWDExporterOpts *MaxAWDExporterOpts::imp = NULL;
 HWND MaxAWDExporterOpts::miscOpts = NULL;
 HWND MaxAWDExporterOpts::mtlOpts = NULL;
+HWND MaxAWDExporterOpts::animOpts = NULL;
+HWND MaxAWDExporterOpts::viewerOpts = NULL;
 
 
 MaxAWDExporterOpts::~MaxAWDExporterOpts(void)
@@ -66,10 +68,26 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 					case 0:
 						ShowWindow(miscOpts, TRUE);
 						ShowWindow(mtlOpts, FALSE);
+						ShowWindow(animOpts, FALSE);
+						ShowWindow(viewerOpts, FALSE);
 						break;
 					case 1:
 						ShowWindow(miscOpts, FALSE);
 						ShowWindow(mtlOpts, TRUE);
+						ShowWindow(animOpts, FALSE);
+						ShowWindow(viewerOpts, FALSE);
+						break;
+					case 2:
+						ShowWindow(miscOpts, FALSE);
+						ShowWindow(mtlOpts, FALSE);
+						ShowWindow(animOpts, TRUE);
+						ShowWindow(viewerOpts, FALSE);
+						break;
+					case 3:
+						ShowWindow(miscOpts, FALSE);
+						ShowWindow(mtlOpts, FALSE);
+						ShowWindow(animOpts, FALSE);
+						ShowWindow(viewerOpts, TRUE);
 						break;
 				};
 				return TRUE;
@@ -92,22 +110,32 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	TCITEM tci = {0};
 	tci.mask = TCIF_TEXT|TCIF_STATE;
 
-	tci.pszText = _T("Scene & misc");
+	tci.pszText = _T("Scene && misc");
 	TabCtrl_InsertItem(tabPanel, 0, &tci);
+	miscOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_MISC_OPTS), 
+		tabPanel, MiscOptsDialogProc);
 	
 	tci.pszText = _T("Materials");
 	TabCtrl_InsertItem(tabPanel, 1, &tci);
-	
-	miscOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_MISC_OPTS), 
-		tabPanel, MiscOptsDialogProc);
-
 	mtlOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_MTL_OPTS), 
 		tabPanel, MtlOptsDialogProc);
+	
+	tci.pszText = _T("Animation");
+	TabCtrl_InsertItem(tabPanel, 2, &tci);
+	animOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_ANIM_OPTS), 
+		tabPanel, AnimOptsDialogProc);
+
+	tci.pszText = _T("Previewer");
+	TabCtrl_InsertItem(tabPanel, 3, &tci);
+	viewerOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_VIEWER_OPTS), 
+		tabPanel, ViewerOptsDialogProc);
 
 	// Select first tab
 	TabCtrl_SetCurSel(tabPanel, 0);
 	ShowWindow(miscOpts, TRUE);
 	ShowWindow(mtlOpts, FALSE);
+	ShowWindow(animOpts, FALSE);
+	ShowWindow(viewerOpts, FALSE);
 }
 
 
@@ -119,6 +147,20 @@ INT_PTR CALLBACK MaxAWDExporterOpts::MiscOptsDialogProc(HWND hWnd,UINT message,W
 
 
 INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+{
+	// TODO: Implement proc
+	return FALSE;
+}
+
+
+INT_PTR CALLBACK MaxAWDExporterOpts::AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+{
+	// TODO: implement proc
+	return FALSE;
+}
+
+
+INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	// TODO: Implement proc
 	return FALSE;

@@ -20,6 +20,8 @@ private:
 
 	static HWND miscOpts;
 	static HWND mtlOpts;
+	static HWND animOpts;
+	static HWND viewerOpts;
 
 	// Main proc function and helpers
 	static INT_PTR CALLBACK DialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
@@ -28,6 +30,8 @@ private:
 	// Tab panel proc functions
 	static INT_PTR CALLBACK MiscOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static INT_PTR CALLBACK MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static INT_PTR CALLBACK AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static INT_PTR CALLBACK ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 
 public:
 	MaxAWDExporterOpts(void);
