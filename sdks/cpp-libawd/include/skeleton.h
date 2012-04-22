@@ -30,6 +30,10 @@ class AWDSkeletonJoint :
         int calc_num_children();
 
         awd_uint32 get_id();
+
+        void set_bind_mtx(awd_float64 *);
+        awd_float64 *get_bind_mtx();
+
         void set_parent(AWDSkeletonJoint *);
         AWDSkeletonJoint *get_parent();
         AWDSkeletonJoint *add_child_joint(AWDSkeletonJoint *);
