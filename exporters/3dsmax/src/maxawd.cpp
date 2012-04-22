@@ -309,6 +309,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 
 	// Traverse MAX nodes and add to AWD structure.
 	INode *root = i->GetRootNode();
+	ExportSkeletons(root);
 	ExportNode(root, NULL);
 
 	// Export animation if a sequences.txt file was found
@@ -429,10 +430,8 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 	obj = node->GetObjectRef();
 	if (obj && obj->ClassID()==BONE_OBJ_CLASSID) {
-		// Export skeleton, which will traverse the children of
-		// this node internally, so there is no need to continue
-		// going deeper in this function.
-		ExportSkeleton(node);
+		// This will have already been exported by the initial sweep
+		// for bones/skeletons, so there is no need to recurse deeper
 		goDeeper = false;
 	}
 	else {
@@ -726,6 +725,23 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 		indexPtr.ui32 = indices;
 		sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, weightPtr, numVerts*jointsPerVertex);
 		sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, indexPtr, numVerts*jointsPerVertex);
+	}
+}
+
+
+void MaxAWDExporter::ExportSkeletons(INode *node)
+{
+	Object *obj = node->GetObjectRef();
+	if (obj && obj->ClassID() == BONE_OBJ_CLASSID) {
+		ExportSkeleton(node);
+	}
+	else {
+		// This wasn't a bone, but there might be bones
+		// further down the hierarchy from this one
+		int i;
+		for (i=0; i<node->NumberOfChildren(); i++) {
+			ExportSkeletons(node->GetChildNode(i));
+		}
 	}
 }
 
