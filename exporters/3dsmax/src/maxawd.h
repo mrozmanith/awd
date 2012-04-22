@@ -24,6 +24,7 @@
 
 #include "awd/awd.h"
 #include "cache.h"
+#include "maxawdopts.h"
 
 #include <stdmat.h>
 #include <iskin.h>
@@ -48,6 +49,8 @@ class MaxAWDExporter : public SceneExport {
 		BlockCache *cache;
 		SkeletonCache *skeletonCache;
 		ColorMaterialCache *colMtlCache;
+
+		MaxAWDExporterOpts opts;
 
 	public:
 		
