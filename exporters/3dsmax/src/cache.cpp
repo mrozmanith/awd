@@ -101,6 +101,7 @@ AWDMaterial *ColorMaterialCache::Get(awd_color color)
 
 SkeletonCacheItem::SkeletonCacheItem(INode *maxRootBone)
 {
+	cur = NULL;
 	next = NULL;
 	rootBone = maxRootBone;
 	firstJoint = NULL;
@@ -214,6 +215,25 @@ int SkeletonCacheItem::IndexOfBone(INode *bone)
 	}
 
 	return -1;
+}
+
+
+void SkeletonCacheItem::IterReset()
+{
+	cur = firstJoint;
+}
+
+
+SkeletonCacheJoint *SkeletonCacheItem::IterNext()
+{
+	// Stop if end was reached
+	if (!cur)
+		return NULL;
+
+	// Move on and return previous
+	SkeletonCacheJoint *ret = cur;
+	cur = cur->next;
+	return ret;
 }
 
 

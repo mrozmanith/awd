@@ -75,6 +75,7 @@ class SkeletonCacheItem
 {
 private:
 	INode *rootBone;
+	SkeletonCacheJoint *cur;
 	SkeletonCacheJoint *firstJoint;
 	SkeletonCacheJoint *lastJoint;
 	int numJoints;
@@ -91,6 +92,9 @@ public:
 
 	void ConfigureForSkin(ISkin *skin);
 	int IndexOfBone(INode *bone);
+
+	void IterReset();
+	SkeletonCacheJoint *IterNext();
 };
 
 class SkeletonCache
