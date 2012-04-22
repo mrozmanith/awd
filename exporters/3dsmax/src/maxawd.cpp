@@ -624,12 +624,25 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 
 				// Loop through frames for this sequence and create poses
 				for (f=curSeq->start; f<curSeq->stop; f++) {
+					SkeletonCacheJoint *curJoint;
 					AWDSkeletonPose *pose;
+
+					TimeValue t = f * ticksPerFrame;
 
 					// TODO: Consider coming  up with a proper name
 					pose = new AWDSkeletonPose("", 0);
 
 					// TODO: Sample all bones for this pose
+					curSkel->IterReset();
+					while ((curJoint = curSkel->IterNext()) != NULL) {
+						INode *bone = curJoint->maxBone;
+						Matrix3 tm = bone->GetNodeTM(t) * Inverse(bone->GetParentTM(t));
+
+						awd_float64 *mtx = (awd_float64*)malloc(sizeof(awd_float64)*12);
+						SerializeMatrix3(tm, mtx);
+
+						pose->set_next_transform(mtx);
+					}
 
 					// Store pose in AWD document
 					awdAnim->set_next_frame_pose(pose, frameDur);
