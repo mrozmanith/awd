@@ -103,6 +103,7 @@ public:
 	~SkeletonCache(void);
 
 	AWDSkeleton *Add(INode *maxRootBone);
+	SkeletonCacheItem *GetFromBone(INode *bone);
 	bool HasItems();
 	void IterReset();
 	SkeletonCacheItem *IterNext();

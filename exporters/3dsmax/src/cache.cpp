@@ -171,6 +171,24 @@ void SkeletonCacheItem::GatherJoint(INode *bone, AWDSkeletonJoint *awdParent)
 }
 
 
+int SkeletonCacheItem::IndexOfBone(INode *bone)
+{
+	SkeletonCacheJoint *cur;
+
+	cur = firstJoint;
+	while (cur) {
+		if (cur->maxBone == bone)
+			return cur->index;
+
+		cur = cur->next;
+	}
+
+	return -1;
+}
+
+
+
+
 SkeletonCache::SkeletonCache(void)
 {
 	firstItem = NULL;
@@ -202,6 +220,24 @@ AWDSkeleton *SkeletonCache::Add(INode *rootBone)
 
 	// Return skeleton
 	return item->awdSkel;
+}
+
+
+SkeletonCacheItem *SkeletonCache::GetFromBone(INode *bone)
+{
+	SkeletonCacheItem *cur;
+
+	cur = firstItem;
+	while (cur) {
+		// Check if this cache item is a skeleton
+		// containing the supplied bone.
+		if (cur->IndexOfBone(bone) >= 0)
+			return cur;
+
+		cur = cur->next;
+	}
+
+	return NULL;
 }
 
 
