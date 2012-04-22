@@ -1,4 +1,5 @@
 #include "cache.h"
+#include "utils.h"
 #include <stdlib.h>
 
 BlockCache::BlockCache(void)
@@ -143,17 +144,25 @@ void SkeletonCacheItem::GatherJoint(INode *bone, AWDSkeletonJoint *awdParent)
 	int i;
 	char *name;
 	SkeletonCacheJoint *cacheJoint;
-    AWDSkeletonJoint *awdJoint;
+	AWDSkeletonJoint *awdJoint;
+	Matrix3 boneTM;
+	awd_float64 *bindMtx;
 
-    name = bone->GetName();
-    awdJoint = new AWDSkeletonJoint(name, strlen(name), NULL);
+	// Use bone transform as bind matrix for now. This will be
+	// overwritten by the skin export if exporting skins.
+	boneTM = bone->GetNodeTM(0);
+	bindMtx = (awd_float64*)malloc(sizeof(awd_float64)*12);
+	SerializeMatrix3(Inverse(boneTM), bindMtx);
 
-    if (awdParent != NULL) {
+	name = bone->GetName();
+	awdJoint = new AWDSkeletonJoint(name, strlen(name), bindMtx);
+
+	if (awdParent != NULL) {
 		awdParent->add_child_joint(awdJoint);
-    }
-    else {
-        awdSkel->set_root_joint(awdJoint);
-    }
+	}
+	else {
+		awdSkel->set_root_joint(awdJoint);
+	}
 
 	// Add to cache
 	cacheJoint = (SkeletonCacheJoint*)malloc(sizeof(SkeletonCacheJoint));
