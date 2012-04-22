@@ -14,12 +14,10 @@ AWDSkeletonJoint::AWDSkeletonJoint(const char *name, awd_uint16 name_len, awd_fl
     this->next = NULL;
     this->first_child = NULL;
     this->last_child = NULL;
-    this->bind_mtx = bind_mtx;
     this->num_children = 0;
+    this->bind_mtx = NULL;
 
-    if (this->bind_mtx == NULL) {
-        this->bind_mtx = awdutil_id_mtx4x4(NULL);
-    }
+    set_bind_mtx(bind_mtx);
 }
 
 
@@ -64,6 +62,28 @@ AWDSkeletonJoint *
 AWDSkeletonJoint::get_parent()
 {
     return this->parent;
+}
+
+
+void
+AWDSkeletonJoint::set_bind_mtx(awd_float64 *bind_mtx)
+{
+    if (this->bind_mtx) {
+        free(this->bind_mtx);
+    }
+
+    this->bind_mtx = bind_mtx;
+
+    if (this->bind_mtx == NULL) {
+        this->bind_mtx = awdutil_id_mtx4x4(NULL);
+    }
+}
+
+
+awd_float64 *
+AWDSkeletonJoint::get_bind_mtx()
+{
+    return this->bind_mtx;
 }
 
 
