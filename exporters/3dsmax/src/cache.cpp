@@ -180,6 +180,27 @@ void SkeletonCacheItem::GatherJoint(INode *bone, AWDSkeletonJoint *awdParent)
 }
 
 
+void SkeletonCacheItem::ConfigureForSkin(ISkin *skin)
+{
+	SkeletonCacheJoint *cur;
+
+	cur = firstJoint;
+	while (cur) {
+		Matrix3 invBindTM;
+		awd_float64 *invBindMtx;
+
+		// Update bind matrix with the one defined by skin
+		skin->GetBoneInitTM(cur->maxBone, invBindTM);
+		invBindTM = Inverse(invBindTM);
+		invBindMtx = (awd_float64*)malloc(sizeof(awd_float64) * 12);
+		SerializeMatrix3(invBindTM, invBindMtx);
+		cur->awdJoint->set_bind_mtx(invBindMtx);
+
+		cur = cur->next;
+	}
+}
+
+
 int SkeletonCacheItem::IndexOfBone(INode *bone)
 {
 	SkeletonCacheJoint *cur;

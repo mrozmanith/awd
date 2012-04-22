@@ -519,6 +519,10 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 		if (skel == NULL)
 			return;
 
+		// Configure skeleton (i.e. update bind matrices) for the 
+		// binding defined by this particular skin.
+		skel->ConfigureForSkin(skin);
+
 		int numVerts = context->GetNumPoints();
 		weights = (awd_float64*)malloc(jointsPerVertex * numVerts * sizeof(awd_float64));
 		indices = (awd_uint32*)malloc(jointsPerVertex * numVerts * sizeof(awd_uint32));
