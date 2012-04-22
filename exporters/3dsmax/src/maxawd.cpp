@@ -663,59 +663,70 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 {
-	int iVtx;
-	awd_float64 *weights;
-	awd_uint32 *indices;
+	if (skin->GetNumBones()) {
+		int iVtx;
+		awd_float64 *weights;
+		awd_uint32 *indices;
 
-	// TODO: Replace with option
-	const int jointsPerVertex = 2;
+		// TODO: Replace with option
+		const int jointsPerVertex = 2;
 
-	ISkinContextData *context = skin->GetContextInterface(node);
+		// Get skeleton information from cache and geometry information
+		// through an ISkinContextData interface.
+		SkeletonCacheItem *skel = skeletonCache->GetFromBone(skin->GetBone(0));
+		ISkinContextData *context = skin->GetContextInterface(node);
 
-	int numVerts = context->GetNumPoints();
-	weights = (awd_float64*)malloc(jointsPerVertex * numVerts * sizeof(awd_float64));
-	indices = (awd_uint32*)malloc(jointsPerVertex * numVerts * sizeof(awd_uint32));
+		// If the skeleton used for this skin could not be found,
+		// break now or the code below will crash
+		if (skel == NULL)
+			return;
 
-	for (iVtx=0; iVtx<numVerts; iVtx++) {
-		int iBone;
-		int numBones;
-		double weightSum = 0;
+		int numVerts = context->GetNumPoints();
+		weights = (awd_float64*)malloc(jointsPerVertex * numVerts * sizeof(awd_float64));
+		indices = (awd_uint32*)malloc(jointsPerVertex * numVerts * sizeof(awd_uint32));
 
-		numBones = context->GetNumAssignedBones(iVtx);
+		for (iVtx=0; iVtx<numVerts; iVtx++) {
+			int iBone;
+			int numBones;
+			double weightSum = 0;
 
-		// For each weight/index slot, retrieve weight/index values
-		// from skin, or after having run out of assigned bones for
-		// a vertex, set weight to zero.
-		for (iBone=0; iBone<jointsPerVertex; iBone++) {
+			numBones = context->GetNumAssignedBones(iVtx);
 
-			// Calculate index in stream
-			int strIdx = iVtx*jointsPerVertex + iBone;
+			// For each weight/index slot, retrieve weight/index values
+			// from skin, or after having run out of assigned bones for
+			// a vertex, set weight to zero.
+			for (iBone=0; iBone<jointsPerVertex; iBone++) {
+				INode *bone = skin->GetBone(iBone);
 
-			if (iBone < numBones) {
-				weights[strIdx] = context->GetBoneWeight(iVtx, iBone);
-				indices[strIdx] = context->GetAssignedBone(iVtx, iBone);
+				// Calculate index in stream
+				int strIdx = iVtx*jointsPerVertex + iBone;
 
-				weightSum += weights[iBone];
+				if (iBone < numBones) {
+					weights[strIdx] = context->GetBoneWeight(iVtx, iBone);
+					indices[strIdx] = skel->IndexOfBone(bone);
+
+					weightSum += weights[strIdx];
+				}
+				else {
+					weights[strIdx] = 0.0;
+					indices[strIdx] = 0;
+				}
 			}
-			else {
-				weights[strIdx] = 0.0;
-				indices[strIdx] = 0;
+
+			// Normalize weights (sum must be 1.0)
+			double scale = 1/weightSum;
+			for (iBone=0; iBone<jointsPerVertex; iBone++) {
+				weights[iVtx*jointsPerVertex + iBone] *= scale;
 			}
 		}
 
-		// Normalize weights (sum must be 1.0)
-		double scale = 1/weightSum;
-		for (iBone=0; iBone<jointsPerVertex; iBone++) {
-			weights[iVtx*jointsPerVertex + iBone] *= scale;
-		}
+		AWD_str_ptr weightPtr;
+		AWD_str_ptr indexPtr;
+		weightPtr.f64 = weights;
+		indexPtr.ui32 = indices;
+		sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, weightPtr, numVerts*jointsPerVertex);
+		sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, indexPtr, numVerts*jointsPerVertex);
 	}
-
-	AWD_str_ptr weightPtr;
-	AWD_str_ptr indexPtr;
-	weightPtr.f64 = weights;
-	indexPtr.ui32 = indices;
-	sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, weightPtr, numVerts*jointsPerVertex);
-	sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, indexPtr, numVerts*jointsPerVertex);
 }
 
 
