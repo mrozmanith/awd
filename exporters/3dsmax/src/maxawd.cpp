@@ -51,24 +51,6 @@ ClassDesc2* GetMaxAWDExporterDesc() {
 
 
 
-INT_PTR CALLBACK MaxAWDExporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam) {
-	static MaxAWDExporter *imp = NULL;
-
-	switch(message) {
-		case WM_INITDIALOG:
-			imp = (MaxAWDExporter *)lParam;
-			CenterWindow(hWnd,GetParent(hWnd));
-			return TRUE;
-
-		case WM_CLOSE:
-			EndDialog(hWnd, 0);
-			return 1;
-	}
-	return 0;
-}
-
-
-
 MaxAWDExporter::MaxAWDExporter()
 {
 }
@@ -136,13 +118,11 @@ BOOL MaxAWDExporter::SupportsOptions(int ext, DWORD options)
 
 int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
-	/*
-	if(!suppressPrompts)
-		DialogBoxParam(hInstance, 
-				MAKEINTRESOURCE(IDD_PANEL), 
-				GetActiveWindow(), 
-				MaxAWDExporterOptionsDlgProc, (LPARAM)this);
-	*/
+	// Open the dialog (provided that prompts are not suppressed) and
+	// if it returns false, return to cancel the export.
+	if (!suppressPrompts && !opts.ShowDialog()) {
+		return true;
+	}
 
 	PrepareExport();
 
