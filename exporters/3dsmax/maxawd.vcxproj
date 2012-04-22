@@ -887,11 +887,13 @@
     <ClInclude Include="src\cache.h" />
     <ClInclude Include="src\maxawd.h" />
     <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cache.cpp" />
     <ClCompile Include="src\DllEntry.cpp" />
     <ClCompile Include="src\maxawd.cpp" />
+    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\sdks\cpp-libawd\libawd.vcxproj">
