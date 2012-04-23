@@ -137,6 +137,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\geomutil.h" />
     <ClInclude Include="lib\lzma\Alloc.h" />
     <ClInclude Include="include\attr.h" />
     <ClInclude Include="include\awd.h" />
