@@ -536,7 +536,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeights, awd_uint32 **extJoints)
 {
-	if (skin->GetNumBones()) {
+	if (skin && skin->GetNumBones()) {
 		int iVtx;
 		awd_float64 *weights;
 		awd_uint32 *indices;
