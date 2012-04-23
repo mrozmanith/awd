@@ -30,6 +30,9 @@ size_t          awdutil_get_type_size(AWD_field_type, bool);
 awd_uint32      awdutil_write_floats(int, awd_float64 *, int, bool);
 awd_uint32      awdutil_write_varstr(int, const char *, awd_uint16);
 
+awd_color       awdutil_float_color(double, double, double, double);
+awd_color       awdutil_int_color(int, int, int, int);
+
 awd_uint16      awdutil_swapui16(awd_uint16);
 awd_uint32      awdutil_swapui32(awd_uint32);
 awd_float32     awdutil_swapf32(awd_float32);

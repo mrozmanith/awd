@@ -138,6 +138,20 @@ awdutil_write_varstr(int fd, const char *str, awd_uint16 str_len)
 }
 
 
+awd_color
+awdutil_float_color(double r, double g, double b, double a)
+{
+    return awdutil_int_color(r*255, g*255, b*255, a*255);
+}
+
+
+awd_color
+awdutil_int_color(int r, int g, int b, int a)
+{
+    return ((r&0xff)<<24) | ((g&0xff)<<16) | ((b&0xff)<<8) | (a&0xff);
+}
+
+
 int
 awdutil_mktmp(char **path)
 {
