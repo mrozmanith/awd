@@ -346,8 +346,10 @@ AWDMeshInst::write_body(int fd, bool wide_mtx)
 
     this->write_scene_common(fd, wide_mtx);
 
-    // Write mesh geom address
-    geom_addr = UI32(this->geom->get_addr());
+    // Write mesh geom address (can be NULL)
+    geom_addr = 0;
+    if (this->geom != NULL)
+        geom_addr = UI32(this->geom->get_addr());
     write(fd, &geom_addr, sizeof(awd_uint32));
 
     // Write materials list. First write material count, and then
