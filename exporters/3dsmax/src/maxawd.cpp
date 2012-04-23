@@ -131,10 +131,12 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 	ExportSkeletons(root);
 	ExportNode(root, NULL);
 
-	// Export animation if a sequences.txt file was found
-	SequenceMetaData *sequences = LoadSequenceFile(name);
-	if (sequences != NULL)
-		ExportAnimation(sequences);
+	// Export animation if enabled and if a sequences.txt file was found
+	if (opts.ExportSkelAnim()) {
+		SequenceMetaData *sequences = LoadSequenceFile(name);
+		if (sequences != NULL)
+			ExportAnimation(sequences);
+	}
 
 	// Flush serialized AWD structure to file
 	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
@@ -287,14 +289,19 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 				awdMesh = ExportTriObject(obj, node, skin);
 
-				if (parent) {
-					parent->add_child(awdMesh);
-				}
-				else {
-					awd->add_scene_block(awdMesh);
+				// Add generated mesh instance to AWD scene graph.
+				// This can be null, if exporter was configured not
+				// to export scene graph objects.
+				if (awdMesh) {
+					if (parent) {
+						parent->add_child(awdMesh);
+					}
+					else {
+						awd->add_scene_block(awdMesh);
+					}
 				}
 
-				// Store the new block as parent to be used for
+				// Store the new block (if any) as parent to be used for
 				// blocks that represent children of this Max node.
 				awdParent = awdMesh;
 			}
@@ -313,21 +320,34 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *skin)
 {
-	AWDTriGeom *awdGeom = ExportTriGeom(obj, node, skin);
+	AWDMaterial *awdMtl = NULL;
+	AWDTriGeom *awdGeom = NULL;
 
-	Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
-	double *mtxData = (double *)malloc(12*sizeof(double));
-	SerializeMatrix3(mtx, mtxData);
+	if (opts.ExportGeometry()) {
+		awdGeom = ExportTriGeom(obj, node, skin);
+	}
 
 	// Export material
-	AWDMaterial *awdMtl = ExportNodeMaterial(node);
+	if (opts.ExportMaterials()) {
+		awdMtl = ExportNodeMaterial(node);
+	}
 
 	// Export instance
-	char *name = node->GetName();
-	AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), awdGeom, mtxData);
-	inst->add_material(awdMtl);
+	if (opts.ExportScene()) {
+		Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
+		double *mtxData = (double *)malloc(12*sizeof(double));
+		SerializeMatrix3(mtx, mtxData);
+
+		char *name = node->GetName();
+		AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), awdGeom, mtxData);
+
+		if (awdMtl)
+			inst->add_material(awdMtl);
 	
-	return inst;
+		return inst;
+	}
+
+	return NULL;
 }
 
 
