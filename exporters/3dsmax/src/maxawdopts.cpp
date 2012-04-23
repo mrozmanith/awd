@@ -58,13 +58,13 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 				case IDC_OK:
 					imp->exportGeometry = (IsDlgButtonChecked(miscOpts, IDC_INC_GEOM) == BST_CHECKED);
 					imp->exportScene = (IsDlgButtonChecked(miscOpts, IDC_INC_SCENE) == BST_CHECKED);
-					imp->exportMaterials = (IsDlgButtonChecked(miscOpts, IDC_INC_MTL) == BST_CHECKED);
-					imp->embedTextures = (IsDlgButtonChecked(miscOpts, IDC_EMBED_TEX) == BST_CHECKED);
-					imp->exportSkeletons = (IsDlgButtonChecked(miscOpts, IDC_INC_SKEL) == BST_CHECKED);
-					imp->exportSkelAnim = (IsDlgButtonChecked(miscOpts, IDC_INC_SKELANIM) == BST_CHECKED);
-					imp->createPreview = (IsDlgButtonChecked(miscOpts, IDC_SWF_ENABLE) == BST_CHECKED);
-					imp->launchPreview = (IsDlgButtonChecked(miscOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
-					imp->networkPreview = (IsDlgButtonChecked(miscOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+					imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
+					imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_EMBED_TEX) == BST_CHECKED);
+					imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
+					imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+					imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
+					imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
+					imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
 					EndDialog(hWnd, IDOK);
 					break;
 
