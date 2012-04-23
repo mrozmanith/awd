@@ -89,4 +89,5 @@ class MaxAWDExporter : public SceneExport {
 		void				ExportSkeletons(INode *node);
 		void				ExportSkeleton(INode *rootBone);
 		void				ExportAnimation(SequenceMetaData *sequences);
+		void				ExportUserAttributes(Animatable *obj, AWDAttrElement *elem);
 };

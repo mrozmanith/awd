@@ -13,6 +13,9 @@
 //***************************************************************************/
 
 #include <Windows.h>
+#include <icustattribcontainer.h>
+#include <custattrib.h>
+#include <iparamb2.h>
 
 #include "awd/awd.h"
 #include "awd/platform.h"
@@ -341,6 +344,8 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 
 		char *name = node->GetName();
 		AWDMeshInst *inst = new AWDMeshInst(name, strlen(name), awdGeom, mtxData);
+
+		ExportUserAttributes(obj, inst);
 
 		if (awdMtl)
 			inst->add_material(awdMtl);
@@ -706,6 +711,53 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 
 				// Proceed to next sequence
 				curSeq = curSeq->next;
+			}
+		}
+	}
+}
+
+
+void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
+{
+	ICustAttribContainer *attributes = obj->GetCustAttribContainer();
+	if (attributes) {
+		int a;
+		int numAttribs;
+
+		numAttribs = attributes->GetNumCustAttribs();
+		for (a=0; a<numAttribs; a++) {
+			int p;
+
+			CustAttrib *attr = attributes->GetCustAttrib(a);
+			IParamBlock2 *block = attr->GetParamBlock(0);
+
+			for (p=0; p<block->NumParams(); p++) {
+				bool success;
+				ParamID pid = block->IndextoID(p);
+
+				success = false;
+				Interval valid = FOREVER;
+
+				awd_uint16 len;
+				AWD_field_type type;
+				AWD_field_ptr ptr;
+				ptr.v = NULL;
+
+				switch (block->GetParameterType(pid)) {
+					case TYPE_FLOAT:
+						type = AWD_FIELD_FLOAT32;
+						len = sizeof(awd_float32);
+						ptr.v = malloc(len);
+						success = block->GetValue(pid, 0, *ptr.f32, valid);
+						break;
+				}
+
+				if (success) {
+					ParamDef def = block->GetParamDef(pid);
+					// TODO: Name is always lowercase. Is that correct for Max?
+					// TODO: Use namespace
+					elem->set_attr(NULL, def.int_name, strlen(def.int_name), ptr, len, AWD_FIELD_FLOAT32);
+				}
 			}
 		}
 	}
