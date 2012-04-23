@@ -359,18 +359,26 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 	awdGeom = (AWDTriGeom *)cache->Get(obj);
 	if (awdGeom == NULL) {
 		int t;
+		int jpv=0;
+		awd_float64 *weights;
+		awd_uint32 *joints;
 
 		TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);	
 
 		Mesh& mesh = triObject->GetMesh();
+
+		// Extract skinning information (returns number of joints per vertex)
+		jpv = ExportSkin(node, skin, &weights, &joints);
 
 		// Calculate offset matrix from the object TM (which includes geometry
 		// offset) and the node TM (which doesn't.) This will be used to transform
 		// all vertices into node space.
 		Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
 
-		int numTris = mesh.getNumFaces();
 		AWDGeomUtil geomUtil;
+		geomUtil.joints_per_vertex = jpv;
+
+		int numTris = mesh.getNumFaces();
 
 		for (t=0; t<numTris; t++) {
 			int v;
@@ -391,7 +399,19 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				vd->u = tvtx.x;
 				vd->v = tvtx.y;
 				vd->nx = vd->ny = vd->nz = 0; // TODO: Implement normals
-				vd->num_bindings = 0; // TODO: Implement skinning
+
+				// If there is skinning information, copy it from the weight
+				// and joint index arrays returned by ExportSkin() above.
+				vd->num_bindings = jpv;
+				if (jpv > 0) {
+					vd->weights = (awd_float64*)malloc(jpv*sizeof(awd_float64));
+					vd->joints = (awd_uint32*)malloc(jpv*sizeof(awd_uint32));
+
+					int memoffs = jpv*vIdx;
+					memcpy(vd->weights, weights+memoffs, jpv*sizeof(awd_float64));
+					memcpy(vd->joints, joints+memoffs, jpv*sizeof(awd_uint32));
+				}
+
 				vd->mtlid = 0; // TODO: Implement sub-meshing
 
 				geomUtil.append_vdata_struct(vd);
@@ -505,7 +525,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 }
 
 
-void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
+int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeights, awd_uint32 **extJoints)
 {
 	if (skin->GetNumBones()) {
 		int iVtx;
@@ -523,7 +543,7 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 		// If the skeleton used for this skin could not be found,
 		// break now or the code below will crash
 		if (skel == NULL)
-			return;
+			return 0;
 
 		// Configure skeleton (i.e. update bind matrices) for the 
 		// binding defined by this particular skin.
@@ -568,13 +588,13 @@ void MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub)
 			}
 		}
 
-		AWD_str_ptr weightPtr;
-		AWD_str_ptr indexPtr;
-		weightPtr.f64 = weights;
-		indexPtr.ui32 = indices;
-		sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, weightPtr, numVerts*jointsPerVertex);
-		sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, indexPtr, numVerts*jointsPerVertex);
+		*extWeights = weights;
+		*extJoints = indices;
+
+		return jointsPerVertex;
 	}
+
+	return 0;
 }
 
 

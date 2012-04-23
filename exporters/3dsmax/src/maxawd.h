@@ -85,7 +85,7 @@ class MaxAWDExporter : public SceneExport {
 		AWDMeshInst *		ExportTriObject(Object *obj, INode *node, ISkin *skin);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);
-		void				ExportSkin(INode *node, ISkin *skin, AWDSubGeom *sub);
+		int					ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeights, awd_uint32 **extJoints);
 		void				ExportSkeletons(INode *node);
 		void				ExportSkeleton(INode *rootBone);
 		void				ExportAnimation(SequenceMetaData *sequences);
