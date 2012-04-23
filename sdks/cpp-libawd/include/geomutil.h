@@ -14,14 +14,27 @@ typedef struct _ninfluence {
 typedef struct _vdata {
     unsigned int orig_idx;
     int out_idx;
+
+    // Position
     double x;
     double y;
     double z;
+
+    // UV
     double u;
     double v;
+
+    // Normal
     double nx;
     double ny;
     double nz;
+
+    // Skinning
+    int num_bindings;
+    double *weights;
+    int *joints;
+
+    int mtlid;
 
     bool force_hard;
     struct _vdata *next_exp;
@@ -48,6 +61,7 @@ public:
     double normal_threshold;
 
     void append_vert_data(unsigned int,  double, double, double, double, double, double, double, double, bool);
+    void append_vdata_struct(vdata *);
     int build_geom(AWDTriGeom *);
 };
 

@@ -35,18 +35,29 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
     vd->nx = nx;
     vd->ny = ny;
     vd->nz = nz;
+    vd->mtlid = 0;
+    vd->num_bindings = 0;
+    vd->weights = NULL;
+    vd->joints = NULL;
     vd->force_hard = force_hard;
-    vd->next_col = NULL;
-    vd->next_exp = NULL;
-    vd->first_normal_influence = NULL;
-    vd->last_normal_influence = NULL;
 
+    append_vdata_struct(vd);
+}
+
+
+void
+AWDGeomUtil::append_vdata_struct(vdata *vd)
+{
     if (!this->exp_first_vd)
         this->exp_first_vd = vd;
     else
         this->exp_last_vd->next_exp = vd;
 
     this->exp_last_vd = vd;
+    this->exp_last_vd->first_normal_influence = NULL;
+    this->exp_last_vd->last_normal_influence = NULL;
+    this->exp_last_vd->next_col = NULL;
+    this->exp_last_vd->next_exp = NULL;
 }
 
 
@@ -173,12 +184,16 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     AWD_str_ptr i_str;
     AWD_str_ptr n_str;
     AWD_str_ptr u_str;
+    AWD_str_ptr w_str;
+    AWD_str_ptr j_str;
 
     sub = new AWDSubGeom();
     v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
     i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
     n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
     u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
+    w_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
+    j_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
 
     v_idx = i_idx = 0;
 
@@ -199,6 +214,17 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
             n_str.f64[v_idx*3+0] = vd->nx;
             n_str.f64[v_idx*3+1] = vd->ny;
             n_str.f64[v_idx*3+2] = vd->nz;
+
+            // If there are bindings, transfer them from 
+            // array in vdata struct to output streams.
+            if (vd->num_bindings>0) {
+                int w_idx;
+                int jpv = vd->num_bindings;
+                for (w_idx=0; w_idx<jpv; w_idx++) {
+                    w_str.f64[v_idx*jpv + w_idx] = vd->weights[w_idx];
+                    j_str.ui32[v_idx*jpv + w_idx] = vd->joints[w_idx];
+                }
+            }
 
             i_str.ui32[i_idx++] = v_idx++;
 
