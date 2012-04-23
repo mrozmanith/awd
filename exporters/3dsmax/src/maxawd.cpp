@@ -380,6 +380,11 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		int numTris = mesh.getNumFaces();
 
+		// Build normals
+		// TODO: Verify that this is the correct way to do it
+		if (mesh.normalsBuilt == 0)
+			mesh.buildNormals();
+
 		for (t=0; t<numTris; t++) {
 			int v;
 			Face face = mesh.faces[t];
