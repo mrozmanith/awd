@@ -719,6 +719,8 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 
 void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 {
+	static AWDNamespace *ns = NULL;
+
 	ICustAttribContainer *attributes = obj->GetCustAttribContainer();
 	if (attributes) {
 		int a;
@@ -755,8 +757,17 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 				if (success) {
 					ParamDef def = block->GetParamDef(pid);
 					// TODO: Name is always lowercase. Is that correct for Max?
-					// TODO: Use namespace
-					elem->set_attr(NULL, def.int_name, strlen(def.int_name), ptr, len, AWD_FIELD_FLOAT32);
+					
+					if (ns == NULL) {
+						// Namespace has not yet been created; ns is a static
+						// function-scope variable that should be created only
+						// once and then reused for all user attributes.
+						// TODO: Retrieve namespace identifier from GUI
+						ns = new AWDNamespace("", 0);
+						awd->add_namespace(ns);
+					}
+
+					elem->set_attr(ns, def.int_name, strlen(def.int_name), ptr, len, AWD_FIELD_FLOAT32);
 				}
 			}
 		}
