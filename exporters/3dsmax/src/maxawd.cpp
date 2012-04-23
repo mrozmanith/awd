@@ -388,8 +388,10 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 			for (v=0; v<3; v++) {
 				int vIdx = face.getVert(v);
-				Point3& vtx = offsMtx * mesh.getVert(vIdx);
-				Point3 tvtx = mesh.getTVert(tvface.getTVert(v));
+				int tvIdx = tvface.getTVert(v);
+				Point3 vtx = offsMtx * mesh.getVert(vIdx);
+				Point3 normal = mesh.getNormal(vIdx);
+				Point3 tvtx = mesh.getTVert(tvIdx);
 
 				vdata *vd = (vdata *)malloc(sizeof(vdata));
 				vd->orig_idx = vIdx;
@@ -398,7 +400,9 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				vd->z = vtx.y;
 				vd->u = tvtx.x;
 				vd->v = tvtx.y;
-				vd->nx = vd->ny = vd->nz = 0; // TODO: Implement normals
+				vd->nx = -normal.x;
+				vd->ny = normal.z;
+				vd->nz = normal.y;
 
 				// If there is skinning information, copy it from the weight
 				// and joint index arrays returned by ExportSkin() above.
