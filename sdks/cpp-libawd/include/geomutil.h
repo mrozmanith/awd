@@ -16,23 +16,23 @@ typedef struct _vdata {
     int out_idx;
 
     // Position
-    double x;
-    double y;
-    double z;
+    awd_float64 x;
+    awd_float64 y;
+    awd_float64 z;
 
     // UV
-    double u;
-    double v;
+    awd_float64 u;
+    awd_float64 v;
 
     // Normal
-    double nx;
-    double ny;
-    double nz;
+    awd_float64 nx;
+    awd_float64 ny;
+    awd_float64 nz;
 
     // Skinning
     int num_bindings;
-    double *weights;
-    int *joints;
+    awd_float64 *weights;
+    awd_uint32 *joints;
 
     int mtlid;
 
