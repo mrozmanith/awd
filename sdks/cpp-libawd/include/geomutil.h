@@ -47,6 +47,7 @@ typedef struct _vdata {
 class AWDGeomUtil
 {
 private:
+    int num_exp_vd;
     vdata *exp_first_vd;
     vdata *exp_last_vd;
     vdata *col_first_vd;
@@ -58,6 +59,7 @@ public:
     AWDGeomUtil();
     ~AWDGeomUtil();
 
+    int joints_per_vertex;
     double normal_threshold;
 
     void append_vert_data(unsigned int,  double, double, double, double, double, double, double, double, bool);
