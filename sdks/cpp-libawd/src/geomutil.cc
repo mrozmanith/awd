@@ -2,19 +2,23 @@
 #include <stdlib.h>
 #include <cstdio>
 
+#include "platform.h"
 #include "geomutil.h"
 
 AWDGeomUtil::AWDGeomUtil()
 {
+    this->num_exp_vd = 0;
     this->col_first_vd = NULL;
     this->col_last_vd = NULL;
     this->exp_first_vd = NULL;
     this->exp_last_vd = NULL;
     this->normal_threshold = 0;
+    this->joints_per_vertex = 0;
 }
 
 AWDGeomUtil::~AWDGeomUtil()
 {
+    // TODO: Dispose temporary structures
 }
 
 
@@ -58,6 +62,7 @@ AWDGeomUtil::append_vdata_struct(vdata *vd)
     this->exp_last_vd->last_normal_influence = NULL;
     this->exp_last_vd->next_col = NULL;
     this->exp_last_vd->next_exp = NULL;
+    this->num_exp_vd++;
 }
 
 
@@ -192,8 +197,15 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
     n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
     u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
-    w_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
-    j_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
+
+    if (this->joints_per_vertex > 0) {
+        int max_num_vals = this->num_exp_vd * this->joints_per_vertex;
+        w_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * max_num_vals);
+        j_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * max_num_vals);
+
+        memset(w_str.v, 0, max_num_vals * sizeof(awd_float64));
+        memset(j_str.v, 0, max_num_vals * sizeof(awd_uint32));
+    }
 
     v_idx = i_idx = 0;
 
@@ -272,6 +284,12 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, i_str, i_idx);
     sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
     sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
+
+    if (this->joints_per_vertex > 0) {
+        sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, w_str, v_idx*this->joints_per_vertex);
+        sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, j_str, v_idx*this->joints_per_vertex);
+    }
+
     md->add_sub_mesh(sub);
 
     return 1;
