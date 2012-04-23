@@ -18,6 +18,7 @@
 #include <iparamb2.h>
 
 #include "awd/awd.h"
+#include "awd/util.h"
 #include "awd/platform.h"
 #include "awd/geomutil.h"
 #include "maxawd.h"
@@ -734,10 +735,10 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 			IParamBlock2 *block = attr->GetParamBlock(0);
 
 			for (p=0; p<block->NumParams(); p++) {
-				bool success;
 				ParamID pid = block->IndextoID(p);
+				Color col;
+				AColor acol;
 
-				success = false;
 				Interval valid = FOREVER;
 
 				awd_uint16 len;
@@ -746,15 +747,56 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 				ptr.v = NULL;
 
 				switch (block->GetParameterType(pid)) {
+					case TYPE_ANGLE:
+					case TYPE_PCNT_FRAC:
+					case TYPE_WORLD:
 					case TYPE_FLOAT:
 						type = AWD_FIELD_FLOAT32;
 						len = sizeof(awd_float32);
 						ptr.v = malloc(len);
-						success = block->GetValue(pid, 0, *ptr.f32, valid);
+						*ptr.f32 = block->GetFloat(pid);
+						break;
+
+					case TYPE_TIMEVALUE:
+					case TYPE_INT:
+						type = AWD_FIELD_INT32;
+						len = sizeof(awd_int32);
+						ptr.v = malloc(len);
+						*ptr.i32 = block->GetInt(pid);
+						break;
+
+					case TYPE_BOOL:
+						type = AWD_FIELD_BOOL;
+						len = sizeof(awd_bool);
+						ptr.v = malloc(len);
+						*ptr.b = (0 != block->GetInt(pid));
+						break;
+
+					case TYPE_FILENAME:
+					case TYPE_STRING:
+						type = AWD_FIELD_STRING;
+						ptr.str = (char*)block->GetStr(pid);
+						len = strlen(ptr.str);
+						break;
+
+					case TYPE_RGBA:
+						type = AWD_FIELD_COLOR;
+						len = sizeof(awd_color);
+						col = block->GetColor(pid);
+						ptr.v = malloc(len);
+						*ptr.col = awdutil_float_color(col.r, col.g, col.b, 1.0);
+						break;
+
+					case TYPE_FRGBA:
+						type = AWD_FIELD_COLOR;
+						len = sizeof(awd_color);
+						acol = block->GetAColor(pid);
+						ptr.v = malloc(len);
+						*ptr.col = awdutil_float_color(acol.r, acol.g, acol.b, acol.a);
 						break;
 				}
 
-				if (success) {
+				if (ptr.v != NULL) {
 					ParamDef def = block->GetParamDef(pid);
 					// TODO: Name is always lowercase. Is that correct for Max?
 					
