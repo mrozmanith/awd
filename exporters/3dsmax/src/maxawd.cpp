@@ -525,8 +525,28 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	path = tex->GetMapName();
 
 	// TODO: Deal differently with embedded textures
-	awdTex = new AWDBitmapTexture(EXTERNAL, name.data(), name.length());
-	awdTex->set_url(path, strlen(path));
+	if (opts.EmbedTextures()) {
+		int fd = open(path, _O_BINARY | _O_RDONLY);
+		
+		if (fd >= 0) {
+			struct stat fst;
+			fstat(fd, &fst);
+
+			awd_uint8 *buf = (awd_uint8*)malloc(fst.st_size);
+			read(fd, buf, fst.st_size);
+			close(fd);
+
+			awdTex = new AWDBitmapTexture(EMBEDDED, name.data(), name.Length());
+			awdTex->set_embed_data(buf, fst.st_size);
+		}
+		else {
+			// TODO: Handle failure, but how? Error message, or silently make external?
+		}
+	}
+	else {
+		awdTex = new AWDBitmapTexture(EXTERNAL, name.data(), name.length());
+		awdTex->set_url(path, strlen(path));
+	}
 
 	awd->add_texture(awdTex);
 
