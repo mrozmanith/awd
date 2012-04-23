@@ -16,6 +16,10 @@ private:
 	bool exportSkeletons;
 	bool exportSkelAnim;
 
+	bool createPreview;
+	bool launchPreview;
+	bool networkPreview;
+
 	static MaxAWDExporterOpts *imp;
 
 	static HWND miscOpts;
