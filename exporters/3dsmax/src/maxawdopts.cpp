@@ -12,6 +12,10 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 
 	exportSkeletons = true;
 	exportSkelAnim = true;
+
+	createPreview = true;
+	launchPreview = true;
+	networkPreview = false;
 }
 
 
@@ -129,6 +133,18 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	TabCtrl_InsertItem(tabPanel, 3, &tci);
 	viewerOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_VIEWER_OPTS), 
 		tabPanel, ViewerOptsDialogProc);
+
+	// Set defaults
+	SetCheckBox(miscOpts, IDC_INC_GEOM, imp->exportGeometry);
+	SetCheckBox(miscOpts, IDC_INC_SCENE, imp->exportScene);
+	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
+	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
+	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
+	SetCheckBox(animOpts, IDC_INC_SKELANIM, imp->exportSkelAnim);
+	SetCheckBox(viewerOpts, IDC_SWF_ENABLE, imp->createPreview);
+	SetCheckBox(viewerOpts, IDC_SWF_LAUNCH, imp->launchPreview);
+	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
+	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !imp->networkPreview);
 
 	// Select first tab
 	TabCtrl_SetCurSel(tabPanel, 0);
