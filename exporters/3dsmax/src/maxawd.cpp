@@ -16,6 +16,7 @@
 
 #include "awd/awd.h"
 #include "awd/platform.h"
+#include "awd/geomutil.h"
 #include "maxawd.h"
 #include "utils.h"
 
@@ -357,10 +358,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 	awdGeom = (AWDTriGeom *)cache->Get(obj);
 	if (awdGeom == NULL) {
-		int i;
-		int numVerts, numTris;
-		AWD_str_ptr vertData;
-		AWD_str_ptr indexData;
+		int t;
 
 		TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);	
 
@@ -371,44 +369,49 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 		// all vertices into node space.
 		Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
 
-		numVerts = mesh.getNumVerts();
-		vertData.v = malloc(3 * numVerts * sizeof(double));
+		int numTris = mesh.getNumFaces();
+		AWDGeomUtil geomUtil;
 
-		for (i=0; i<numVerts; i++) {
-			// Transform vertex into node space
-			Point3& vtx = offsMtx * mesh.getVert(i);
-			vertData.f64[i*3+0] = -vtx.x;
-			vertData.f64[i*3+1] = vtx.z;
-			vertData.f64[i*3+2] = vtx.y;
-		}
-
-		numTris = mesh.getNumFaces();
-		indexData.v = malloc(3 * numTris * sizeof(int));
-
-		for (i=0; i<numTris; i++) {
-			Face& face = mesh.faces[i];
+		for (t=0; t<numTris; t++) {
+			int v;
+			Face face = mesh.faces[t];
+			TVFace tvface = mesh.tvFace[t];
 			DWORD *inds = face.getAllVerts();
 
-			indexData.ui32[i*3+0] = inds[0];
-			indexData.ui32[i*3+1] = inds[2];
-			indexData.ui32[i*3+2] = inds[1];
+			for (v=0; v<3; v++) {
+				int vIdx = face.getVert(v);
+				Point3& vtx = offsMtx * mesh.getVert(vIdx);
+				Point3 tvtx = mesh.getTVert(tvface.getTVert(v));
+
+				vdata *vd = (vdata *)malloc(sizeof(vdata));
+				vd->orig_idx = vIdx;
+				vd->x = -vtx.x;
+				vd->y = vtx.z;
+				vd->z = vtx.y;
+				vd->u = tvtx.x;
+				vd->v = tvtx.y;
+				vd->nx = vd->ny = vd->nz = 0; // TODO: Implement normals
+				vd->num_bindings = 0; // TODO: Implement skinning
+				vd->mtlid = 0; // TODO: Implement sub-meshing
+
+				geomUtil.append_vdata_struct(vd);
+			}
 		}
 
-		AWDSubGeom *sub = new AWDSubGeom();
-		sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, vertData, numVerts*3);
-		sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, indexData, numTris*3);
-
+		// TODO: Re-enable skin export once geom util works as expected
+		/*
 		if (skin) {
 			ExportSkin(node, skin, sub);
 		}
+		*/
 
 		char *name = node->GetName();
 
 		// TODO: Use another name for the geometry
 		awdGeom = new AWDTriGeom(name, strlen(name));
-		awdGeom->add_sub_mesh(sub);
-		awd->add_mesh_data(awdGeom);
+		geomUtil.build_geom(awdGeom);
 
+		awd->add_mesh_data(awdGeom);
 		cache->Set(obj, awdGeom);
 
 		// If conversion created a new object, dispose it
