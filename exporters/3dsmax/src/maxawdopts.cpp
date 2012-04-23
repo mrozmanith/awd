@@ -56,7 +56,15 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 		case WM_COMMAND:
 			switch (wParam) {
 				case IDC_OK:
-					// TODO: Set options
+					imp->exportGeometry = (IsDlgButtonChecked(miscOpts, IDC_INC_GEOM) == BST_CHECKED);
+					imp->exportScene = (IsDlgButtonChecked(miscOpts, IDC_INC_SCENE) == BST_CHECKED);
+					imp->exportMaterials = (IsDlgButtonChecked(miscOpts, IDC_INC_MTL) == BST_CHECKED);
+					imp->embedTextures = (IsDlgButtonChecked(miscOpts, IDC_EMBED_TEX) == BST_CHECKED);
+					imp->exportSkeletons = (IsDlgButtonChecked(miscOpts, IDC_INC_SKEL) == BST_CHECKED);
+					imp->exportSkelAnim = (IsDlgButtonChecked(miscOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+					imp->createPreview = (IsDlgButtonChecked(miscOpts, IDC_SWF_ENABLE) == BST_CHECKED);
+					imp->launchPreview = (IsDlgButtonChecked(miscOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
+					imp->networkPreview = (IsDlgButtonChecked(miscOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
 					EndDialog(hWnd, IDOK);
 					break;
 
@@ -183,3 +191,47 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 }
 
 
+bool MaxAWDExporterOpts::ExportGeometry(void)
+{
+	return exportGeometry;
+}
+
+bool MaxAWDExporterOpts::ExportScene(void)
+{
+	return exportScene;
+}
+
+bool MaxAWDExporterOpts::ExportMaterials(void)
+{
+	return exportMaterials;
+}
+
+bool MaxAWDExporterOpts::EmbedTextures(void)
+{
+	return embedTextures;
+}
+
+bool MaxAWDExporterOpts::ExportSkeletons(void)
+{
+	return exportSkeletons;
+}
+
+bool MaxAWDExporterOpts::ExportSkelAnim(void)
+{
+	return exportSkelAnim;
+}
+
+bool MaxAWDExporterOpts::CreatePreview(void)
+{
+	return createPreview;
+}
+
+bool MaxAWDExporterOpts::LaunchPreview(void)
+{
+	return launchPreview;
+}
+
+bool MaxAWDExporterOpts::PreviewForDeployment(void)
+{
+	return networkPreview;
+}

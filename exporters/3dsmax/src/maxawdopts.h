@@ -42,5 +42,16 @@ public:
 	~MaxAWDExporterOpts(void);
 
 	bool ShowDialog(void);
+
+	// Getters for options
+	bool ExportGeometry(void);
+	bool ExportScene(void);
+	bool ExportMaterials(void);
+	bool EmbedTextures(void);
+	bool ExportSkeletons(void);
+	bool ExportSkelAnim(void);
+	bool CreatePreview(void);
+	bool LaunchPreview(void);
+	bool PreviewForDeployment(void);
 };
 
