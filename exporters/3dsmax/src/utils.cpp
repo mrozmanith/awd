@@ -65,6 +65,10 @@ SequenceMetaData *ParseSequenceFile(const char *path)
 			int nameLen;
 			char *name, *start, *end;
 
+			// Skip empty lines and comments
+			if (strlen(line)==0 || line[0]=='#')
+				continue;
+
 			// Read name and skip if missing.
 			name = strtok(line, " ");
 			if (!name) continue;
