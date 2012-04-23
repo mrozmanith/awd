@@ -77,7 +77,7 @@ class MaxAWDExporter : public SceneExport {
 		void				PrepareExport();
 		void				CleanUp();
 
-		void				CopyViewer(const TCHAR *awdName);
+		void				CopyViewer(const TCHAR *awdName, bool launch);
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);

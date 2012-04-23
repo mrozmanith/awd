@@ -142,8 +142,10 @@ int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BO
 	close(fd);
 
 	// Copy viewer HTML and SWF template to output directory
-	// TODO: Make this optional and configurable
-	CopyViewer(name);
+	if (opts.CreatePreview()) {
+		bool launch = (!suppressPrompts && opts.LaunchPreview());
+		CopyViewer(name, launch);
+	}
 
 	// Free used memory
 	CleanUp();
@@ -194,7 +196,7 @@ void MaxAWDExporter::CopyViewerHTML(char *templatePath, char *outPath, char *nam
 }
 
 
-void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
+void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath, bool launch)
 {
 	char awdDrive[4];
 	char awdPath[1024];
@@ -232,8 +234,9 @@ void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath)
 	CopyFile(tplSwfPath, outSwfPath, true);
 	CopyFile(tplJsPath, outJsPath, true);
 
-	//TODO: Move to end of export operation and make optional
-	//ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, SW_SHOWNORMAL);
+	if (launch) {
+		ShellExecute(NULL, "open", outHtmlPath, NULL, NULL, SW_SHOWNORMAL);
+	}
 }
 
 
