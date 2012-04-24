@@ -194,10 +194,10 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     AWD_str_ptr j_str;
 
     sub = new AWDSubGeom();
-    v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
-    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 0xffff);
-    n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
-    u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 0xffff);
+    v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
+    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 3 * this->num_exp_vd);
+    n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
+    u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * this->num_exp_vd);
 
     if (this->joints_per_vertex > 0) {
         int max_num_vals = this->num_exp_vd * this->joints_per_vertex;
@@ -279,7 +279,21 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
         }
     }
 
-    // TODO: Implement splitting of sub-meshes to avoid buffer overflows
+    // Reallocate buffers using final length if vertices were joined,
+    // in which case the highest index (v_idx) will not match the number
+    // of vdata structures that were added. There's no need to reallocate
+    // the index buffer since the triangle count will not have changed.
+    if (v_idx < this->num_exp_vd) {
+        v_str.v = realloc(v_str.v, sizeof(awd_float64) * 3 * v_idx);
+        u_str.v = realloc(u_str.v, sizeof(awd_float64) * 2 * v_idx);
+        n_str.v = realloc(n_str.v, sizeof(awd_float64) * 3 * v_idx);
+        if (this->joints_per_vertex > 0) {
+            w_str.v = realloc(w_str.v, sizeof(awd_float64) * v_idx * this->joints_per_vertex);
+            i_str.v = realloc(w_str.v, sizeof(awd_uint32) * v_idx * this->joints_per_vertex);
+        }
+    }
+
+
     sub = new AWDSubGeom();
     sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, v_str, v_idx*3);
     sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, i_str, i_idx);
