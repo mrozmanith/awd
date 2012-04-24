@@ -18,7 +18,28 @@ AWDGeomUtil::AWDGeomUtil()
 
 AWDGeomUtil::~AWDGeomUtil()
 {
-    // TODO: Dispose temporary structures
+    vdata *cur_v = this->exp_first_vd;
+    while (cur_v) {
+        ninfluence *cur_n;
+        vdata *next_v = cur_v->next_exp;
+
+        // Free skinning data if any
+        if (cur_v->num_bindings) {
+            free(cur_v->weights);
+            free(cur_v->joints);
+        }
+
+        // Free normal influence list
+        cur_n = cur_v->first_normal_influence;
+        while (cur_n) {
+            ninfluence *next_n = cur_n->next;
+            free(cur_n);
+            cur_n = next_n;
+        }
+
+        free(cur_v);
+        cur_v = next_v;
+    }
 }
 
 
