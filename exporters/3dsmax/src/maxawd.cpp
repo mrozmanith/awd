@@ -594,31 +594,58 @@ int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeight
 
 		for (iVtx=0; iVtx<numVerts; iVtx++) {
 			int iBone;
+			int iWeight;
 			int numBones;
 			double weightSum = 0;
 
 			numBones = context->GetNumAssignedBones(iVtx);
 
-			// For each weight/index slot, retrieve weight/index values
-			// from skin, or after having run out of assigned bones for
-			// a vertex, set weight to zero.
-			for (iBone=0; iBone<jointsPerVertex; iBone++) {
+			double *tmpWeights = (double*)malloc(numBones*sizeof(double));
+			int *tmpIndices = (int*)malloc(numBones*sizeof(int));
+
+			// Retrieve weight/index for all joints in skin.
+			for (iBone=0; iBone<numBones; iBone++) {
 				INode *bone = skin->GetBone(iBone);
+				tmpWeights[iBone] = context->GetBoneWeight(iVtx, iBone);
+				tmpIndices[iBone] = skel->IndexOfBone(bone);
+			}
 
-				// Calculate index in stream
-				int strIdx = iVtx*jointsPerVertex + iBone;
+			// Retrieve most significant joint weights from temporary buffers
+			// or after having run out of assigned bones for a vertex, set
+			// weight to zero.
+			for (iWeight=0; iWeight < jointsPerVertex; iWeight++) {
+				int strIdx = iVtx*jointsPerVertex + iWeight;
 
-				if (iBone < numBones) {
-					weights[strIdx] = context->GetBoneWeight(iVtx, iBone);
-					indices[strIdx] = skel->IndexOfBone(bone);
+				if (iWeight < numBones) {
+					int maxIBone = -1;
+					double max = 0.0;
+
+					// Loop through temporary buffer to find most significant
+					// joint (highest weight) and store it.
+					for (iBone=0; iBone<numBones; iBone++) {
+						if (tmpWeights[iBone] > max) {
+							max = tmpWeights[iBone];
+							maxIBone = iBone;
+						}
+					}
+
+					// Retrieve most significant weight/index pair
+					weights[strIdx] = tmpWeights[maxIBone];
+					indices[strIdx] = tmpIndices[maxIBone];
 
 					weightSum += weights[strIdx];
+
+					// Set to zero to mark as already used.
+					tmpWeights[maxIBone] = 0.0;
 				}
 				else {
 					weights[strIdx] = 0.0;
 					indices[strIdx] = 0;
 				}
 			}
+
+			free(tmpWeights);
+			free(tmpIndices);
 
 			// Normalize weights (sum must be 1.0)
 			double scale = 1/weightSum;
