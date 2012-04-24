@@ -62,6 +62,7 @@ AWDGeomUtil::append_vdata_struct(vdata *vd)
     this->exp_last_vd->last_normal_influence = NULL;
     this->exp_last_vd->next_col = NULL;
     this->exp_last_vd->next_exp = NULL;
+    this->exp_last_vd->out_idx = 0;
     this->num_exp_vd++;
 }
 
