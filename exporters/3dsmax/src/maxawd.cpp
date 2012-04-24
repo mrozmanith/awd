@@ -605,7 +605,8 @@ int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeight
 
 			// Retrieve weight/index for all joints in skin.
 			for (iBone=0; iBone<numBones; iBone++) {
-				INode *bone = skin->GetBone(iBone);
+				int boneId = context->GetAssignedBone(iVtx, iBone);
+				INode *bone = skin->GetBone(boneId);
 				tmpWeights[iBone] = context->GetBoneWeight(iVtx, iBone);
 				tmpIndices[iBone] = skel->IndexOfBone(bone);
 			}
