@@ -428,6 +428,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				}
 
 				vd->mtlid = 0; // TODO: Implement sub-meshing
+				vd->force_hard = false;
 
 				geomUtil.append_vdata_struct(vd);
 			}
