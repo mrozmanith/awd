@@ -401,8 +401,11 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				int vIdx = face.getVert(v);
 				int tvIdx = tvface.getTVert(v);
 				Point3 vtx = offsMtx * mesh.getVert(vIdx);
-				Point3 normal = mesh.getNormal(vIdx);
 				Point3 tvtx = mesh.getTVert(tvIdx);
+
+				// TODO: Define logic for choosing which normals to use	
+				//Point3 normal = mesh.getNormal(vIdx);
+				Point3 normal = mesh.FaceNormal(t, true);
 
 				vdata *vd = (vdata *)malloc(sizeof(vdata));
 				vd->orig_idx = vIdx;
