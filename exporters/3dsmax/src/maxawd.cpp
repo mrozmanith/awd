@@ -126,8 +126,8 @@ void MaxAWDExporter::ShowAbout(HWND hWnd)
 
 BOOL MaxAWDExporter::SupportsOptions(int ext, DWORD options)
 {
-	#pragma message(TODO("Decide which options to support.  Simply return true for each option supported by each Extension the exporter supports."))
-	return TRUE;
+	// Does not at the moment support selection-only export.
+	return FALSE;
 }
 
 
