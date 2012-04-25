@@ -11,7 +11,14 @@ BlockCache::BlockCache(void)
 
 BlockCache::~BlockCache(void)
 {
-	// TODO: Free all items
+	BlockCacheItem *cur = firstItem;
+	while (cur) {
+		BlockCacheItem *next = cur->next;
+		free(cur);
+		cur = next;
+	}
+
+	firstItem = lastItem = NULL;
 }
 
 void BlockCache::Set(void *key, void *val)
@@ -59,7 +66,14 @@ ColorMaterialCache::ColorMaterialCache(void)
 
 ColorMaterialCache::~ColorMaterialCache(void)
 {
-	// TODO: Free all items
+	ColorMaterialCacheItem *cur = firstItem;
+	while (cur) {
+		ColorMaterialCacheItem *next = cur->next;
+		free(cur);
+		cur = next;
+	}
+
+	firstItem = lastItem = NULL;
 }
 
 void ColorMaterialCache::Set(awd_color color, AWDMaterial *mtl)
@@ -118,7 +132,14 @@ SkeletonCacheItem::SkeletonCacheItem(INode *maxRootBone)
 
 SkeletonCacheItem::~SkeletonCacheItem(void)
 {
-	// TODO: Delete all joints
+	SkeletonCacheJoint *cur = firstJoint;
+	while (cur) {
+		SkeletonCacheJoint *next = cur->next;
+		free(cur);
+		cur = next;
+	}
+
+	firstJoint = lastJoint = NULL;
 }
 
 
@@ -249,7 +270,14 @@ SkeletonCache::SkeletonCache(void)
 
 SkeletonCache::~SkeletonCache(void)
 {
-	// TODO: Free all items
+	SkeletonCacheItem *cur = firstItem;
+	while (cur) {
+		SkeletonCacheItem *next = cur->next;
+		delete cur;
+		cur = next;
+	}
+
+	firstItem = lastItem = NULL;
 }
 
 
