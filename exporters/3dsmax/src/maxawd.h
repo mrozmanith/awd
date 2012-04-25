@@ -54,6 +54,7 @@ class MaxAWDExporter : public SceneExport {
 		const char *awdFullPath;
 		bool suppressDialogs;
 
+		int fd;
 		AWD *awd;
 		BlockCache *cache;
 		SkeletonCache *skeletonCache;
