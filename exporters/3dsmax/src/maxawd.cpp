@@ -628,7 +628,6 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	name = tex->GetName();
 	path = tex->GetMapName();
 
-	// TODO: Deal differently with embedded textures
 	if (opts.EmbedTextures()) {
 		int fd = open(path, _O_BINARY | _O_RDONLY);
 		
@@ -830,7 +829,6 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 					// TODO: Consider coming  up with a proper name
 					pose = new AWDSkeletonPose("", 0);
 
-					// TODO: Sample all bones for this pose
 					curSkel->IterReset();
 					while ((curJoint = curSkel->IterNext()) != NULL) {
 						INode *bone = curJoint->maxBone;
@@ -935,7 +933,6 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 
 				if (ptr.v != NULL) {
 					ParamDef def = block->GetParamDef(pid);
-					// TODO: Name is always lowercase. Is that correct for Max?
 					
 					if (ns == NULL) {
 						// Namespace has not yet been created; ns is a static
