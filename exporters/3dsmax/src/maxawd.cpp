@@ -53,7 +53,17 @@ ClassDesc2* GetMaxAWDExporterDesc() {
 }
 
 
-
+/**
+ * Invoked by the Interface::ProgressStart() method to execute
+ * the export operation while showing the progress bar. The
+ * argument is specified by MaxAWDExporter::DoExport() as the
+ * instance of the exporter.
+*/
+static DWORD ExecuteExportCallback(void *arg)
+{
+	MaxAWDExporter *exporter = (MaxAWDExporter*)arg;
+	return exporter->ExecuteExport();
+}
 
 
 MaxAWDExporter::MaxAWDExporter()
@@ -121,46 +131,61 @@ BOOL MaxAWDExporter::SupportsOptions(int ext, DWORD options)
 }
 
 
-int	MaxAWDExporter::DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
+int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BOOL suppressPrompts, DWORD options)
 {
+	awdFullPath = path;
+	maxInterface = i;
+	suppressDialogs = suppressPrompts;
+
 	// Open the dialog (provided that prompts are not suppressed) and
 	// if it returns false, return to cancel the export.
 	if (!suppressPrompts && !opts.ShowDialog()) {
 		return true;
 	}
 
-	PrepareExport();
-
-	// Traverse MAX nodes and add to AWD structure.
-	INode *root = i->GetRootNode();
-	ExportSkeletons(root);
-	ExportNode(root, NULL);
-
-	// Export animation if enabled and if a sequences.txt file was found
-	if (opts.ExportSkelAnim()) {
-		SequenceMetaData *sequences = LoadSequenceFile(name);
-		if (sequences != NULL)
-			ExportAnimation(sequences);
-	}
-
-	// Flush serialized AWD structure to file
-	int fd = open(name, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
-	awd->flush(fd);
-	close(fd);
-
-	// Copy viewer HTML and SWF template to output directory
-	if (opts.CreatePreview()) {
-		bool launch = (!suppressPrompts && opts.LaunchPreview());
-		CopyViewer(name, launch);
-	}
-
-	// Free used memory
-	CleanUp();
+	// Execute export while showing a progress bar. Send this as argument
+	// to the execute callback, which will invoke MaxAWDExporter::ExecuteExport();
+	maxInterface->ProgressStart("Exporting AWD file", TRUE, &ExecuteExportCallback, this);
 
 	// Export worked
 	return TRUE;
 }
 
+
+int MaxAWDExporter::ExecuteExport()
+{
+	PrepareExport();
+
+	// Traverse MAX nodes and add to AWD structure.
+	INode *root = maxInterface->GetRootNode();
+	ExportSkeletons(root);
+	ExportNode(root, NULL);
+
+	// Export animation if enabled and if a sequences.txt file was found
+	if (opts.ExportSkelAnim()) {
+		SequenceMetaData *sequences = LoadSequenceFile(awdFullPath);
+		if (sequences != NULL)
+			ExportAnimation(sequences);
+	}
+
+	// Flush serialized AWD structure to file
+	int fd = open(awdFullPath, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
+	awd->flush(fd);
+	close(fd);
+
+	maxInterface->ProgressEnd();
+
+	// Copy viewer HTML and SWF template to output directory
+	if (opts.CreatePreview()) {
+		bool launch = (!suppressDialogs && opts.LaunchPreview());
+		CopyViewer(launch);
+	}
+
+	// Free used memory
+	CleanUp();
+
+	return TRUE;
+}
 
 void MaxAWDExporter::PrepareExport()
 {
@@ -203,7 +228,7 @@ void MaxAWDExporter::CopyViewerHTML(char *templatePath, char *outPath, char *nam
 }
 
 
-void MaxAWDExporter::CopyViewer(const TCHAR *awdFullPath, bool launch)
+void MaxAWDExporter::CopyViewer(bool launch)
 {
 	char awdDrive[4];
 	char awdPath[1024];

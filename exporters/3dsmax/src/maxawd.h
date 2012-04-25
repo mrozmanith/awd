@@ -45,6 +45,10 @@ typedef struct SequenceMetaData_struct {
 
 class MaxAWDExporter : public SceneExport {
 	private:
+		Interface *maxInterface;
+		const char *awdFullPath;
+		bool suppressDialogs;
+
 		AWD *awd;
 		BlockCache *cache;
 		SkeletonCache *skeletonCache;
@@ -70,6 +74,8 @@ class MaxAWDExporter : public SceneExport {
 		BOOL SupportsOptions(int ext, DWORD options);
 		int	 DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
+		int ExecuteExport();
+
 		//Constructor/Destructor
 		MaxAWDExporter();
 		~MaxAWDExporter();
@@ -77,7 +83,7 @@ class MaxAWDExporter : public SceneExport {
 		void				PrepareExport();
 		void				CleanUp();
 
-		void				CopyViewer(const TCHAR *awdName, bool launch);
+		void				CopyViewer(bool launch);
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);
