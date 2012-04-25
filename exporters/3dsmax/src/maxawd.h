@@ -30,6 +30,11 @@
 #include <iskin.h>
 #include <modstack.h>
 
+#define MAXAWD_PHASE_SKEL 1
+#define MAXAWD_PHASE_SCENE 2
+#define MAXAWD_PHASE_ANIM 3
+#define MAXAWD_PHASE_FLUSH 4
+
 extern TCHAR *GetString(int id);
 
 extern HINSTANCE hInstance;
@@ -54,7 +59,12 @@ class MaxAWDExporter : public SceneExport {
 		SkeletonCache *skeletonCache;
 		ColorMaterialCache *colMtlCache;
 
+		int numNodesTotal;
+		int numNodesTraversed;
+
 		MaxAWDExporterOpts opts;
+
+		void UpdateProgressBar(int phase, double phaseProgress);
 
 	public:
 		

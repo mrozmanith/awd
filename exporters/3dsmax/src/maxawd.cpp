@@ -156,9 +156,17 @@ int MaxAWDExporter::ExecuteExport()
 {
 	PrepareExport();
 
-	// Traverse MAX nodes and add to AWD structure.
+	// Get total number of nodes for progress calculation
 	INode *root = maxInterface->GetRootNode();
+	numNodesTotal = CalcNumDescendants(root);
+
+	// Traverse node tree for skeletons
+	numNodesTraversed = 0;
 	ExportSkeletons(root);
+
+	// Traverse node tree again for scene objects
+	// (including their geometry, materials, et c)
+	numNodesTraversed = 0;
 	ExportNode(root, NULL);
 
 	// Export animation if enabled and if a sequences.txt file was found
@@ -202,6 +210,41 @@ void MaxAWDExporter::CleanUp()
 	delete cache;
 	delete colMtlCache;
 	delete skeletonCache;
+}
+
+
+void MaxAWDExporter::UpdateProgressBar(int phase, double phaseProgress)
+{
+	int phaseStart;
+	int phaseFinish;
+	char *title;
+
+	switch (phase) {
+		case MAXAWD_PHASE_SKEL:
+			phaseStart = 0;
+			phaseFinish = 20;
+			title = "Skeletons";
+			break;
+		case MAXAWD_PHASE_SCENE:
+			phaseStart = 20;
+			phaseFinish = 60;
+			title = "Scene & geometry";
+			break;
+		case MAXAWD_PHASE_ANIM:
+			phaseStart = 60;
+			phaseFinish = 80;
+			title = "Animation";
+			break;
+		case MAXAWD_PHASE_FLUSH:
+			phaseStart = 80;
+			phaseFinish = 100;
+			title = "Writing file";
+			break;
+	}
+
+	int phaseLen = phaseFinish - phaseStart;
+	int progress = phaseStart + floor(phaseProgress*phaseLen + 0.5);
+	maxInterface->ProgressUpdate(progress, FALSE, title);
 }
 
 
@@ -338,12 +381,24 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 		}
 	}
 
+	numNodesTraversed++;
+
 	if (goDeeper) {
 		int i;
 		int numChildren = node->NumberOfChildren();
+
+		// Update progress bar before recursing
+		UpdateProgressBar(MAXAWD_PHASE_SCENE, (double)numNodesTraversed/(double)numNodesTotal);
+
 		for (i=0; i<numChildren; i++) {
 			ExportNode(node->GetChildNode(i), awdParent);
 		}
+	}
+	else {
+		// No need to traverse this branch further. Count all
+		// descendants as traversed and update progress bar.
+		numNodesTraversed += CalcNumDescendants(node);
+		UpdateProgressBar(MAXAWD_PHASE_SCENE, (double)numNodesTraversed/(double)numNodesTotal);
 	}
 }
 
@@ -692,14 +747,25 @@ int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeight
 
 void MaxAWDExporter::ExportSkeletons(INode *node)
 {
+	numNodesTraversed++;
+
 	Object *obj = node->GetObjectRef();
 	if (obj && obj->ClassID() == BONE_OBJ_CLASSID) {
 		ExportSkeleton(node);
+
+		// No need to traverse this branch further. Count
+		// the entire branch as traversed.
+		numNodesTraversed += CalcNumDescendants(node);
+		UpdateProgressBar(MAXAWD_PHASE_SKEL, (double)numNodesTraversed/(double)numNodesTotal);
 	}
 	else {
 		// This wasn't a bone, but there might be bones
 		// further down the hierarchy from this one
 		int i;
+
+		// Update progress bar before recursing
+		UpdateProgressBar(MAXAWD_PHASE_SKEL, (double)numNodesTraversed/(double)numNodesTotal);
+
 		for (i=0; i<node->NumberOfChildren(); i++) {
 			ExportSkeletons(node->GetChildNode(i));
 		}
