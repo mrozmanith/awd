@@ -473,15 +473,22 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		for (t=0; t<numTris; t++) {
 			int v;
+			TVFace tvface;
 			Face face = mesh.faces[t];
-			TVFace tvface = mesh.tvFace[t];
 			DWORD *inds = face.getAllVerts();
+
+			if (mesh.tvFace)
+				tvface = mesh.tvFace[t];
 
 			for (v=0; v<3; v++) {
 				int vIdx = face.getVert(v);
-				int tvIdx = tvface.getTVert(v);
+				Point3 tvtx;
 				Point3 vtx = offsMtx * mesh.getVert(vIdx);
-				Point3 tvtx = mesh.getTVert(tvIdx);
+
+				if (mesh.tvFace) {
+					int tvIdx = tvface.getTVert(v);
+					tvtx = mesh.getTVert(tvIdx);
+				}
 
 				// TODO: Define logic for choosing which normals to use	
 				//Point3 normal = mesh.getNormal(vIdx);
@@ -492,8 +499,18 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				vd->x = -vtx.x;
 				vd->y = vtx.z;
 				vd->z = vtx.y;
-				vd->u = tvtx.x;
-				vd->v = tvtx.y;
+				
+				// Might not have UV coords
+				if (mesh.tvFace) {
+					vd->u = tvtx.x;
+					vd->v = tvtx.y;
+				}
+				else {
+					// TODO: Set flag to skip UVs instead
+					vd->u = 0.0;
+					vd->v = 0.0;
+				}
+
 				vd->nx = -normal.x;
 				vd->ny = normal.z;
 				vd->nz = normal.y;
