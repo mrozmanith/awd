@@ -13,6 +13,11 @@ void SerializeMatrix3(Matrix3 &mtx, double *output);
 int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject);
 
 /**
+ * Calculate total number of descendant nodes by recursing tree.
+*/
+int CalcNumDescendants(INode *node);
+
+/**
  * Find and load the animation sequence description file.
 */
 SequenceMetaData *LoadSequenceFile(const char *awdFullPath);

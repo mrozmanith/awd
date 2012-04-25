@@ -48,6 +48,19 @@ int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
 }
 
 
+int CalcNumDescendants(INode *node)
+{
+	int i;
+	int num = node->NumberOfChildren();
+	
+	for (i=0; i<node->NumberOfChildren(); i++) {
+		num += CalcNumDescendants(node->GetChildNode(i));
+	}
+
+	return num;
+}
+
+
 SequenceMetaData *ParseSequenceFile(const char *path)
 {
 	FILE *fp;
