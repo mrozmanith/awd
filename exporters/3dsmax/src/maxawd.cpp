@@ -143,6 +143,11 @@ int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BO
 		return true;
 	}
 
+	// Open file and check for success
+	fd = open(awdFullPath, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
+	if (fd == -1)
+		return FALSE;
+	
 	// Execute export while showing a progress bar. Send this as argument
 	// to the execute callback, which will invoke MaxAWDExporter::ExecuteExport();
 	maxInterface->ProgressStart("Exporting AWD file", TRUE, &ExecuteExportCallback, this);
@@ -177,7 +182,6 @@ int MaxAWDExporter::ExecuteExport()
 	}
 
 	// Flush serialized AWD structure to file
-	int fd = open(awdFullPath, _O_TRUNC | _O_CREAT | _O_BINARY | _O_RDWR, _S_IWRITE);
 	awd->flush(fd);
 	close(fd);
 
