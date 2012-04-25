@@ -538,13 +538,6 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 			}
 		}
 
-		// TODO: Re-enable skin export once geom util works as expected
-		/*
-		if (skin) {
-			ExportSkin(node, skin, sub);
-		}
-		*/
-
 		char *name = node->GetName();
 
 		// TODO: Use another name for the geometry
