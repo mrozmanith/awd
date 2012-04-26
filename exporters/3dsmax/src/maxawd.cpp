@@ -468,6 +468,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		AWDGeomUtil geomUtil;
 		geomUtil.joints_per_vertex = jpv;
+		geomUtil.include_uv = (mesh.tvFace != NULL);
 
 		int numTris = mesh.getNumFaces();
 
@@ -482,18 +483,12 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 			Face face = mesh.faces[t];
 			DWORD *inds = face.getAllVerts();
 
-			if (mesh.tvFace)
+			if (geomUtil.include_uv)
 				tvface = mesh.tvFace[t];
 
 			for (v=0; v<3; v++) {
 				int vIdx = face.getVert(v);
-				Point3 tvtx;
 				Point3 vtx = offsMtx * mesh.getVert(vIdx);
-
-				if (mesh.tvFace) {
-					int tvIdx = tvface.getTVert(v);
-					tvtx = mesh.getTVert(tvIdx);
-				}
 
 				// TODO: Define logic for choosing which normals to use	
 				//Point3 normal = mesh.getNormal(vIdx);
@@ -506,14 +501,12 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				vd->z = vtx.y;
 				
 				// Might not have UV coords
-				if (mesh.tvFace) {
+				if (geomUtil.include_uv) {
+					int tvIdx = tvface.getTVert(v);
+					Point3 tvtx = mesh.getTVert(tvIdx);
+
 					vd->u = tvtx.x;
 					vd->v = tvtx.y;
-				}
-				else {
-					// TODO: Set flag to skip UVs instead
-					vd->u = 0.0;
-					vd->v = 0.0;
 				}
 
 				vd->nx = -normal.x;
