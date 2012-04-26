@@ -35,12 +35,16 @@ BEGIN
     CONTROL         "Custom1",IDC_ROLLUP,"RollupWindow",WS_TABSTOP,7,7,290,212
 END
 
-IDD_AWD_MISC_OPTS DIALOGEX 0, 15, 280, 51
+IDD_AWD_SCENE_OPTS DIALOGEX 0, 15, 280, 118
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Include geometry",IDC_INC_GEOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,72,10
-    CONTROL         "Include scenegraph hierarchy",IDC_INC_SCENE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,111,10
+    CONTROL         "Include geometry",IDC_INC_GEOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,25,72,10
+    CONTROL         "Include scenegraph hierarchy",IDC_INC_SCENE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,111,10
+    CONTROL         "Include skinning data",IDC_INC_SKIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,41,83,10
+    CONTROL         "",IDC_JPV_SPINNER,"SpinnerControl",WS_TABSTOP,147,55,7,10
+    CONTROL         "",IDC_JPV_EDIT,"CustEdit",WS_TABSTOP,97,55,48,10
+    LTEXT           "Joints per vertex:",IDC_STATIC,30,55,58,8
 END
 
 IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 52
@@ -63,7 +67,7 @@ BEGIN
     LTEXT           "The Flash Player security policy prevents a SWF file from accessing both local files and files via a network. Select whether to generate a SWF file for local preview or deployment online.",IDC_STATIC,20,55,236,24
 END
 
-IDD_AWD_ANIM_OPTS DIALOGEX 0, 15, 280, 107
+IDD_AWD_ANIM_OPTS DIALOGEX 0, 15, 280, 126
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -73,6 +77,13 @@ BEGIN
     EDITTEXT        IDC_SEQ_TXT,7,80,149,14,ES_AUTOHSCROLL
     LTEXT           "Sequence list file",IDC_STATIC,7,48,54,8
     LTEXT           "A files that specifies names and frame ranges for animation sequences. See documentation for details.",IDC_STATIC,7,60,183,17
+    LTEXT           "See geometry panel for skinning options.",IDC_STATIC,7,105,183,10
+END
+
+IDD_AWD_GENERAL_OPTS DIALOGEX 0, 15, 280, 51
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
 END
 
 
@@ -92,12 +103,12 @@ BEGIN
         BOTTOMMARGIN, 237
     END
 
-    IDD_AWD_MISC_OPTS, DIALOG
+    IDD_AWD_SCENE_OPTS, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 44
+        BOTTOMMARGIN, 111
     END
 
     IDD_AWD_MTL_OPTS, DIALOG
@@ -121,7 +132,15 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 100
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_AWD_GENERAL_OPTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 273
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 44
     END
 END
 #endif    // APSTUDIO_INVOKED
