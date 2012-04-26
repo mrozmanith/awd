@@ -944,7 +944,7 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 						awd->add_namespace(ns);
 					}
 
-					elem->set_attr(ns, def.int_name, strlen(def.int_name), ptr, len, AWD_FIELD_FLOAT32);
+					elem->set_attr(ns, def.int_name, strlen(def.int_name), ptr, len, type);
 				}
 			}
 		}
