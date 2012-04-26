@@ -5,6 +5,10 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 {
 	// Default values
 	compression = (int)DEFLATE;
+	exportAttributes = true;
+
+	attributeNamespace = (char*)malloc(25);
+	strncpy(attributeNamespace, "http://example.com/awdns\0", 25);
 
 	exportScene = true;
 	exportGeometry = true;
@@ -61,27 +65,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 		case WM_COMMAND:
 			switch (wParam) {
 				case IDC_OK:
-					// General options
-					imp->compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
-
-					// Scene & geometry options
-					imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
-					imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
-					imp->exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
-					imp->jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
-					
-					// Material options
-					imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
-					imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_EMBED_TEX) == BST_CHECKED);
-
-					// Animation options
-					imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
-					imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
-
-					// Preview options
-					imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
-					imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
-					imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+					SaveOptions();
 					EndDialog(hWnd, IDOK);
 					break;
 
@@ -130,6 +114,8 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 
 	// Set defaults
 	ComboBox_SetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO), imp->compression);
+	SetCheckBox(generalOpts, IDC_INC_ATTR, imp->exportAttributes);
+	Edit_SetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace);
 	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
 	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
 	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
@@ -144,6 +130,38 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 
 	rollup->Show();
 }
+
+
+void MaxAWDExporterOpts::SaveOptions(void)
+{
+	// General options
+	imp->compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
+	imp->exportAttributes = (IsDlgButtonChecked(generalOpts, IDC_INC_ATTR) == BST_CHECKED);
+	
+	int len = Edit_GetTextLength(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT));
+	imp->attributeNamespace = (char*)realloc(imp->attributeNamespace, len + 1);
+	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace, len);
+
+	// Scene & geometry options
+	imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
+	imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
+	imp->exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
+	imp->jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
+					
+	// Material options
+	imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
+	imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_EMBED_TEX) == BST_CHECKED);
+
+	// Animation options
+	imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
+	imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+
+	// Preview options
+	imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
+	imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
+	imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+}
+
 
 
 INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
@@ -201,6 +219,16 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 int MaxAWDExporterOpts::Compression(void)
 {
 	return compression;
+}
+
+bool MaxAWDExporterOpts::ExportAttributes(void)
+{
+	return exportAttributes;
+}
+
+char *MaxAWDExporterOpts::AttributeNamespace(void)
+{
+	return attributeNamespace;
 }
 
 bool MaxAWDExporterOpts::ExportScene(void)

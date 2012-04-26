@@ -10,6 +10,8 @@ class MaxAWDExporterOpts
 {
 private:
 	int compression;
+	bool exportAttributes;
+	char *attributeNamespace;
 
 	bool exportScene;
 	bool exportGeometry;
@@ -37,6 +39,7 @@ private:
 	// Main proc function and helpers
 	static INT_PTR CALLBACK DialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static void InitDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static void SaveOptions(void);
 
 	// Tab panel proc functions
 	static INT_PTR CALLBACK GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
@@ -53,6 +56,8 @@ public:
 
 	// Getters for options
 	int Compression(void);
+	bool ExportAttributes(void);
+	char *AttributeNamespace(void);
 
 	bool ExportScene(void);
 	bool ExportGeometry(void);
