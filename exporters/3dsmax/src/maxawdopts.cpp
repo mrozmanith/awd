@@ -4,8 +4,10 @@
 MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 {
 	// Default values
-	exportGeometry = true;
 	exportScene = true;
+	exportGeometry = true;
+	exportSkin = true;
+	jointsPerVertex = 2;
 
 	exportMaterials = true;
 	embedTextures = false;
@@ -21,7 +23,8 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 
 // Static members
 MaxAWDExporterOpts *MaxAWDExporterOpts::imp = NULL;
-HWND MaxAWDExporterOpts::miscOpts = NULL;
+HWND MaxAWDExporterOpts::generalOpts = NULL;
+HWND MaxAWDExporterOpts::sceneOpts = NULL;
 HWND MaxAWDExporterOpts::mtlOpts = NULL;
 HWND MaxAWDExporterOpts::animOpts = NULL;
 HWND MaxAWDExporterOpts::viewerOpts = NULL;
@@ -56,12 +59,21 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 		case WM_COMMAND:
 			switch (wParam) {
 				case IDC_OK:
-					imp->exportGeometry = (IsDlgButtonChecked(miscOpts, IDC_INC_GEOM) == BST_CHECKED);
-					imp->exportScene = (IsDlgButtonChecked(miscOpts, IDC_INC_SCENE) == BST_CHECKED);
+					// Scene & geometry options
+					imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
+					imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
+					imp->exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
+					imp->jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
+					
+					// Material options
 					imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
 					imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_EMBED_TEX) == BST_CHECKED);
+
+					// Animation options
 					imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
 					imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+
+					// Preview options
 					imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
 					imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
 					imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
@@ -74,44 +86,12 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 			}
 			return TRUE;
 
-		case WM_NOTIFY:
-			if (((LPNMHDR)lParam)->code == TCN_SELCHANGE) {
-				switch (TabCtrl_GetCurSel(((LPNMHDR)lParam)->hwndFrom)) {
-					case 0:
-						ShowWindow(miscOpts, TRUE);
-						ShowWindow(mtlOpts, FALSE);
-						ShowWindow(animOpts, FALSE);
-						ShowWindow(viewerOpts, FALSE);
-						break;
-					case 1:
-						ShowWindow(miscOpts, FALSE);
-						ShowWindow(mtlOpts, TRUE);
-						ShowWindow(animOpts, FALSE);
-						ShowWindow(viewerOpts, FALSE);
-						break;
-					case 2:
-						ShowWindow(miscOpts, FALSE);
-						ShowWindow(mtlOpts, FALSE);
-						ShowWindow(animOpts, TRUE);
-						ShowWindow(viewerOpts, FALSE);
-						break;
-					case 3:
-						ShowWindow(miscOpts, FALSE);
-						ShowWindow(mtlOpts, FALSE);
-						ShowWindow(animOpts, FALSE);
-						ShowWindow(viewerOpts, TRUE);
-						break;
-				};
-				return TRUE;
-			}
-			break;
-
 		case WM_CLOSE:
 			EndDialog(hWnd, 0);
 			return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
 
@@ -123,10 +103,13 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	HWND rh = GetDlgItem(hWnd, IDC_ROLLUP);
 	IRollupWindow *rollup = GetIRollup(rh);
 
-	index = rollup->AppendRollup(hInstance, (const char *)MAKEINTRESOURCE(IDD_AWD_MISC_OPTS), 
-		MiscOptsDialogProc, "Scene & misc");
-	miscOpts = rollup->GetPanelDlg(index);
+	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_GENERAL_OPTS),
+		GeneralOptsDialogProc, "General");
+	generalOpts = rollup->GetPanelDlg(index);
 
+	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_SCENE_OPTS), 
+		SceneOptsDialogProc, "Scene & geometry");
+	sceneOpts = rollup->GetPanelDlg(index);
 	
 	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_MTL_OPTS), 
 		MtlOptsDialogProc, "Materials");
@@ -141,8 +124,8 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	viewerOpts = rollup->GetPanelDlg(index);
 
 	// Set defaults
-	SetCheckBox(miscOpts, IDC_INC_GEOM, imp->exportGeometry);
-	SetCheckBox(miscOpts, IDC_INC_SCENE, imp->exportScene);
+	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
+	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
 	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
 	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
 	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
@@ -156,7 +139,22 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 }
 
 
-INT_PTR CALLBACK MaxAWDExporterOpts::MiscOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+{
+	switch (message) {
+		case WM_INITDIALOG:
+			ISpinnerControl *spinner = GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER));
+			spinner->SetValue(imp->jointsPerVertex, FALSE);
+			spinner->SetLimits(1, 5, FALSE);
+			spinner->LinkToEdit(GetDlgItem(hWnd,IDC_JPV_EDIT),EDITTYPE_INT);
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+
+INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	// TODO: implement proc
 	return FALSE;
@@ -184,14 +182,24 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 }
 
 
+bool MaxAWDExporterOpts::ExportScene(void)
+{
+	return exportScene;
+}
+
 bool MaxAWDExporterOpts::ExportGeometry(void)
 {
 	return exportGeometry;
 }
 
-bool MaxAWDExporterOpts::ExportScene(void)
+bool MaxAWDExporterOpts::ExportSkin(void)
 {
-	return exportScene;
+	return exportSkin;
+}
+
+int MaxAWDExporterOpts::JointsPerVertex(void)
+{
+	return jointsPerVertex;
 }
 
 bool MaxAWDExporterOpts::ExportMaterials(void)
@@ -212,11 +220,6 @@ bool MaxAWDExporterOpts::ExportSkeletons(void)
 bool MaxAWDExporterOpts::ExportSkelAnim(void)
 {
 	return exportSkelAnim;
-}
-
-int MaxAWDExporterOpts::JointsPerVertex(void)
-{
-	return jointsPerVertex;
 }
 
 bool MaxAWDExporterOpts::CreatePreview(void)

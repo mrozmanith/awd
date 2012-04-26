@@ -7,15 +7,16 @@
 class MaxAWDExporterOpts
 {
 private:
-	bool exportGeometry;
 	bool exportScene;
-
+	bool exportGeometry;
+	bool exportSkin;
+	int jointsPerVertex;
+	
 	bool exportMaterials;
 	bool embedTextures;
 
 	bool exportSkeletons;
 	bool exportSkelAnim;
-	int jointsPerVertex;
 
 	bool createPreview;
 	bool launchPreview;
@@ -23,7 +24,8 @@ private:
 
 	static MaxAWDExporterOpts *imp;
 
-	static HWND miscOpts;
+	static HWND generalOpts;
+	static HWND sceneOpts;
 	static HWND mtlOpts;
 	static HWND animOpts;
 	static HWND viewerOpts;
@@ -33,7 +35,8 @@ private:
 	static void InitDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	// Tab panel proc functions
-	static INT_PTR CALLBACK MiscOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static INT_PTR CALLBACK GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static INT_PTR CALLBACK SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static INT_PTR CALLBACK MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static INT_PTR CALLBACK AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static INT_PTR CALLBACK ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
@@ -45,13 +48,17 @@ public:
 	bool ShowDialog(void);
 
 	// Getters for options
-	bool ExportGeometry(void);
 	bool ExportScene(void);
+	bool ExportGeometry(void);
+	bool ExportSkin(void);
+	int JointsPerVertex();
+
 	bool ExportMaterials(void);
 	bool EmbedTextures(void);
+
 	bool ExportSkeletons(void);
 	bool ExportSkelAnim(void);
-	int JointsPerVertex();
+	
 	bool CreatePreview(void);
 	bool LaunchPreview(void);
 	bool PreviewForDeployment(void);
