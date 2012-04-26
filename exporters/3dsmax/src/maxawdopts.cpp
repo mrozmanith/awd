@@ -126,6 +126,7 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	// Set defaults
 	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
 	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
+	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
 	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
 	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
 	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
@@ -144,8 +145,8 @@ INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,
 	switch (message) {
 		case WM_INITDIALOG:
 			ISpinnerControl *spinner = GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER));
-			spinner->SetValue(imp->jointsPerVertex, FALSE);
 			spinner->SetLimits(1, 5, FALSE);
+			spinner->SetValue(imp->jointsPerVertex, TRUE);
 			spinner->LinkToEdit(GetDlgItem(hWnd,IDC_JPV_EDIT),EDITTYPE_INT);
 			return TRUE;
 	}
