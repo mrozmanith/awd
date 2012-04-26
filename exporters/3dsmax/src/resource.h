@@ -30,10 +30,11 @@
 #define IDC_INC_SKELANIM                1013
 #define IDC_EDIT1                       1014
 #define IDC_SEQ_TXT                     1014
+#define IDC_CUSTOM1                     1015
+#define IDC_ROLLUP                      1015
 #define IDC_COLOR                       1456
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
-#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 
@@ -41,7 +42,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

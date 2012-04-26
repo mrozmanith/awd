@@ -1,5 +1,5 @@
 #include "maxawdopts.h"
-
+#include <custcont.h>
 
 MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 {
@@ -118,29 +118,27 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 
 void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	HWND tabPanel = GetDlgItem(hWnd, IDC_TABPANEL);
-	TCITEM tci = {0};
-	tci.mask = TCIF_TEXT|TCIF_STATE;
+	int index;
 
-	tci.pszText = _T("Scene && misc");
-	TabCtrl_InsertItem(tabPanel, 0, &tci);
-	miscOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_MISC_OPTS), 
-		tabPanel, MiscOptsDialogProc);
-	
-	tci.pszText = _T("Materials");
-	TabCtrl_InsertItem(tabPanel, 1, &tci);
-	mtlOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_MTL_OPTS), 
-		tabPanel, MtlOptsDialogProc);
-	
-	tci.pszText = _T("Animation");
-	TabCtrl_InsertItem(tabPanel, 2, &tci);
-	animOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_ANIM_OPTS), 
-		tabPanel, AnimOptsDialogProc);
+	HWND rh = GetDlgItem(hWnd, IDC_ROLLUP);
+	IRollupWindow *rollup = GetIRollup(rh);
 
-	tci.pszText = _T("Previewer");
-	TabCtrl_InsertItem(tabPanel, 3, &tci);
-	viewerOpts = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_AWD_VIEWER_OPTS), 
-		tabPanel, ViewerOptsDialogProc);
+	index = rollup->AppendRollup(hInstance, (const char *)MAKEINTRESOURCE(IDD_AWD_MISC_OPTS), 
+		MiscOptsDialogProc, "Scene & misc");
+	miscOpts = rollup->GetPanelDlg(index);
+
+	
+	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_MTL_OPTS), 
+		MtlOptsDialogProc, "Materials");
+	mtlOpts = rollup->GetPanelDlg(index);
+	
+	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_ANIM_OPTS), 
+		AnimOptsDialogProc, "Animation");
+	animOpts = rollup->GetPanelDlg(index);
+
+	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_VIEWER_OPTS), 
+		ViewerOptsDialogProc, "Flash viewer");
+	viewerOpts = rollup->GetPanelDlg(index);
 
 	// Set defaults
 	SetCheckBox(miscOpts, IDC_INC_GEOM, imp->exportGeometry);
@@ -154,12 +152,7 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
 	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !imp->networkPreview);
 
-	// Select first tab
-	TabCtrl_SetCurSel(tabPanel, 0);
-	ShowWindow(miscOpts, TRUE);
-	ShowWindow(mtlOpts, FALSE);
-	ShowWindow(animOpts, FALSE);
-	ShowWindow(viewerOpts, FALSE);
+	rollup->Show();
 }
 
 
@@ -179,7 +172,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WP
 
 INT_PTR CALLBACK MaxAWDExporterOpts::AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	// TODO: implement proc
+	// TODO: Implement proc
 	return FALSE;
 }
 
@@ -219,6 +212,11 @@ bool MaxAWDExporterOpts::ExportSkeletons(void)
 bool MaxAWDExporterOpts::ExportSkelAnim(void)
 {
 	return exportSkelAnim;
+}
+
+int MaxAWDExporterOpts::JointsPerVertex(void)
+{
+	return jointsPerVertex;
 }
 
 bool MaxAWDExporterOpts::CreatePreview(void)
