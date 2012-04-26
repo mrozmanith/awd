@@ -659,13 +659,13 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeights, awd_uint32 **extJoints)
 {
-	if (skin && skin->GetNumBones()) {
+	if (opts.ExportSkin() && skin && skin->GetNumBones()) {
 		int iVtx;
 		awd_float64 *weights;
 		awd_uint32 *indices;
 
 		// TODO: Replace with option
-		const int jointsPerVertex = 2;
+		const int jointsPerVertex = opts.JointsPerVertex();
 
 		// Get skeleton information from cache and geometry information
 		// through an ISkinContextData interface.
