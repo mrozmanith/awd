@@ -14,6 +14,8 @@ AWDGeomUtil::AWDGeomUtil()
     this->exp_last_vd = NULL;
     this->normal_threshold = 0;
     this->joints_per_vertex = 0;
+    this->include_uv = true;
+    this->include_normals = true;
 }
 
 AWDGeomUtil::~AWDGeomUtil()
@@ -148,36 +150,40 @@ AWDGeomUtil::has_vert(vdata *vd)
             goto next;
 
         // If UV coordinates do not match, move on to next vertex
-        if (cur->u != vd->u || cur->v != vd->v)
+        if (this->include_uv) {
+            if (cur->u != vd->u || cur->v != vd->v)
             goto next;
+        }
 
         // Check if normals match (possibly with fuzzy matching using a
         // threshold) and if they don't, move on to the next vertex.
-        if (this->normal_threshold > 0) {
-            if (vd->nx==cur->nx && vd->ny==cur->ny && vd->nz==cur->nz) {
-                // The exact same normals; avoid angle calculation
-                add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
-            }
-            else {
-                double angle;
-                double l0, l1;
-
-                // Calculate lenghts (usually 1.0)
-                l0 = sqrt(cur->nx*cur->nx + cur->ny*cur->ny + cur->nz*cur->nz);
-                l1 = sqrt(vd->nx*vd->nx + vd->ny*vd->ny + vd->nz*vd->nz);
-
-                // Calculate angle and compare to threshold
-                angle = acos((cur->nx*vd->nx + cur->ny*vd->ny + cur->nz*vd->nz) / (l0*l1));
-                if (angle <= this->normal_threshold) {
+        if (this->include_normals) {
+            if (this->normal_threshold > 0) {
+                if (vd->nx==cur->nx && vd->ny==cur->ny && vd->nz==cur->nz) {
+                    // The exact same normals; avoid angle calculation
                     add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
                 }
                 else {
-                    goto next;
+                    double angle;
+                    double l0, l1;
+
+                    // Calculate lenghts (usually 1.0)
+                    l0 = sqrt(cur->nx*cur->nx + cur->ny*cur->ny + cur->nz*cur->nz);
+                    l1 = sqrt(vd->nx*vd->nx + vd->ny*vd->ny + vd->nz*vd->nz);
+
+                    // Calculate angle and compare to threshold
+                    angle = acos((cur->nx*vd->nx + cur->ny*vd->ny + cur->nz*vd->nz) / (l0*l1));
+                    if (angle <= this->normal_threshold) {
+                        add_unique_influence(cur, vd->nx, vd->ny, vd->nz);
+                    }
+                    else {
+                        goto next;
+                    }
                 }
             }
-        }
-        else if (cur->nx != vd->nx || cur->ny != vd->ny || cur->nz != vd->nz)
-            goto next;
+            else if (cur->nx != vd->nx || cur->ny != vd->ny || cur->nz != vd->nz)
+                goto next;
+		}
 
         // Important: Don't put any more tests here after the normal test, which
         // needs to come last since it will add normal influences, which should
@@ -322,8 +328,12 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     sub = new AWDSubGeom();
     sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, v_str, v_idx*3);
     sub->add_stream(TRIANGLES, tri_str_type, i_str, i_idx);
-    sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
-    sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
+
+    if (this->include_normals)
+        sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
+
+    if (this->include_uv)
+        sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
 
     if (this->joints_per_vertex > 0) {
         sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, w_str, v_idx*this->joints_per_vertex);

@@ -61,6 +61,8 @@ public:
 
     int joints_per_vertex;
     double normal_threshold;
+    bool include_uv;
+    bool include_normals;
 
     void append_vert_data(unsigned int,  double, double, double, double, double, double, double, double, bool);
     void append_vdata_struct(vdata *);
