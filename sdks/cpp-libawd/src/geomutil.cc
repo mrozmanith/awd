@@ -205,6 +205,7 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
 {
     vdata *vd;
     AWDSubGeom *sub;
+    AWD_field_type tri_str_type;
 
     int v_idx, i_idx;
     AWD_str_ptr v_str;
@@ -314,10 +315,13 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
         }
     }
 
+    // Choose stream type for the triangle stream depending on whether
+    // all vertex indices can be represented by an uint16 or not.
+    tri_str_type = (v_idx > 0xffff)? AWD_FIELD_UINT32 : AWD_FIELD_UINT16;
 
     sub = new AWDSubGeom();
     sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, v_str, v_idx*3);
-    sub->add_stream(TRIANGLES, AWD_FIELD_UINT16, i_str, i_idx);
+    sub->add_stream(TRIANGLES, tri_str_type, i_str, i_idx);
     sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
     sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
 
