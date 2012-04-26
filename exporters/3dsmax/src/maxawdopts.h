@@ -4,9 +4,13 @@
 #include "max.h"
 #include "resource.h"
 
+#include "awd/awd.h"
+
 class MaxAWDExporterOpts
 {
 private:
+	int compression;
+
 	bool exportScene;
 	bool exportGeometry;
 	bool exportSkin;
@@ -48,6 +52,8 @@ public:
 	bool ShowDialog(void);
 
 	// Getters for options
+	int Compression(void);
+
 	bool ExportScene(void);
 	bool ExportGeometry(void);
 	bool ExportSkin(void);

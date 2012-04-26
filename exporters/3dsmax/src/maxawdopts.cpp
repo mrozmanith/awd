@@ -4,6 +4,8 @@
 MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 {
 	// Default values
+	compression = (int)DEFLATE;
+
 	exportScene = true;
 	exportGeometry = true;
 	exportSkin = true;
@@ -59,6 +61,9 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 		case WM_COMMAND:
 			switch (wParam) {
 				case IDC_OK:
+					// General options
+					imp->compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
+
 					// Scene & geometry options
 					imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
 					imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
@@ -124,6 +129,7 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	viewerOpts = rollup->GetPanelDlg(index);
 
 	// Set defaults
+	ComboBox_SetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO), imp->compression);
 	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
 	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
 	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
@@ -140,6 +146,21 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 }
 
 
+INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+{
+	switch (message) {
+		case WM_INITDIALOG:
+			ComboBox_AddItemData(GetDlgItem(hWnd, IDC_COMP_COMBO), "None");
+			ComboBox_AddItemData(GetDlgItem(hWnd, IDC_COMP_COMBO), "GZIP");
+			// TODO: Re-enable once Away3D can actually read LZMA compressed files.
+			//ComboBox_AddItemData(GetDlgItem(hWnd, IDC_COMP_COMBO), "LZMA");
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+
 INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	switch (message) {
@@ -151,13 +172,6 @@ INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,
 			return TRUE;
 	}
 
-	return FALSE;
-}
-
-
-INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
-{
-	// TODO: implement proc
 	return FALSE;
 }
 
