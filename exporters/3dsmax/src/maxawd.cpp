@@ -204,7 +204,7 @@ void MaxAWDExporter::PrepareExport()
 	cache = new BlockCache();
 	colMtlCache = new ColorMaterialCache();
 	skeletonCache = new SkeletonCache();
-	awd = new AWD(UNCOMPRESSED, 0);
+	awd = new AWD((AWD_compression)opts.Compression(), 0);
 }
 
 
