@@ -15,6 +15,8 @@ private:
 
 	bool exportScene;
 	bool exportGeometry;
+	bool exportUVs;
+	bool exportNormals;
 	bool exportSkin;
 	int jointsPerVertex;
 	
@@ -61,6 +63,8 @@ public:
 
 	bool ExportScene(void);
 	bool ExportGeometry(void);
+	bool ExportUVs(void);
+	bool ExportNormals(void);
 	bool ExportSkin(void);
 	int JointsPerVertex();
 

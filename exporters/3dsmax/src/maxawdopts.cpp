@@ -12,6 +12,8 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 
 	exportScene = true;
 	exportGeometry = true;
+	exportUVs = true;
+	exportNormals = true;
 	exportSkin = true;
 	jointsPerVertex = 2;
 
@@ -118,6 +120,8 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	Edit_SetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace);
 	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
 	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
+	SetCheckBox(sceneOpts, IDC_INC_UVS, imp->exportUVs);
+	SetCheckBox(sceneOpts, IDC_INC_NORMALS, imp->exportNormals);
 	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
 	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
 	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
@@ -145,6 +149,8 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	// Scene & geometry options
 	imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
 	imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
+	imp->exportUVs = (IsDlgButtonChecked(sceneOpts, IDC_INC_UVS) == BST_CHECKED);
+	imp->exportNormals = (IsDlgButtonChecked(sceneOpts, IDC_INC_NORMALS) == BST_CHECKED);
 	imp->exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
 	imp->jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
 					
@@ -239,6 +245,16 @@ bool MaxAWDExporterOpts::ExportScene(void)
 bool MaxAWDExporterOpts::ExportGeometry(void)
 {
 	return exportGeometry;
+}
+
+bool MaxAWDExporterOpts::ExportUVs(void)
+{
+	return exportUVs;
+}
+
+bool MaxAWDExporterOpts::ExportNormals(void)
+{
+	return exportNormals;
 }
 
 bool MaxAWDExporterOpts::ExportSkin(void)
