@@ -658,7 +658,6 @@ int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeight
 		awd_float64 *weights;
 		awd_uint32 *indices;
 
-		// TODO: Replace with option
 		const int jointsPerVertex = opts.JointsPerVertex();
 
 		// Get skeleton information from cache and geometry information
