@@ -197,6 +197,12 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 }
 
 
+
+int MaxAWDExporterOpts::Compression(void)
+{
+	return compression;
+}
+
 bool MaxAWDExporterOpts::ExportScene(void)
 {
 	return exportScene;
