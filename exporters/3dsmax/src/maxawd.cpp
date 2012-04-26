@@ -468,14 +468,16 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		AWDGeomUtil geomUtil;
 		geomUtil.joints_per_vertex = jpv;
-		geomUtil.include_uv = (mesh.tvFace != NULL);
+		geomUtil.include_uv = (opts.ExportUVs() && mesh.tvFace != NULL);
+		geomUtil.include_normals = opts.ExportNormals();
+
+		// Build normals if requested by user to be exported
+		// TODO: Replace this with explicit normals from EditNormals modifier?
+		if (geomUtil.include_normals && mesh.normalsBuilt==0) {
+			mesh.buildNormals();
+		}
 
 		int numTris = mesh.getNumFaces();
-
-		// Build normals
-		// TODO: Verify that this is the correct way to do it
-		if (mesh.normalsBuilt == 0)
-			mesh.buildNormals();
 
 		for (t=0; t<numTris; t++) {
 			int v;
@@ -489,10 +491,6 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 			for (v=0; v<3; v++) {
 				int vIdx = face.getVert(v);
 				Point3 vtx = offsMtx * mesh.getVert(vIdx);
-
-				// TODO: Define logic for choosing which normals to use	
-				//Point3 normal = mesh.getNormal(vIdx);
-				Point3 normal = mesh.FaceNormal(t, true);
 
 				vdata *vd = (vdata *)malloc(sizeof(vdata));
 				vd->orig_idx = vIdx;
@@ -509,9 +507,12 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 					vd->v = tvtx.y;
 				}
 
-				vd->nx = -normal.x;
-				vd->ny = normal.z;
-				vd->nz = normal.y;
+				if (geomUtil.include_normals) {
+					Point3 normal = mesh.getNormal(vIdx);
+					vd->nx = -normal.x;
+					vd->ny = normal.z;
+					vd->nz = normal.y;
+				}
 
 				// If there is skinning information, copy it from the weight
 				// and joint index arrays returned by ExportSkin() above.
