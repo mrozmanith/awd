@@ -15,6 +15,7 @@ private:
 
 	bool exportSkeletons;
 	bool exportSkelAnim;
+	int jointsPerVertex;
 
 	bool createPreview;
 	bool launchPreview;
@@ -50,6 +51,7 @@ public:
 	bool EmbedTextures(void);
 	bool ExportSkeletons(void);
 	bool ExportSkelAnim(void);
+	int JointsPerVertex();
 	bool CreatePreview(void);
 	bool LaunchPreview(void);
 	bool PreviewForDeployment(void);
