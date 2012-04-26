@@ -26,7 +26,10 @@
 #define IDC_EMBED_TEX                   1007
 #define IDC_INC_SKIN                    1007
 #define IDC_SWFSB_LOCAL                 1008
+#define IDC_INC_SKIN2                   1008
+#define IDC_INC_UVS                     1008
 #define IDC_SWFSB_NETWORK               1009
+#define IDC_INC_NORMALS                 1009
 #define IDC_SWF_ENABLE                  1010
 #define IDC_SWF_LAUNCH                  1011
 #define IDC_INC_SKEL                    1012
@@ -37,7 +40,6 @@
 #define IDC_JPV_SPINNER                 1016
 #define IDC_JPV_EDIT                    1017
 #define IDC_COMP_COMBO                  1017
-#define IDC_CHECK1                      1018
 #define IDC_INC_ATTR                    1018
 #define IDC_ATTRNS_TEXT                 1020
 #define IDC_COLOR                       1456
