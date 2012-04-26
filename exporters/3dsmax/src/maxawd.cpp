@@ -205,6 +205,7 @@ void MaxAWDExporter::PrepareExport()
 	colMtlCache = new ColorMaterialCache();
 	skeletonCache = new SkeletonCache();
 	awd = new AWD((AWD_compression)opts.Compression(), 0);
+	ns = NULL;
 }
 
 
@@ -855,7 +856,8 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 
 void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 {
-	static AWDNamespace *ns = NULL;
+	if (!opts.ExportAttributes())
+		return;
 
 	ICustAttribContainer *attributes = obj->GetCustAttribContainer();
 	if (attributes) {
@@ -935,11 +937,10 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 					ParamDef def = block->GetParamDef(pid);
 					
 					if (ns == NULL) {
-						// Namespace has not yet been created; ns is a static
-						// function-scope variable that should be created only
-						// once and then reused for all user attributes.
-						// TODO: Retrieve namespace identifier from GUI
-						ns = new AWDNamespace("", 0);
+						// Namespace has not yet been created; ns is a class
+						// variable that will be created only once and then
+						// reused for all user attributes.
+						ns = new AWDNamespace(opts.AttributeNamespace(), strlen(opts.AttributeNamespace()));
 						awd->add_namespace(ns);
 					}
 

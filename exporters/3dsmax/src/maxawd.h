@@ -56,6 +56,7 @@ class MaxAWDExporter : public SceneExport {
 
 		int fd;
 		AWD *awd;
+		AWDNamespace *ns;
 		BlockCache *cache;
 		SkeletonCache *skeletonCache;
 		ColorMaterialCache *colMtlCache;
