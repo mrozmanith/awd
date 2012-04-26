@@ -36,8 +36,10 @@
 #define IDC_ROLLUP                      1015
 #define IDC_JPV_SPINNER                 1016
 #define IDC_JPV_EDIT                    1017
-#define IDC_COMBO1                      1017
 #define IDC_COMP_COMBO                  1017
+#define IDC_CHECK1                      1018
+#define IDC_INC_ATTR                    1018
+#define IDC_ATTRNS_TEXT                 1020
 #define IDC_COLOR                       1456
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
@@ -48,7 +50,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
