@@ -51,7 +51,7 @@ int IndexOfSkinMod(Object *obj, IDerivedObject **derivedObject)
 int CalcNumDescendants(INode *node)
 {
 	int i;
-	int num = node->NumberOfChildren();
+	int num = 1;
 	
 	for (i=0; i<node->NumberOfChildren(); i++) {
 		num += CalcNumDescendants(node->GetChildNode(i));
