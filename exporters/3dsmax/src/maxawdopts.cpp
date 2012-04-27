@@ -172,6 +172,8 @@ void MaxAWDExporterOpts::SaveOptions(void)
 
 INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
+	bool enabled;
+
 	switch (message) {
 		case WM_INITDIALOG:
 			ComboBox_AddItemData(GetDlgItem(hWnd, IDC_COMP_COMBO), "None");
@@ -179,6 +181,15 @@ INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT messag
 			// TODO: Re-enable once Away3D can actually read LZMA compressed files.
 			//ComboBox_AddItemData(GetDlgItem(hWnd, IDC_COMP_COMBO), "LZMA");
 			return TRUE;
+
+		case WM_COMMAND:
+			if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_ATTR)) {
+				enabled = (IsDlgButtonChecked(hWnd,IDC_INC_ATTR) == BST_CHECKED);
+				Static_Enable(GetDlgItem(hWnd,IDC_ATTRNS_STATIC), enabled);
+				Edit_Enable(GetDlgItem(hWnd,IDC_ATTRNS_TEXT), enabled);
+				return TRUE;
+			}
+			break;
 	}
 
 	return FALSE;
@@ -187,13 +198,36 @@ INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT messag
 
 INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
+	ISpinnerControl *spinner;
+	bool enabled;
+
 	switch (message) {
 		case WM_INITDIALOG:
-			ISpinnerControl *spinner = GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER));
+			spinner = GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER));
 			spinner->SetLimits(1, 5, FALSE);
 			spinner->SetValue(imp->jointsPerVertex, TRUE);
 			spinner->LinkToEdit(GetDlgItem(hWnd,IDC_JPV_EDIT),EDITTYPE_INT);
 			return TRUE;
+
+		case WM_COMMAND:
+			if ((HWND)lParam == GetDlgItem(hWnd, IDC_INC_GEOM)) {
+				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_GEOM) == BST_CHECKED);
+				Button_Enable(GetDlgItem(hWnd,IDC_INC_NORMALS), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_INC_UVS), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_INC_SKIN), enabled);
+				GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER))->Enable(enabled);
+				GetICustEdit(GetDlgItem(hWnd,IDC_JPV_EDIT))->Enable(enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_JPV_STATIC), enabled);
+				return TRUE;
+			}
+			else if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_SKIN)) {
+				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_SKIN) == BST_CHECKED);
+				GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER))->Enable(enabled);
+				GetICustEdit(GetDlgItem(hWnd, IDC_JPV_EDIT))->Enable(enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_JPV_STATIC), enabled);
+				return TRUE;
+			}
+			break;
 	}
 
 	return FALSE;
@@ -202,21 +236,60 @@ INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,
 
 INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	// TODO: Implement proc
+	bool enabled;
+
+	switch (message) {
+		case WM_COMMAND:
+			if ((HWND)lParam == GetDlgItem(hWnd, IDC_INC_MTL)) {
+				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_MTL) == BST_CHECKED);
+				Button_Enable(GetDlgItem(hWnd,IDC_EMBED_TEX), enabled);
+				return TRUE;
+			}
+			break;
+	}
+
 	return FALSE;
 }
 
 
 INT_PTR CALLBACK MaxAWDExporterOpts::AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	// TODO: Implement proc
+	bool enabled;
+
+	switch (message) {
+		case WM_COMMAND:
+			if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_SKELANIM)) {
+				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_SKELANIM) == BST_CHECKED);
+				Edit_Enable(GetDlgItem(hWnd,IDC_SEQ_TXT), enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_SEQ_STATIC1), enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_SEQ_STATIC2), enabled);
+				return TRUE;
+			}
+			break;
+	}
+
 	return FALSE;
 }
 
 
 INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	// TODO: Implement proc
+	bool enabled;
+
+	switch (message) {
+		case WM_COMMAND:
+			if ((HWND)lParam == GetDlgItem(hWnd,IDC_SWF_ENABLE)) {
+				enabled = (IsDlgButtonChecked(hWnd,IDC_SWF_ENABLE) == BST_CHECKED);
+				Button_Enable(GetDlgItem(hWnd,IDC_SWF_LAUNCH), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_SWFSB_LOCAL), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_SWFSB_NETWORK), enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_SWFSB_STATIC1), enabled);
+				Static_Enable(GetDlgItem(hWnd,IDC_SWFSB_STATIC2), enabled);
+				return TRUE;
+			}
+			break;
+	}
+
 	return FALSE;
 }
 

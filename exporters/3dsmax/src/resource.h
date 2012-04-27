@@ -26,7 +26,6 @@
 #define IDC_EMBED_TEX                   1007
 #define IDC_INC_SKIN                    1007
 #define IDC_SWFSB_LOCAL                 1008
-#define IDC_INC_SKIN2                   1008
 #define IDC_INC_UVS                     1008
 #define IDC_SWFSB_NETWORK               1009
 #define IDC_INC_NORMALS                 1009
@@ -42,6 +41,12 @@
 #define IDC_COMP_COMBO                  1017
 #define IDC_INC_ATTR                    1018
 #define IDC_ATTRNS_TEXT                 1020
+#define IDC_ATTRNS_STATIC               1021
+#define IDC_JPV_STATIC                  1022
+#define IDC_SWFSB_STATIC1               1023
+#define IDC_SWFSB_STATIC2               1024
+#define IDC_SEQ_STATIC1                 1025
+#define IDC_SEQ_STATIC2                 1026
 #define IDC_COLOR                       1456
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
@@ -52,7 +57,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1021
+#define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
