@@ -30,31 +30,31 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Away3D AWD options"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDC_OK,197,223,50,14
+    DEFPUSHBUTTON   "OK",IDC_OK,193,223,50,14
     PUSHBUTTON      "Cancel",IDC_CANCEL,247,223,50,14
     CONTROL         "Custom1",IDC_ROLLUP,"RollupWindow",WS_TABSTOP,7,7,290,212
 END
 
-IDD_AWD_SCENE_OPTS DIALOGEX 0, 15, 280, 115
+IDD_AWD_SCENE_OPTS DIALOGEX 0, 15, 280, 108
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Include geometry",IDC_INC_GEOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,25,72,10
     CONTROL         "Include scenegraph hierarchy",IDC_INC_SCENE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,111,10
-    CONTROL         "Include skinning data",IDC_INC_SKIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,73,83,10
-    CONTROL         "",IDC_JPV_SPINNER,"SpinnerControl",WS_TABSTOP,147,87,7,10
-    CONTROL         "",IDC_JPV_EDIT,"CustEdit",WS_TABSTOP,97,87,48,10
-    LTEXT           "Joints per vertex:",IDC_JPV_STATIC,30,87,58,8
-    CONTROL         "Include texture co-ordinates (UVs)",IDC_INC_UVS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,41,127,10
-    CONTROL         "Include vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,57,89,10
+    CONTROL         "Include skinning data",IDC_INC_SKIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,73,83,10
+    CONTROL         "",IDC_JPV_SPINNER,"SpinnerControl",WS_TABSTOP,147,88,7,10
+    CONTROL         "",IDC_JPV_EDIT,"CustEdit",WS_TABSTOP,97,88,48,10
+    LTEXT           "Joints per vertex:",IDC_JPV_STATIC,33,88,58,8
+    CONTROL         "Include texture co-ordinates (UVs)",IDC_INC_UVS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,41,127,10
+    CONTROL         "Include vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,57,89,10
 END
 
-IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 52
+IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 44
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Include materials",IDC_INC_MTL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,70,10
-    CONTROL         "Embed textures",IDC_EMBED_TEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,67,10
+    CONTROL         "Embed textures",IDC_EMBED_TEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,22,67,9
 END
 
 IDD_AWD_VIEWER_OPTS DIALOGEX 0, 15, 280, 122
@@ -69,20 +69,20 @@ BEGIN
     LTEXT           "The Flash Player security policy prevents a SWF file from accessing both local files and files via a network. Select whether to generate a SWF file for local preview or deployment online.",IDC_SWFSB_STATIC2,20,55,236,24
 END
 
-IDD_AWD_ANIM_OPTS DIALOGEX 0, 15, 280, 126
+IDD_AWD_ANIM_OPTS DIALOGEX 0, 15, 280, 115
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Include skeletons",IDC_INC_SKEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,71,10
     CONTROL         "Include skeletal animation sequences",IDC_INC_SKELANIM,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,134,10
-    EDITTEXT        IDC_SEQ_TXT,7,80,149,14,ES_AUTOHSCROLL
-    LTEXT           "Sequence list file",IDC_SEQ_STATIC1,7,48,54,8
-    LTEXT           "A files that specifies names and frame ranges for animation sequences. See documentation for details.",IDC_SEQ_STATIC2,7,60,183,17
-    LTEXT           "See geometry panel for skinning options.",IDC_STATIC,7,105,183,10
+    EDITTEXT        IDC_SEQ_TXT,20,76,149,14,ES_AUTOHSCROLL
+    LTEXT           "Sequence list file",IDC_SEQ_STATIC1,20,44,54,8
+    LTEXT           "A files that specifies names and frame ranges for animation sequences. See documentation for details.",IDC_SEQ_STATIC2,20,56,183,17
+    LTEXT           "See geometry panel for skinning options.",IDC_STATIC,20,97,183,10
 END
 
-IDD_AWD_GENERAL_OPTS DIALOGEX 0, 15, 280, 72
+IDD_AWD_GENERAL_OPTS DIALOGEX 0, 15, 280, 61
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -115,7 +115,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 108
+        BOTTOMMARGIN, 101
     END
 
     IDD_AWD_MTL_OPTS, DIALOG
@@ -123,7 +123,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 45
+        BOTTOMMARGIN, 37
     END
 
     IDD_AWD_VIEWER_OPTS, DIALOG
@@ -139,7 +139,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 119
+        BOTTOMMARGIN, 108
     END
 
     IDD_AWD_GENERAL_OPTS, DIALOG
@@ -147,7 +147,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 65
+        BOTTOMMARGIN, 54
     END
 END
 #endif    // APSTUDIO_INVOKED
