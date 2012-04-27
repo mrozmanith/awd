@@ -235,8 +235,11 @@ void MaxAWDExporter::DieWithError(void)
 
 void MaxAWDExporter::DieWithErrorMessage(char *message, char *caption)
 {
-	Interface *i = GetCOREInterface();
-	MessageBox(i->GetMAXHWnd(), message, caption, MB_OK);
+	if (!suppressDialogs) {
+		Interface *i = GetCOREInterface();
+		MessageBox(i->GetMAXHWnd(), message, caption, MB_OK);
+	}
+
 	DieWithError();
 }
 
