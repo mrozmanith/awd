@@ -618,13 +618,13 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 {
 	AWDBitmapTexture *awdTex;
 	MSTR name;
-	char *path;
+	char *fullPath;
 
 	name = tex->GetName();
-	path = tex->GetMapName();
+	fullPath = tex->GetMapName();
 
 	if (opts.EmbedTextures()) {
-		int fd = open(path, _O_BINARY | _O_RDONLY);
+		int fd = open(fullPath, _O_BINARY | _O_RDONLY);
 		
 		if (fd >= 0) {
 			struct stat fst;
@@ -643,7 +643,34 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	}
 	else {
 		awdTex = new AWDBitmapTexture(EXTERNAL, name.data(), name.length());
-		awdTex->set_url(path, strlen(path));
+
+		if (opts.ForceBasenameTextures()) {
+			char fileName[256];
+			char fileExt[16];
+			char *url;
+
+			// Split path to retrieve name and concatenate to form base name
+			_splitpath_s(fullPath, NULL, 0, NULL, 0, fileName, 240, fileExt, 16);
+			url = (char*)malloc(strlen(fileName)+strlen(fileExt));
+			strcpy(url, fileName);
+			strcat(url, fileExt);
+			awdTex->set_url(url, strlen(fileName)+strlen(fileExt));
+
+			if (opts.CopyTextures()) {
+				char awdDrive[4];
+				char awdPath[1024];
+				char outPath[1024];
+
+				// Concatenate output path using base path of AWD file and basename of
+				// texture file, and copy texture file to output directory.
+				_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, NULL, 0, NULL, 0);
+				_makepath_s(outPath, 1024, awdDrive, awdPath, fileName, fileExt);
+				CopyFile(fullPath, outPath, true);
+			}
+		}
+		else {
+			awdTex->set_url(fullPath, strlen(fullPath));
+		}
 	}
 
 	awd->add_texture(awdTex);
