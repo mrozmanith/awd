@@ -44,7 +44,7 @@ BEGIN
     CONTROL         "Include skinning data",IDC_INC_SKIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,73,83,10
     CONTROL         "",IDC_JPV_SPINNER,"SpinnerControl",WS_TABSTOP,147,87,7,10
     CONTROL         "",IDC_JPV_EDIT,"CustEdit",WS_TABSTOP,97,87,48,10
-    LTEXT           "Joints per vertex:",IDC_STATIC,30,87,58,8
+    LTEXT           "Joints per vertex:",IDC_JPV_STATIC,30,87,58,8
     CONTROL         "Include texture co-ordinates (UVs)",IDC_INC_UVS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,41,127,10
     CONTROL         "Include vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,57,89,10
 END
@@ -65,8 +65,8 @@ BEGIN
     CONTROL         "Launch when complete",IDC_SWF_LAUNCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,89,10
     CONTROL         "Export for local preview",IDC_SWFSB_LOCAL,"Button",BS_AUTORADIOBUTTON,20,85,92,10
     CONTROL         "Export for deployment",IDC_SWFSB_NETWORK,"Button",BS_AUTORADIOBUTTON,20,99,88,10
-    LTEXT           "Export type",IDC_STATIC,20,43,39,8
-    LTEXT           "The Flash Player security policy prevents a SWF file from accessing both local files and files via a network. Select whether to generate a SWF file for local preview or deployment online.",IDC_STATIC,20,55,236,24
+    LTEXT           "Export type",IDC_SWFSB_STATIC1,20,43,39,8
+    LTEXT           "The Flash Player security policy prevents a SWF file from accessing both local files and files via a network. Select whether to generate a SWF file for local preview or deployment online.",IDC_SWFSB_STATIC2,20,55,236,24
 END
 
 IDD_AWD_ANIM_OPTS DIALOGEX 0, 15, 280, 126
@@ -77,8 +77,8 @@ BEGIN
     CONTROL         "Include skeletal animation sequences",IDC_INC_SKELANIM,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,134,10
     EDITTEXT        IDC_SEQ_TXT,7,80,149,14,ES_AUTOHSCROLL
-    LTEXT           "Sequence list file",IDC_STATIC,7,48,54,8
-    LTEXT           "A files that specifies names and frame ranges for animation sequences. See documentation for details.",IDC_STATIC,7,60,183,17
+    LTEXT           "Sequence list file",IDC_SEQ_STATIC1,7,48,54,8
+    LTEXT           "A files that specifies names and frame ranges for animation sequences. See documentation for details.",IDC_SEQ_STATIC2,7,60,183,17
     LTEXT           "See geometry panel for skinning options.",IDC_STATIC,7,105,183,10
 END
 
@@ -90,7 +90,7 @@ BEGIN
     LTEXT           "Compression:",IDC_STATIC,7,8,44,8
     CONTROL         "Export custom attributes",IDC_INC_ATTR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,26,95,10
     EDITTEXT        IDC_ATTRNS_TEXT,75,38,183,12,ES_AUTOHSCROLL
-    LTEXT           "Use namespace:",IDC_STATIC,20,40,54,8
+    LTEXT           "Use namespace:",IDC_ATTRNS_STATIC,20,40,54,8
 END
 
 
