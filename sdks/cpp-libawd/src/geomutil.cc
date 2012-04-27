@@ -224,8 +224,12 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     sub = new AWDSubGeom();
     v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
     i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * this->num_exp_vd);
-    n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
-    u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * this->num_exp_vd);
+
+    if (this->include_normals) 
+        n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
+
+    if (this->include_uv)
+        u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * this->num_exp_vd);
 
     if (this->joints_per_vertex > 0) {
         int max_num_vals = this->num_exp_vd * this->joints_per_vertex;
@@ -249,12 +253,16 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
             v_str.f64[v_idx*3+1] = vd->y;
             v_str.f64[v_idx*3+2] = vd->z;
 
-            u_str.f64[v_idx*2+0] = vd->u;
-            u_str.f64[v_idx*2+1] = vd->v;
+            if (this->include_uv) {
+                u_str.f64[v_idx*2+0] = vd->u;
+                u_str.f64[v_idx*2+1] = vd->v;
+            }
 
-            n_str.f64[v_idx*3+0] = vd->nx;
-            n_str.f64[v_idx*3+1] = vd->ny;
-            n_str.f64[v_idx*3+2] = vd->nz;
+            if (this->include_normals) {
+                n_str.f64[v_idx*3+0] = vd->nx;
+                n_str.f64[v_idx*3+1] = vd->ny;
+                n_str.f64[v_idx*3+2] = vd->nz;
+            }
 
             // If there are bindings, transfer them from 
             // array in vdata struct to output streams.
@@ -307,19 +315,10 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
         }
     }
 
-    // Reallocate buffers using final length if vertices were joined,
-    // in which case the highest index (v_idx) will not match the number
-    // of vdata structures that were added. There's no need to reallocate
-    // the index buffer since the triangle count will not have changed.
-    if (v_idx < this->num_exp_vd) {
-        v_str.v = realloc(v_str.v, sizeof(awd_float64) * 3 * v_idx);
-        u_str.v = realloc(u_str.v, sizeof(awd_float64) * 2 * v_idx);
-        n_str.v = realloc(n_str.v, sizeof(awd_float64) * 3 * v_idx);
-        if (this->joints_per_vertex > 0) {
-            w_str.v = realloc(w_str.v, sizeof(awd_float64) * v_idx * this->joints_per_vertex);
-            j_str.v = realloc(j_str.v, sizeof(awd_uint32) * v_idx * this->joints_per_vertex);
-        }
-    }
+    // Reallocate the vertex buffer using final length after vertices were
+    // joined. There's no need to reallocate the index buffer since the 
+    // triangle count will not have changed.
+    v_str.v = realloc(v_str.v, sizeof(awd_float64) * 3 * v_idx);
 
     // Choose stream type for the triangle stream depending on whether
     // all vertex indices can be represented by an uint16 or not.
@@ -329,13 +328,22 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     sub->add_stream(VERTICES, AWD_FIELD_FLOAT32, v_str, v_idx*3);
     sub->add_stream(TRIANGLES, tri_str_type, i_str, i_idx);
 
-    if (this->include_normals)
+    if (this->include_normals) {
+        // Reallocate buffer using actual length and add to sub-geom
+        n_str.v = realloc(n_str.v, sizeof(awd_float64) * 3 * v_idx);
         sub->add_stream(VERTEX_NORMALS, AWD_FIELD_FLOAT32, n_str, v_idx*3);
+    }
 
-    if (this->include_uv)
+    if (this->include_uv) {
+        // Reallocate buffer using actual length and add to sub-geom
+        u_str.v = realloc(u_str.v, sizeof(awd_float64) * 2 * v_idx);
         sub->add_stream(UVS, AWD_FIELD_FLOAT32, u_str, v_idx*2);
+    }
 
     if (this->joints_per_vertex > 0) {
+        // Reallocate buffers using actual length and add to sub-geom
+        w_str.v = realloc(w_str.v, sizeof(awd_float64) * v_idx * this->joints_per_vertex);
+        j_str.v = realloc(j_str.v, sizeof(awd_uint32) * v_idx * this->joints_per_vertex);
         sub->add_stream(VERTEX_WEIGHTS, AWD_FIELD_FLOAT32, w_str, v_idx*this->joints_per_vertex);
         sub->add_stream(JOINT_INDICES, AWD_FIELD_UINT16, j_str, v_idx*this->joints_per_vertex);
     }
