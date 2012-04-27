@@ -35,6 +35,10 @@
 #define MAXAWD_PHASE_ANIM 3
 #define MAXAWD_PHASE_FLUSH 4
 
+// Error handling helper macros
+#define RETURN_IF_ERROR(retval) if (error) return retval;
+#define DIE_IF_ERROR() if (error) { maxInterface->ProgressEnd(); CleanUp(); return FALSE; }
+
 extern TCHAR *GetString(int id);
 
 extern HINSTANCE hInstance;
@@ -61,11 +65,15 @@ class MaxAWDExporter : public SceneExport {
 		SkeletonCache *skeletonCache;
 		ColorMaterialCache *colMtlCache;
 
+		bool error;
+
 		int numNodesTotal;
 		int numNodesTraversed;
 
 		MaxAWDExporterOpts opts;
 
+		void DieWithError(void);
+		void DieWithErrorMessage(char *message, char *caption);
 		void UpdateProgressBar(int phase, double phaseProgress);
 
 	public:
