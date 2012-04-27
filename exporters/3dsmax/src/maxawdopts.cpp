@@ -99,19 +99,19 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	generalOpts = rollup->GetPanelDlg(index);
 
 	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_SCENE_OPTS), 
-		SceneOptsDialogProc, "Scene & geometry");
+		SceneOptsDialogProc, "Scene & geometry", 0, APPENDROLL_CLOSED);
 	sceneOpts = rollup->GetPanelDlg(index);
 	
 	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_MTL_OPTS), 
-		MtlOptsDialogProc, "Materials");
+		MtlOptsDialogProc, "Materials", 0, APPENDROLL_CLOSED);
 	mtlOpts = rollup->GetPanelDlg(index);
 	
 	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_ANIM_OPTS), 
-		AnimOptsDialogProc, "Animation");
+		AnimOptsDialogProc, "Animation", 0, APPENDROLL_CLOSED);
 	animOpts = rollup->GetPanelDlg(index);
 
 	index = rollup->AppendRollup(hInstance, MAKEINTRESOURCE(IDD_AWD_VIEWER_OPTS), 
-		ViewerOptsDialogProc, "Flash viewer");
+		ViewerOptsDialogProc, "Flash viewer", 0, APPENDROLL_CLOSED);
 	viewerOpts = rollup->GetPanelDlg(index);
 
 	// Set defaults
