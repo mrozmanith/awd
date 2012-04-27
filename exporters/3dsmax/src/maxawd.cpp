@@ -68,6 +68,7 @@ static DWORD ExecuteExportCallback(void *arg)
 
 MaxAWDExporter::MaxAWDExporter()
 {
+	error = false;
 }
 
 MaxAWDExporter::~MaxAWDExporter() 
@@ -156,7 +157,6 @@ int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BO
 	return TRUE;
 }
 
-
 int MaxAWDExporter::ExecuteExport()
 {
 	PrepareExport();
@@ -169,10 +169,16 @@ int MaxAWDExporter::ExecuteExport()
 	numNodesTraversed = 0;
 	ExportSkeletons(root);
 
+	// Die if error occurred.
+	DIE_IF_ERROR();
+
 	// Traverse node tree again for scene objects
 	// (including their geometry, materials, et c)
 	numNodesTraversed = 0;
 	ExportNode(root, NULL);
+
+	// Die if error occurred.
+	DIE_IF_ERROR();
 
 	// Export animation if enabled and if a sequences.txt file was found
 	if (opts.ExportSkelAnim()) {
@@ -180,6 +186,9 @@ int MaxAWDExporter::ExecuteExport()
 		if (sequences != NULL)
 			ExportAnimation(sequences);
 	}
+
+	// Die if error occurred.
+	DIE_IF_ERROR();
 
 	// Flush serialized AWD structure to file
 	awd->flush(fd);
@@ -215,6 +224,20 @@ void MaxAWDExporter::CleanUp()
 	delete cache;
 	delete colMtlCache;
 	delete skeletonCache;
+}
+
+
+void MaxAWDExporter::DieWithError(void)
+{
+	error = true;
+}
+
+
+void MaxAWDExporter::DieWithErrorMessage(char *message, char *caption)
+{
+	Interface *i = GetCOREInterface();
+	MessageBox(i->GetMAXHWnd(), message, caption, MB_OK);
+	DieWithError();
 }
 
 
@@ -366,6 +389,7 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 				}
 
 				awdMesh = ExportTriObject(obj, node, skin);
+				RETURN_IF_ERROR();
 
 				// Add generated mesh instance to AWD scene graph.
 				// This can be null, if exporter was configured not
@@ -397,6 +421,7 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 		for (i=0; i<numChildren; i++) {
 			ExportNode(node->GetChildNode(i), awdParent);
+			RETURN_IF_ERROR();
 		}
 	}
 	else {
@@ -420,6 +445,7 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 	// Export material
 	if (opts.ExportMaterials()) {
 		awdMtl = ExportNodeMaterial(node);
+		RETURN_IF_ERROR(NULL);
 	}
 
 	// Export instance
@@ -594,6 +620,10 @@ AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node)
 					
 						awdDiffTex = ExportBitmapTexture((BitmapTex *)tex);
 
+						// Stop if an error occurred during texture
+						// export (e.g. that a file was missing.)
+						RETURN_IF_ERROR(NULL);
+
 						awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
 						awdMtl->set_texture(awdDiffTex);
 					}
@@ -638,7 +668,15 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 			awdTex->set_embed_data(buf, fst.st_size);
 		}
 		else {
-			// TODO: Handle failure, but how? Error message, or silently make external?
+			char buf[1024];
+			snprintf(buf, 1024, 
+				"Texture \"%s\" could not be opened for embedding. "
+				"The file might be missing. Correct the path and try exporting again.",
+				tex->GetName());
+
+			// Show error message and return to stop texture export.
+			DieWithErrorMessage(buf, "Texture embedding error");
+			return NULL;
 		}
 	}
 	else {
