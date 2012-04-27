@@ -558,10 +558,13 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				geomUtil.append_vdata_struct(vd);
 			}
 		}
+		
+		// Generate geometry name by concatenating the name 
+		// of the mesh/node with the suffix "_geom"
+		char *name = (char*)malloc(strlen(node->GetName())+6);
+		strcpy(name, node->GetName());
+		strcat(name, "_geom");
 
-		char *name = node->GetName();
-
-		// TODO: Use another name for the geometry
 		awdGeom = new AWDTriGeom(name, strlen(name));
 		geomUtil.build_geom(awdGeom);
 
