@@ -223,7 +223,7 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
 
     sub = new AWDSubGeom();
     v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
-    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * 3 * this->num_exp_vd);
+    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * this->num_exp_vd);
     n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
     u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * this->num_exp_vd);
 
@@ -317,7 +317,7 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
         n_str.v = realloc(n_str.v, sizeof(awd_float64) * 3 * v_idx);
         if (this->joints_per_vertex > 0) {
             w_str.v = realloc(w_str.v, sizeof(awd_float64) * v_idx * this->joints_per_vertex);
-            i_str.v = realloc(w_str.v, sizeof(awd_uint32) * v_idx * this->joints_per_vertex);
+            j_str.v = realloc(j_str.v, sizeof(awd_uint32) * v_idx * this->joints_per_vertex);
         }
     }
 
