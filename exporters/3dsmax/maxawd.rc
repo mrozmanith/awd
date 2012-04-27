@@ -49,12 +49,16 @@ BEGIN
     CONTROL         "Include vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,57,89,10
 END
 
-IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 44
+IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 86
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Include materials",IDC_INC_MTL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,70,10
-    CONTROL         "Embed textures",IDC_EMBED_TEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,22,67,9
+    CONTROL         "Use full texture paths (can be local)",IDC_TEX_FULLPATH,
+                    "Button",BS_AUTORADIOBUTTON,20,21,130,10
+    CONTROL         "Force relative texture paths",IDC_TEX_BASENAME,"Button",BS_AUTORADIOBUTTON,20,35,106,10
+    CONTROL         "Embed textures in AWD file",IDC_TEX_EMBED,"Button",BS_AUTORADIOBUTTON,20,64,103,10
+    CONTROL         "Copy textures to output directory",IDC_TEX_COPY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,49,125,10
 END
 
 IDD_AWD_VIEWER_OPTS DIALOGEX 0, 15, 280, 122
@@ -123,7 +127,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 273
         TOPMARGIN, 7
-        BOTTOMMARGIN, 37
+        BOTTOMMARGIN, 79
     END
 
     IDD_AWD_VIEWER_OPTS, DIALOG
