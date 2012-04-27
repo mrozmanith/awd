@@ -18,6 +18,8 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	jointsPerVertex = 2;
 
 	exportMaterials = true;
+	forceBasenameTextures = true;
+	copyTextures = true;
 	embedTextures = false;
 
 	exportSkeletons = true;
@@ -124,6 +126,9 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(sceneOpts, IDC_INC_NORMALS, imp->exportNormals);
 	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
 	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
+	SetCheckBox(mtlOpts, IDC_TEX_BASENAME, imp->forceBasenameTextures);
+	SetCheckBox(mtlOpts, IDC_TEX_FULLPATH, !imp->forceBasenameTextures);
+	SetCheckBox(mtlOpts, IDC_TEX_COPY, imp->copyTextures);
 	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
 	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
 	SetCheckBox(animOpts, IDC_INC_SKELANIM, imp->exportSkelAnim);
@@ -156,7 +161,9 @@ void MaxAWDExporterOpts::SaveOptions(void)
 					
 	// Material options
 	imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
-	imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_EMBED_TEX) == BST_CHECKED);
+	imp->forceBasenameTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_BASENAME) == BST_CHECKED);
+	imp->copyTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_COPY) == BST_CHECKED);
+	imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_EMBED) == BST_CHECKED);
 
 	// Animation options
 	imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
@@ -242,10 +249,18 @@ INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WP
 		case WM_COMMAND:
 			if ((HWND)lParam == GetDlgItem(hWnd, IDC_INC_MTL)) {
 				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_MTL) == BST_CHECKED);
-				Button_Enable(GetDlgItem(hWnd,IDC_EMBED_TEX), enabled);
-				return TRUE;
+				Button_Enable(GetDlgItem(hWnd,IDC_TEX_FULLPATH), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_TEX_BASENAME), enabled);
+				Button_Enable(GetDlgItem(hWnd,IDC_TEX_EMBED), enabled);
 			}
-			break;
+			
+			// IDC_TEX_COPY should only be enabled if both the IDC_INC_MTL checkbox
+			// and the IDC_TEX_BASENAME radio button are checked.
+			enabled = ((IsDlgButtonChecked(hWnd, IDC_INC_MTL)==BST_CHECKED) 
+				&& (IsDlgButtonChecked(hWnd, IDC_TEX_BASENAME)==BST_CHECKED));
+			Button_Enable(GetDlgItem(hWnd,IDC_TEX_COPY), enabled);
+
+			return TRUE;
 	}
 
 	return FALSE;
@@ -343,6 +358,16 @@ int MaxAWDExporterOpts::JointsPerVertex(void)
 bool MaxAWDExporterOpts::ExportMaterials(void)
 {
 	return exportMaterials;
+}
+
+bool MaxAWDExporterOpts::ForceBasenameTextures(void)
+{
+	return forceBasenameTextures;
+}
+
+bool MaxAWDExporterOpts::CopyTextures(void)
+{
+	return copyTextures;
 }
 
 bool MaxAWDExporterOpts::EmbedTextures(void)

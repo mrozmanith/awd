@@ -21,6 +21,8 @@ private:
 	int jointsPerVertex;
 	
 	bool exportMaterials;
+	bool forceBasenameTextures;
+	bool copyTextures;
 	bool embedTextures;
 
 	bool exportSkeletons;
@@ -69,6 +71,8 @@ public:
 	int JointsPerVertex();
 
 	bool ExportMaterials(void);
+	bool ForceBasenameTextures(void);
+	bool CopyTextures(void);
 	bool EmbedTextures(void);
 
 	bool ExportSkeletons(void);
