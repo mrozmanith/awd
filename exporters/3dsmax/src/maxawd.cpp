@@ -311,9 +311,9 @@ void MaxAWDExporter::CopyViewer(bool launch)
 	char awdDrive[4];
 	char awdPath[1024];
 	char awdName[256];
-	char maxExe[1024];
-	char maxDrive[4];
-	char maxPath[1024];
+	char dleFullPath[1024];
+	char dleDrive[4];
+	char dlePath[1024];
 	char tplHtmlPath[1024];
 	char tplSwfPath[1024];
 	char tplJsPath[1024];
@@ -321,16 +321,21 @@ void MaxAWDExporter::CopyViewer(bool launch)
 	char outSwfPath[1024];
 	char outJsPath[1024];
 
-	HMODULE mod = GetModuleHandle(NULL);
-	GetModuleFileName(mod, maxExe, 1024);
-
-	_splitpath_s(maxExe, maxDrive, 4, maxPath, 1024, NULL, 0, NULL, 0);
+	// Get paths of plug-in DLE file and output AWD file and split into
+	// components to be used to concatenate input and output paths.
+	GetModuleFileName(hInstance, dleFullPath, 1024);
+	_splitpath_s(dleFullPath, dleDrive, 4, dlePath, 1024, NULL, 0, NULL, 0);
 	_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, awdName, 256, NULL, 0);
 
+	// Select which viewer SWF file to copy depending on which sandbox
+	// it should be compiled for (network or local.)
+	const char *viewerName = (opts->PreviewForDeployment())? 
+		"maxawd\\viewer_n" : "maxawd\\viewer_l";
+
 	// Assemble paths for inputs (templates)
-	_makepath_s(tplHtmlPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\template", "html");
-	_makepath_s(tplSwfPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\viewer", "swf");
-	_makepath_s(tplJsPath, 1024, maxDrive, maxPath, "plugins\\maxawd\\swfobject", "js");
+	_makepath_s(tplHtmlPath, 1024, dleDrive, dlePath, "maxawd\\template", "html");
+	_makepath_s(tplSwfPath, 1024, dleDrive, dlePath, viewerName, "swf");
+	_makepath_s(tplJsPath, 1024, dleDrive, dlePath, "maxawd\\swfobject", "js");
 
 	// Assemble paths for outputs
 	_makepath_s(outHtmlPath, 1024, awdDrive, awdPath, awdName, "html");
