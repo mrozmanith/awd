@@ -64,7 +64,7 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 	if (!cfg) return;
 
 	while (!feof(cfg)) {
-		char buf[1024];
+		char buf[ATTR_BUF_LEN];
 		fgets(buf, 1024, cfg);
 
 		// Read key and value and skip if any is missing
@@ -73,8 +73,60 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 		if (!key || !val)
 			continue;
 
-		if (strncmp(key, "compression", 1024)==0) {
+		if (ATTREQ(key,"compression")) {
 			compression = strtol(val, NULL, 10);
+		}
+		else if (ATTREQ(key,"attributes")) {
+			exportAttributes = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key,"namespace")) {
+			attributeNamespace = (char*)realloc(attributeNamespace, strlen(val));
+			strcpy(attributeNamespace, val);
+		}
+		else if (ATTREQ(key, "scene")) {
+			exportScene = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "geometry")) {
+			exportGeometry = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "uvs")) {
+			exportUVs = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "normals")) {
+			exportNormals = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "skin")) {
+			exportSkin = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "jpv")) {
+			jointsPerVertex = strtol(val, NULL, 10);
+		}
+		else if (ATTREQ(key, "materials")) {
+			exportMaterials = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "basenametex")) {
+			forceBasenameTextures = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "copytex")) {
+			copyTextures = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "embedtex")) {
+			embedTextures = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "skeletons")) {
+			exportSkeletons = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "skelanim")) {
+			exportSkelAnim = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "preview")) {
+			createPreview = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "launch")) {
+			launchPreview = (strtol(val, NULL, 10) == 1);
+		}
+		else if (ATTREQ(key, "deploy")) {
+			networkPreview = (strtol(val, NULL, 10) == 1);
 		}
 	}
 
