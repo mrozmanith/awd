@@ -46,7 +46,7 @@ BEGIN
     CONTROL         "",IDC_JPV_EDIT,"CustEdit",WS_TABSTOP,97,88,48,10
     LTEXT           "Joints per vertex:",IDC_JPV_STATIC,33,88,58,8
     CONTROL         "Include texture co-ordinates (UVs)",IDC_INC_UVS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,41,127,10
-    CONTROL         "Include vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,57,89,10
+    CONTROL         "Include explicit vertex normals",IDC_INC_NORMALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,57,113,10
 END
 
 IDD_AWD_MTL_OPTS DIALOGEX 0, 15, 280, 86
