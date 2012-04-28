@@ -8,7 +8,7 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	exportAttributes = true;
 
 	attributeNamespace = (char*)malloc(25);
-	strncpy(attributeNamespace, "http://example.com/awdns\0", 25);
+	strcpy(attributeNamespace, "http://example.com/awdns");
 
 	exportScene = true;
 	exportGeometry = true;
@@ -88,6 +88,27 @@ void MaxAWDExporterOpts::WriteConfigFile(void)
 	if (!cfg) return;
 
 	fprintf(cfg, "compression=%d\n", compression);
+	fprintf(cfg, "attributes=%d\n", exportAttributes);
+	fprintf(cfg, "namespace=%s\n", attributeNamespace);
+
+	fprintf(cfg, "scene=%d\n", exportScene);
+	fprintf(cfg, "geometry=%d\n", exportGeometry);
+	fprintf(cfg, "uvs=%d\n", exportUVs);
+	fprintf(cfg, "normals=%d\n", exportNormals);
+	fprintf(cfg, "skin=%d\n", exportSkin);
+	fprintf(cfg, "jpv=%d\n", jointsPerVertex);
+
+	fprintf(cfg, "materials=%d\n", exportMaterials);
+	fprintf(cfg, "basenametex=%d\n", forceBasenameTextures);
+	fprintf(cfg, "copytex=%d\n", copyTextures);
+	fprintf(cfg, "embedtex=%d\n", embedTextures);
+
+	fprintf(cfg, "skeletons=%d\n", exportSkeletons);
+	fprintf(cfg, "skelanim=%d\n", exportSkelAnim);
+
+	fprintf(cfg, "preview=%d\n", createPreview);
+	fprintf(cfg, "launch=%d\n", launchPreview);
+	fprintf(cfg, "deploy=%d\n", networkPreview);
 
 	fclose(cfg);
 }
@@ -196,8 +217,8 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	imp->exportAttributes = (IsDlgButtonChecked(generalOpts, IDC_INC_ATTR) == BST_CHECKED);
 	
 	int len = Edit_GetTextLength(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT));
-	imp->attributeNamespace = (char*)realloc(imp->attributeNamespace, len + 1);
-	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace, len);
+	imp->attributeNamespace = (char*)realloc(imp->attributeNamespace, len+1);
+	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace, len+1);
 
 	// Scene & geometry options
 	imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
