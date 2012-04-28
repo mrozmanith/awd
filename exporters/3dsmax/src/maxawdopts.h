@@ -40,6 +40,11 @@ private:
 	static HWND animOpts;
 	static HWND viewerOpts;
 
+	// Config file
+	FILE *OpenConfigFile(const char *mode);
+	void ReadConfigFile(void);
+	void WriteConfigFile(void);
+
 	// Main proc function and helpers
 	static INT_PTR CALLBACK DialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 	static void InitDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
