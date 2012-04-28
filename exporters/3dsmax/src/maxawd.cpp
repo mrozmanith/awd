@@ -655,8 +655,13 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	name = tex->GetName();
 	fullPath = tex->GetMapName();
 
+	// Get absolute path for open/copy operations. The path used by Max may
+	// be relative, which will not work since CWD is not the project folder.
+	MaxSDK::AssetManagement::AssetUser asset = tex->GetMap();
+	MSTR absTexPath = asset.GetFullFilePath();
+
 	if (opts.EmbedTextures()) {
-		int fd = open(fullPath, _O_BINARY | _O_RDONLY);
+		int fd = open(absTexPath, _O_BINARY | _O_RDONLY);
 		
 		if (fd >= 0) {
 			struct stat fst;
@@ -705,7 +710,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 				// texture file, and copy texture file to output directory.
 				_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, NULL, 0, NULL, 0);
 				_makepath_s(outPath, 1024, awdDrive, awdPath, fileName, fileExt);
-				CopyFile(fullPath, outPath, true);
+				CopyFile(absTexPath, outPath, true);
 			}
 		}
 		else {
