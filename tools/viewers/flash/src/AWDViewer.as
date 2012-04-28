@@ -1,11 +1,22 @@
 package
 {
+	import away3d.animators.SkeletonAnimator;
+	import away3d.animators.data.SkeletonAnimation;
+	import away3d.animators.data.SkeletonAnimationSequence;
+	import away3d.animators.data.SkeletonAnimationState;
+	import away3d.animators.skeleton.Skeleton;
+	import away3d.arcane;
 	import away3d.containers.View3D;
 	import away3d.controllers.HoverController;
+	import away3d.core.base.Geometry;
+	import away3d.core.base.SkinnedSubGeometry;
+	import away3d.core.base.SubGeometry;
 	import away3d.entities.Mesh;
 	import away3d.events.AssetEvent;
 	import away3d.events.LoaderEvent;
+	import away3d.library.AssetLibrary;
 	import away3d.library.assets.AssetType;
+	import away3d.library.utils.AssetLibraryIterator;
 	import away3d.loaders.Loader3D;
 	import away3d.loaders.misc.AssetLoaderContext;
 	import away3d.loaders.parsers.AWD2Parser;
@@ -18,6 +29,8 @@ package
 	import flash.geom.Vector3D;
 	import flash.net.URLRequest;
 	
+	use namespace arcane;
+	
 	[SWF(width="800", height="600")]
 	public class AWDViewer extends Sprite
 	{
@@ -27,6 +40,9 @@ package
 		private var _hoverCtrl : HoverController;
 		private var _prevMouseX : Number;
 		private var _prevMouseY : Number;
+		
+		private var _skeleton : Skeleton;
+		private var _animator : SkeletonAnimator;
 		
 		public function AWDViewer()
 		{
@@ -58,10 +74,10 @@ package
 		private function load(url : String) : void
 		{
 			Loader3D.enableParser(AWD2Parser);
-			_loader = new Loader3D(false);
+			_loader = new Loader3D(true);
 			_loader.addEventListener(AssetEvent.ASSET_COMPLETE, onAssetComplete);
 			_loader.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceComplete);
-			_loader.load(new URLRequest(url), new AssetLoaderContext(false));
+			_loader.load(new URLRequest(url));
 		}
 		
 		
@@ -77,6 +93,9 @@ package
 				if (mesh.material == null || (texMat && texMat.texture == null))
 					mesh.material = new ColorMaterial(Math.random() * 0xffffff);
 			}
+			else if (ev.asset.assetType == AssetType.SKELETON) {
+				_skeleton = Skeleton(ev.asset);
+			}
 		}
 		
 		
@@ -86,6 +105,47 @@ package
 			var max : Vector3D;
 			var min : Vector3D;
 			var d : Vector3D;
+			
+			if (_skeleton) {
+				var it : AssetLibraryIterator;
+				var mesh : Mesh;
+				var geom : Geometry;
+				var jpv : int;
+				
+				it = AssetLibrary.createIterator(AssetType.MESH);
+				while (mesh = Mesh(it.next())) {
+					if (mesh.geometry && mesh.geometry.subGeometries.length > 0) {
+						var sub : SkinnedSubGeometry = mesh.geometry.subGeometries[0] as SkinnedSubGeometry;
+						if (sub != null) {
+							geom = mesh.geometry;
+							jpv = sub.jointIndexData.length / sub.numVertices;
+							break;
+						}
+					}
+				}
+				
+				if (geom) {
+					var seq : SkeletonAnimationSequence;
+					var name : String;
+					var state : SkeletonAnimationState;
+					
+					geom.animation = new SkeletonAnimation(_skeleton, jpv, true);
+					state = SkeletonAnimationState(mesh.animationState);
+					
+					_animator = new SkeletonAnimator(state);
+					_animator.updateRootPosition = false;
+					
+					it = AssetLibrary.createIterator(AssetType.ANIMATION);
+					while (seq = SkeletonAnimationSequence(it.next())) {
+						_animator.addSequence(seq);
+						
+						if (!name)
+							name = seq.name;
+					}
+					
+					_animator.play(name);
+				}
+			}
 			
 			max = new Vector3D(_loader.maxX, _loader.maxY, _loader.maxZ);
 			min = new Vector3D(_loader.minX, _loader.minY, _loader.minZ);
