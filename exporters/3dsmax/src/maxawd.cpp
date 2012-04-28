@@ -143,6 +143,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BO
 	// if it returns false, return to cancel the export.
 	opts = new MaxAWDExporterOpts();
 	if (!suppressPrompts && !opts->ShowDialog()) {
+		delete opts;
 		return true;
 	}
 
