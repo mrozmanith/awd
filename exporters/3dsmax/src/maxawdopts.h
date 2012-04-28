@@ -6,6 +6,10 @@
 
 #include "awd/awd.h"
 
+// Config attribute macros
+#define ATTR_BUF_LEN 1024
+#define ATTREQ(str0,str1) strncmp(str0,str1,ATTR_BUF_LEN)==0
+
 class MaxAWDExporterOpts
 {
 private:
