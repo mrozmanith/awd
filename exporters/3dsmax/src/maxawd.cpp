@@ -16,6 +16,7 @@
 #include <icustattribcontainer.h>
 #include <custattrib.h>
 #include <iparamb2.h>
+#include <MeshNormalSpec.h>
 
 #include "awd/awd.h"
 #include "awd/util.h"
@@ -485,7 +486,8 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		TriObject *triObject = (TriObject*)obj->ConvertToType(0, triObjectClassID);	
 
-		Mesh& mesh = triObject->GetMesh();
+		Mesh mesh = triObject->GetMesh();
+		MeshNormalSpec *normals = mesh.GetSpecifiedNormals();
 
 		// Extract skinning information (returns number of joints per vertex)
 		jpv = ExportSkin(node, skin, &weights, &joints);
@@ -498,13 +500,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 		AWDGeomUtil geomUtil;
 		geomUtil.joints_per_vertex = jpv;
 		geomUtil.include_uv = (opts.ExportUVs() && mesh.tvFace != NULL);
-		geomUtil.include_normals = opts.ExportNormals();
-
-		// Build normals if requested by user to be exported
-		// TODO: Replace this with explicit normals from EditNormals modifier?
-		if (geomUtil.include_normals && mesh.normalsBuilt==0) {
-			mesh.buildNormals();
-		}
+		geomUtil.include_normals = (opts.ExportNormals() && normals && normals->GetNumNormals()>0);
 
 		int numTris = mesh.getNumFaces();
 
@@ -537,7 +533,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 				}
 
 				if (geomUtil.include_normals) {
-					Point3 normal = mesh.getNormal(vIdx);
+					Point3 normal = normals->GetNormal(t, v);
 					vd->nx = -normal.x;
 					vd->ny = normal.z;
 					vd->nz = normal.y;
