@@ -28,6 +28,9 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	createPreview = true;
 	launchPreview = true;
 	networkPreview = false;
+
+	// Override defaults using config file, if any exists
+	ReadConfigFile();
 }
 
 
@@ -42,6 +45,51 @@ HWND MaxAWDExporterOpts::viewerOpts = NULL;
 
 MaxAWDExporterOpts::~MaxAWDExporterOpts(void)
 {
+}
+
+
+FILE *MaxAWDExporterOpts::OpenConfigFile(const char *mode)
+{
+	char buf[1024];
+
+	Interface *ip = GetCOREInterface();
+	_makepath_s(buf, 1024, NULL, ip->GetDir(APP_PLUGCFG_DIR), "MAXAWD", ".CFG");
+	return fopen(buf, mode);
+}
+
+void MaxAWDExporterOpts::ReadConfigFile(void)
+{
+	// Open config file or abort.
+	FILE *cfg = OpenConfigFile("rb");
+	if (!cfg) return;
+
+	while (!feof(cfg)) {
+		char buf[1024];
+		fgets(buf, 1024, cfg);
+
+		// Read key and value and skip if any is missing
+		char *key = strtok(buf, "=");
+		char *val = strtok(NULL, "\n");
+		if (!key || !val)
+			continue;
+
+		if (strncmp(key, "compression", 1024)==0) {
+			compression = strtol(val, NULL, 10);
+		}
+	}
+
+	fclose(cfg);
+}
+
+void MaxAWDExporterOpts::WriteConfigFile(void)
+{
+	// Open config file or abort.
+	FILE *cfg = OpenConfigFile("wb");
+	if (!cfg) return;
+
+	fprintf(cfg, "compression=%d\n", compression);
+
+	fclose(cfg);
 }
 
 
@@ -173,6 +221,8 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
 	imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
 	imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+
+	imp->WriteConfigFile();
 }
 
 
