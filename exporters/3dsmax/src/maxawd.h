@@ -70,7 +70,7 @@ class MaxAWDExporter : public SceneExport {
 		int numNodesTotal;
 		int numNodesTraversed;
 
-		MaxAWDExporterOpts opts;
+		MaxAWDExporterOpts *opts;
 
 		void DieWithError(void);
 		void DieWithErrorMessage(char *message, char *caption);

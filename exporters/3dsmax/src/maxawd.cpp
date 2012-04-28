@@ -141,7 +141,8 @@ int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BO
 
 	// Open the dialog (provided that prompts are not suppressed) and
 	// if it returns false, return to cancel the export.
-	if (!suppressPrompts && !opts.ShowDialog()) {
+	opts = new MaxAWDExporterOpts();
+	if (!suppressPrompts && !opts->ShowDialog()) {
 		return true;
 	}
 
@@ -182,7 +183,7 @@ int MaxAWDExporter::ExecuteExport()
 	DIE_IF_ERROR();
 
 	// Export animation if enabled and if a sequences.txt file was found
-	if (opts.ExportSkelAnim()) {
+	if (opts->ExportSkelAnim()) {
 		SequenceMetaData *sequences = LoadSequenceFile(awdFullPath);
 		if (sequences != NULL)
 			ExportAnimation(sequences);
@@ -198,8 +199,8 @@ int MaxAWDExporter::ExecuteExport()
 	maxInterface->ProgressEnd();
 
 	// Copy viewer HTML and SWF template to output directory
-	if (opts.CreatePreview()) {
-		bool launch = (!suppressDialogs && opts.LaunchPreview());
+	if (opts->CreatePreview()) {
+		bool launch = (!suppressDialogs && opts->LaunchPreview());
 		CopyViewer(launch);
 	}
 
@@ -214,7 +215,7 @@ void MaxAWDExporter::PrepareExport()
 	cache = new BlockCache();
 	colMtlCache = new ColorMaterialCache();
 	skeletonCache = new SkeletonCache();
-	awd = new AWD((AWD_compression)opts.Compression(), 0);
+	awd = new AWD((AWD_compression)opts->Compression(), 0);
 	ns = NULL;
 }
 
@@ -222,6 +223,7 @@ void MaxAWDExporter::PrepareExport()
 void MaxAWDExporter::CleanUp()
 {
 	delete awd;
+	delete opts;
 	delete cache;
 	delete colMtlCache;
 	delete skeletonCache;
@@ -442,18 +444,18 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 	AWDMaterial *awdMtl = NULL;
 	AWDTriGeom *awdGeom = NULL;
 
-	if (opts.ExportGeometry()) {
+	if (opts->ExportGeometry()) {
 		awdGeom = ExportTriGeom(obj, node, skin);
 	}
 
 	// Export material
-	if (opts.ExportMaterials()) {
+	if (opts->ExportMaterials()) {
 		awdMtl = ExportNodeMaterial(node);
 		RETURN_IF_ERROR(NULL);
 	}
 
 	// Export instance
-	if (opts.ExportScene()) {
+	if (opts->ExportScene()) {
 		Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
 		double *mtxData = (double *)malloc(12*sizeof(double));
 		SerializeMatrix3(mtx, mtxData);
@@ -499,8 +501,8 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 
 		AWDGeomUtil geomUtil;
 		geomUtil.joints_per_vertex = jpv;
-		geomUtil.include_uv = (opts.ExportUVs() && mesh.tvFace != NULL);
-		geomUtil.include_normals = (opts.ExportNormals() && normals && normals->GetNumNormals()>0);
+		geomUtil.include_uv = (opts->ExportUVs() && mesh.tvFace != NULL);
+		geomUtil.include_normals = (opts->ExportNormals() && normals && normals->GetNumNormals()>0);
 
 		int numTris = mesh.getNumFaces();
 
@@ -660,7 +662,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	MaxSDK::AssetManagement::AssetUser asset = tex->GetMap();
 	MSTR absTexPath = asset.GetFullFilePath();
 
-	if (opts.EmbedTextures()) {
+	if (opts->EmbedTextures()) {
 		int fd = open(absTexPath, _O_BINARY | _O_RDONLY);
 		
 		if (fd >= 0) {
@@ -689,7 +691,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 	else {
 		awdTex = new AWDBitmapTexture(EXTERNAL, name.data(), name.length());
 
-		if (opts.ForceBasenameTextures()) {
+		if (opts->ForceBasenameTextures()) {
 			char fileName[256];
 			char fileExt[16];
 			char *url;
@@ -701,7 +703,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 			strcat(url, fileExt);
 			awdTex->set_url(url, strlen(fileName)+strlen(fileExt));
 
-			if (opts.CopyTextures()) {
+			if (opts->CopyTextures()) {
 				char awdDrive[4];
 				char awdPath[1024];
 				char outPath[1024];
@@ -726,12 +728,12 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 int MaxAWDExporter::ExportSkin(INode *node, ISkin *skin, awd_float64 **extWeights, awd_uint32 **extJoints)
 {
-	if (opts.ExportSkin() && skin && skin->GetNumBones()) {
+	if (opts->ExportSkin() && skin && skin->GetNumBones()) {
 		int iVtx;
 		awd_float64 *weights;
 		awd_uint32 *indices;
 
-		const int jointsPerVertex = opts.JointsPerVertex();
+		const int jointsPerVertex = opts->JointsPerVertex();
 
 		// Get skeleton information from cache and geometry information
 		// through an ISkinContextData interface.
@@ -921,7 +923,7 @@ void MaxAWDExporter::ExportAnimation(SequenceMetaData *sequences)
 
 void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 {
-	if (!opts.ExportAttributes())
+	if (!opts->ExportAttributes())
 		return;
 
 	ICustAttribContainer *attributes = obj->GetCustAttribContainer();
@@ -1005,7 +1007,7 @@ void MaxAWDExporter::ExportUserAttributes(Animatable *obj, AWDAttrElement *elem)
 						// Namespace has not yet been created; ns is a class
 						// variable that will be created only once and then
 						// reused for all user attributes.
-						ns = new AWDNamespace(opts.AttributeNamespace(), strlen(opts.AttributeNamespace()));
+						ns = new AWDNamespace(opts->AttributeNamespace(), strlen(opts->AttributeNamespace()));
 						awd->add_namespace(ns);
 					}
 
