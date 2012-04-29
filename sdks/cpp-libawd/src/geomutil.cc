@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
-#include <cstdio>
+#include <string.h>
 
 #include "platform.h"
 #include "geomutil.h"
