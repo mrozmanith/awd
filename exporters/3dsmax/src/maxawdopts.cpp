@@ -25,6 +25,9 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	exportSkeletons = true;
 	exportSkelAnim = true;
 
+	sequencesTxtPath = (char*)malloc(14);
+	strcpy(sequencesTxtPath, "sequences.txt");
+
 	createPreview = true;
 	launchPreview = true;
 	networkPreview = false;
@@ -119,6 +122,10 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 		else if (ATTREQ(key, "skelanim")) {
 			exportSkelAnim = (strtol(val, NULL, 10) == 1);
 		}
+		else if (ATTREQ(key, "sequences")) {
+			sequencesTxtPath = (char*)realloc(sequencesTxtPath, strlen(val));
+			strcpy(sequencesTxtPath, val);
+		}
 		else if (ATTREQ(key, "preview")) {
 			createPreview = (strtol(val, NULL, 10) == 1);
 		}
@@ -157,6 +164,7 @@ void MaxAWDExporterOpts::WriteConfigFile(void)
 
 	fprintf(cfg, "skeletons=%d\n", exportSkeletons);
 	fprintf(cfg, "skelanim=%d\n", exportSkelAnim);
+	fprintf(cfg, "sequences=%s\n", sequencesTxtPath);
 
 	fprintf(cfg, "preview=%d\n", createPreview);
 	fprintf(cfg, "launch=%d\n", launchPreview);
@@ -253,6 +261,7 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
 	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
 	SetCheckBox(animOpts, IDC_INC_SKELANIM, imp->exportSkelAnim);
+	Edit_SetText(GetDlgItem(animOpts, IDC_SEQ_TXT), imp->sequencesTxtPath);
 	SetCheckBox(viewerOpts, IDC_SWF_ENABLE, imp->createPreview);
 	SetCheckBox(viewerOpts, IDC_SWF_LAUNCH, imp->launchPreview);
 	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
@@ -264,11 +273,13 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 
 void MaxAWDExporterOpts::SaveOptions(void)
 {
+	int len;
+
 	// General options
 	imp->compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
 	imp->exportAttributes = (IsDlgButtonChecked(generalOpts, IDC_INC_ATTR) == BST_CHECKED);
 	
-	int len = Edit_GetTextLength(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT));
+	len = Edit_GetTextLength(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT));
 	imp->attributeNamespace = (char*)realloc(imp->attributeNamespace, len+1);
 	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace, len+1);
 
@@ -289,6 +300,10 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	// Animation options
 	imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
 	imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+	
+	len = Edit_GetTextLength(GetDlgItem(animOpts, IDC_SEQ_TXT));
+	imp->sequencesTxtPath = (char*)realloc(imp->sequencesTxtPath, len+1);
+	Edit_GetText(GetDlgItem(animOpts, IDC_SEQ_TXT), imp->sequencesTxtPath, len+1);
 
 	// Preview options
 	imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
@@ -506,6 +521,11 @@ bool MaxAWDExporterOpts::ExportSkeletons(void)
 bool MaxAWDExporterOpts::ExportSkelAnim(void)
 {
 	return exportSkelAnim;
+}
+
+char *MaxAWDExporterOpts::SequencesTxtPath(void)
+{
+	return sequencesTxtPath;
 }
 
 bool MaxAWDExporterOpts::CreatePreview(void)

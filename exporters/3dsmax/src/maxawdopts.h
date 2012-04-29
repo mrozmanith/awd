@@ -31,6 +31,7 @@ private:
 
 	bool exportSkeletons;
 	bool exportSkelAnim;
+	char *sequencesTxtPath;
 
 	bool createPreview;
 	bool launchPreview;
@@ -86,6 +87,7 @@ public:
 
 	bool ExportSkeletons(void);
 	bool ExportSkelAnim(void);
+	char *SequencesTxtPath(void);
 	
 	bool CreatePreview(void);
 	bool LaunchPreview(void);
