@@ -185,7 +185,7 @@ int MaxAWDExporter::ExecuteExport()
 
 	// Export animation if enabled and if a sequences.txt file was found
 	if (opts->ExportSkelAnim()) {
-		SequenceMetaData *sequences = LoadSequenceFile(awdFullPath);
+		SequenceMetaData *sequences = LoadSequenceFile(awdFullPath, opts->SequencesTxtPath());
 		if (sequences != NULL)
 			ExportAnimation(sequences);
 	}

@@ -20,7 +20,7 @@ int CalcNumDescendants(INode *node);
 /**
  * Find and load the animation sequence description file.
 */
-SequenceMetaData *LoadSequenceFile(const char *awdFullPath);
+SequenceMetaData *LoadSequenceFile(const char *awdFullPath, char *sequencesTxtPath);
 
 /**
  * Parse animation sequence file.
@@ -38,3 +38,8 @@ int ReplaceString(char *buf, int *size, char *find, char *rep);
  * Check if a file exists.
 */
 bool FileExists(const char *path);
+
+/**
+ * Checks if a path is absolute (includes a drive letter.)
+*/
+bool PathIsAbsolute(const char *path);

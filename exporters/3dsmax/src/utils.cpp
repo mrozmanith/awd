@@ -127,19 +127,35 @@ bool FileExists(const char *path)
          !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-SequenceMetaData *LoadSequenceFile(const char *awdFullPath)
+bool PathIsAbsolute(const char *path)
 {
-	char awdDrive[4];
-	char awdPath[1024];
-	char txtPath[1024];
+	char pathDrive[4];
 
-	_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, NULL, 0, NULL, 0);
-	_makepath_s(txtPath, 1024, awdDrive, awdPath, "sequences", "txt");
+	_splitpath_s(path, pathDrive, 4, NULL, 0, NULL, 0, NULL, 0);
+	return (strlen(pathDrive) > 0);
+}
 
-	if (!FileExists(txtPath))
-		return NULL;
+SequenceMetaData *LoadSequenceFile(const char *awdFullPath, char *sequencesTxtPath)
+{
+	if (PathIsAbsolute(sequencesTxtPath)) {
+		if (!FileExists(sequencesTxtPath))
+			return NULL;
+
+		return ParseSequenceFile(sequencesTxtPath);
+	}
+	else {
+		char awdDrive[4];
+		char awdPath[1024];
+		char txtPath[1024];
+
+		_splitpath_s(awdFullPath, awdDrive, 4, awdPath, 1024, NULL, 0, NULL, 0);
+		_makepath_s(txtPath, 1024, awdDrive, awdPath, sequencesTxtPath, NULL);
+
+		if (!FileExists(txtPath))
+			return NULL;
 	
-	return ParseSequenceFile(txtPath);
+		return ParseSequenceFile(txtPath);
+	}
 }
 
 
