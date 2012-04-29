@@ -373,11 +373,11 @@ if __name__ == '__main__':
         if compression == 0:
             offset = 12
             uncompressed_data = data
-        elif compression == core.DEFLATE:
+        elif compression == 1:
             offset = 0
             data = data[12:]
             uncompressed_data = zlib.decompress(data)
-        elif compression == core.LZMA:
+        elif compression == 2:
             import pylzma
 
             offset = 0
