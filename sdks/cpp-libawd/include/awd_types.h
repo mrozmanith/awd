@@ -28,10 +28,17 @@ typedef unsigned char awd_bool;
 
 
 // Byte order conversions
+// TODO: Use different depending on platform
+/*
 #define UI16(x) awdutil_swapui16(x)
 #define UI32(x) awdutil_swapui32(x)
 #define F32(x)  awdutil_swapf32(x)
 #define F64(x)  awdutil_swapf64(x)
+*/
+#define UI16(x) x
+#define UI32(x) x
+#define F32(x)  x
+#define F64(x)  x
 
 
 typedef enum {
