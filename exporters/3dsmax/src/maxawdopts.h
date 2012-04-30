@@ -57,10 +57,15 @@ private:
 
 	// Tab panel proc functions
 	static INT_PTR CALLBACK GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static bool RedrawGeneralOpts(LPARAM lParam);
 	static INT_PTR CALLBACK SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static bool RedrawSceneOpts(LPARAM lParam);
 	static INT_PTR CALLBACK MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static bool RedrawMtlOpts(LPARAM lParam);
 	static INT_PTR CALLBACK AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static bool RedrawAnimOpts(LPARAM lParam);
 	static INT_PTR CALLBACK ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+	static bool RedrawViewerOpts(LPARAM lParam);
 
 public:
 	MaxAWDExporterOpts(void);
