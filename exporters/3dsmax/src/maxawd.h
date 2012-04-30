@@ -107,7 +107,7 @@ class MaxAWDExporter : public SceneExport {
 		void				CopyViewerHTML(char *templatePath, char *outPath, char *name);
 
 		void				ExportNode(INode *node, AWDSceneBlock *parent);
-		AWDTriGeom *		ExportTriGeom(Object *obj, INode *node, ISkin *skin);
+		AWDTriGeom *		ExportTriGeom(Object *obj, INode *node, ISkin *skin, Matrix3 *bindMtx);
 		AWDMeshInst *		ExportTriObject(Object *obj, INode *node, ISkin *skin);
 		AWDMaterial	*		ExportNodeMaterial(INode *node);
 		AWDBitmapTexture *	ExportBitmapTexture(BitmapTex *tex);

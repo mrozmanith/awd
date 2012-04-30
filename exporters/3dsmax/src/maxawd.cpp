@@ -447,11 +447,12 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *skin)
 {
+	Matrix3 bindMtx;
 	AWDMaterial *awdMtl = NULL;
 	AWDTriGeom *awdGeom = NULL;
 
 	if (opts->ExportGeometry()) {
-		awdGeom = ExportTriGeom(obj, node, skin);
+		awdGeom = ExportTriGeom(obj, node, skin, &bindMtx);
 	}
 
 	// Export material
@@ -462,7 +463,10 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 
 	// Export instance
 	if (opts->ExportScene()) {
-		Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0));
+		// Get local matrix by "un-multiplying" the parent matrix, as well as the 
+		// bind shape matrix which will have already been applied to the geometry.
+		Matrix3 mtx = node->GetNodeTM(0) * Inverse(node->GetParentTM(0)) * Inverse(bindMtx);
+
 		double *mtxData = (double *)malloc(12*sizeof(double));
 		SerializeMatrix3(mtx, mtxData);
 
@@ -481,7 +485,7 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 }
 
 
-AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
+AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin, Matrix3 *bindMtx)
 {
 	AWDTriGeom *awdGeom;
 
@@ -504,6 +508,21 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin)
 		// offset) and the node TM (which doesn't.) This will be used to transform
 		// all vertices into node space.
 		Matrix3 offsMtx = node->GetObjectTM(0) * Inverse(node->GetNodeTM(0));
+
+		// AWD does not support bind shape matrices, so if a geometry is bound
+		// to a skeleton, any mesh using it has to be "untransformed", and in 
+		// turn the geometry needs to have that transformation applied to match.
+		if (skin && jpv) {
+			Matrix3 bm;
+			skin->GetSkinInitTM(node, bm, true);
+			offsMtx *= bm;
+
+			if (bindMtx) {
+				// Transfer to bind shape matrix transform that should be "removed"
+				// from the mesh instance transformation.
+				bindMtx->Set(bm.GetRow(0), bm.GetRow(1), bm.GetRow(2), bm.GetRow(3));
+			}
+		}
 
 		AWDGeomUtil geomUtil;
 		geomUtil.joints_per_vertex = jpv;
