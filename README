@@ -1,0 +1,26 @@
+
+This source distribution contains code and documentation concerning the AWD
+file format, the official AWD SDKs and tools.
+
+Please see the Google Code project page (http://code.google.com/p/awd) for
+up-to-date information, or to contact the maintainers of this project.
+
+
+Folder contents:
+  doc/
+  All types of documentation, including the file format specification in the
+  doc/spec sub-folder
+
+  sdks/
+  AWD software development kits/libraries for all supported programming
+  languages (currently C and Python.)
+
+
+
+License:
+  This software is licensed under they Apache 2.0 License, except when 
+  otherwise stated in an accompanying LICENSE or README file.
+
+  See the separate LICENSE file in this folder for the complete Apache 2.0
+  license legal text.
+
