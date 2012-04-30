@@ -350,7 +350,7 @@ void MaxAWDExporter::CopyViewer(bool launch)
 	CopyViewerHTML(tplHtmlPath, outHtmlPath, awdName);
 
 	// Copy SWF and JS files as-is
-	CopyFile(tplSwfPath, outSwfPath, true);
+	CopyFile(tplSwfPath, outSwfPath, false);
 	CopyFile(tplJsPath, outJsPath, true);
 
 	if (launch) {
