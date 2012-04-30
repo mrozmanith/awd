@@ -270,6 +270,13 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
 	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !imp->networkPreview);
 
+	// Force redraw all panels
+	RedrawGeneralOpts(0);
+	RedrawSceneOpts(0);
+	RedrawMtlOpts(0);
+	RedrawAnimOpts(0);
+	RedrawViewerOpts(0);
+
 	rollup->Show();
 }
 
@@ -331,18 +338,25 @@ INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT messag
 			return TRUE;
 
 		case WM_COMMAND:
-			if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_ATTR)) {
-				enabled = (IsDlgButtonChecked(hWnd,IDC_INC_ATTR) == BST_CHECKED);
-				Static_Enable(GetDlgItem(hWnd,IDC_ATTRNS_STATIC), enabled);
-				Edit_Enable(GetDlgItem(hWnd,IDC_ATTRNS_TEXT), enabled);
-				return TRUE;
-			}
+			return RedrawGeneralOpts(lParam);
 			break;
 	}
 
 	return FALSE;
 }
 
+bool MaxAWDExporterOpts::RedrawGeneralOpts(LPARAM lParam)
+{
+	bool force = (lParam == 0);
+	if (force || (HWND)lParam == GetDlgItem(generalOpts,IDC_INC_ATTR)) {
+		bool enabled = (IsDlgButtonChecked(generalOpts,IDC_INC_ATTR) == BST_CHECKED);
+		Static_Enable(GetDlgItem(generalOpts,IDC_ATTRNS_STATIC), enabled);
+		Edit_Enable(GetDlgItem(generalOpts,IDC_ATTRNS_TEXT), enabled);
+		return true;
+	}
+
+	return false;
+}
 
 INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
@@ -358,73 +372,100 @@ INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,
 			return TRUE;
 
 		case WM_COMMAND:
-			if ((HWND)lParam == GetDlgItem(hWnd, IDC_INC_GEOM)) {
-				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_GEOM) == BST_CHECKED);
-				Button_Enable(GetDlgItem(hWnd,IDC_INC_NORMALS), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_INC_UVS), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_INC_SKIN), enabled);
-				GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER))->Enable(enabled);
-				GetICustEdit(GetDlgItem(hWnd,IDC_JPV_EDIT))->Enable(enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_JPV_STATIC), enabled);
-				return TRUE;
-			}
-			else if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_SKIN)) {
-				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_SKIN) == BST_CHECKED);
-				GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER))->Enable(enabled);
-				GetICustEdit(GetDlgItem(hWnd, IDC_JPV_EDIT))->Enable(enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_JPV_STATIC), enabled);
-				return TRUE;
-			}
+			return RedrawSceneOpts(lParam);
 			break;
 	}
 
 	return FALSE;
+}
+
+
+bool MaxAWDExporterOpts::RedrawSceneOpts(LPARAM lParam)
+{
+	bool ret = false;
+	bool force = (lParam == 0);
+
+	if (force || (HWND)lParam == GetDlgItem(sceneOpts, IDC_INC_GEOM)) {
+		bool enabled = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
+		Button_Enable(GetDlgItem(sceneOpts,IDC_INC_NORMALS), enabled);
+		Button_Enable(GetDlgItem(sceneOpts,IDC_INC_UVS), enabled);
+		Button_Enable(GetDlgItem(sceneOpts,IDC_INC_SKIN), enabled);
+		GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->Enable(enabled);
+		GetICustEdit(GetDlgItem(sceneOpts,IDC_JPV_EDIT))->Enable(enabled);
+		Static_Enable(GetDlgItem(sceneOpts,IDC_JPV_STATIC), enabled);
+		ret = true;
+	}
+
+	if (force || (HWND)lParam == GetDlgItem(sceneOpts,IDC_INC_SKIN)) {
+		bool enabled = ((IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED)
+			&& (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED));
+		GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->Enable(enabled);
+		GetICustEdit(GetDlgItem(sceneOpts, IDC_JPV_EDIT))->Enable(enabled);
+		Static_Enable(GetDlgItem(sceneOpts,IDC_JPV_STATIC), enabled);
+		ret = true;
+	}
+
+	return ret;
 }
 
 
 INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	bool enabled;
-
 	switch (message) {
 		case WM_COMMAND:
-			if ((HWND)lParam == GetDlgItem(hWnd, IDC_INC_MTL)) {
-				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_MTL) == BST_CHECKED);
-				Button_Enable(GetDlgItem(hWnd,IDC_TEX_FULLPATH), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_TEX_BASENAME), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_TEX_EMBED), enabled);
-			}
-			
-			// IDC_TEX_COPY should only be enabled if both the IDC_INC_MTL checkbox
-			// and the IDC_TEX_BASENAME radio button are checked.
-			enabled = ((IsDlgButtonChecked(hWnd, IDC_INC_MTL)==BST_CHECKED) 
-				&& (IsDlgButtonChecked(hWnd, IDC_TEX_BASENAME)==BST_CHECKED));
-			Button_Enable(GetDlgItem(hWnd,IDC_TEX_COPY), enabled);
-
-			return TRUE;
+			return RedrawMtlOpts(lParam);
+			break;
 	}
 
 	return FALSE;
 }
 
+bool MaxAWDExporterOpts::RedrawMtlOpts(LPARAM lParam) 
+{
+	bool force = (lParam == 0);
+	bool enabled;
+
+	if (force || (HWND)lParam == GetDlgItem(mtlOpts, IDC_INC_MTL)) {
+		enabled = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
+		Button_Enable(GetDlgItem(mtlOpts,IDC_TEX_FULLPATH), enabled);
+		Button_Enable(GetDlgItem(mtlOpts,IDC_TEX_BASENAME), enabled);
+		Button_Enable(GetDlgItem(mtlOpts,IDC_TEX_EMBED), enabled);
+	}
+			
+	// IDC_TEX_COPY should only be enabled if both the IDC_INC_MTL checkbox
+	// and the IDC_TEX_BASENAME radio button are checked.
+	enabled = ((IsDlgButtonChecked(mtlOpts, IDC_INC_MTL)==BST_CHECKED) 
+		&& (IsDlgButtonChecked(mtlOpts, IDC_TEX_BASENAME)==BST_CHECKED));
+	Button_Enable(GetDlgItem(mtlOpts,IDC_TEX_COPY), enabled);
+
+	return true;
+}
+
 
 INT_PTR CALLBACK MaxAWDExporterOpts::AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	bool enabled;
-
 	switch (message) {
 		case WM_COMMAND:
-			if ((HWND)lParam == GetDlgItem(hWnd,IDC_INC_SKELANIM)) {
-				enabled = (IsDlgButtonChecked(hWnd, IDC_INC_SKELANIM) == BST_CHECKED);
-				Edit_Enable(GetDlgItem(hWnd,IDC_SEQ_TXT), enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_SEQ_STATIC1), enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_SEQ_STATIC2), enabled);
-				return TRUE;
-			}
+			return RedrawAnimOpts(lParam);
 			break;
 	}
 
 	return FALSE;
+}
+
+bool MaxAWDExporterOpts::RedrawAnimOpts(LPARAM lParam)
+{
+	bool force = (lParam == 0);
+
+	if (force || (HWND)lParam == GetDlgItem(animOpts,IDC_INC_SKELANIM)) {
+		bool enabled = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+		Edit_Enable(GetDlgItem(animOpts,IDC_SEQ_TXT), enabled);
+		Static_Enable(GetDlgItem(animOpts,IDC_SEQ_STATIC1), enabled);
+		Static_Enable(GetDlgItem(animOpts,IDC_SEQ_STATIC2), enabled);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -434,19 +475,28 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 
 	switch (message) {
 		case WM_COMMAND:
-			if ((HWND)lParam == GetDlgItem(hWnd,IDC_SWF_ENABLE)) {
-				enabled = (IsDlgButtonChecked(hWnd,IDC_SWF_ENABLE) == BST_CHECKED);
-				Button_Enable(GetDlgItem(hWnd,IDC_SWF_LAUNCH), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_SWFSB_LOCAL), enabled);
-				Button_Enable(GetDlgItem(hWnd,IDC_SWFSB_NETWORK), enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_SWFSB_STATIC1), enabled);
-				Static_Enable(GetDlgItem(hWnd,IDC_SWFSB_STATIC2), enabled);
-				return TRUE;
-			}
+			return RedrawViewerOpts(lParam);
 			break;
 	}
 
 	return FALSE;
+}
+
+bool MaxAWDExporterOpts::RedrawViewerOpts(LPARAM lParam)
+{
+	bool force = (lParam == 0);
+
+	if (force || (HWND)lParam == GetDlgItem(viewerOpts,IDC_SWF_ENABLE)) {
+		bool enabled = (IsDlgButtonChecked(viewerOpts,IDC_SWF_ENABLE) == BST_CHECKED);
+		Button_Enable(GetDlgItem(viewerOpts,IDC_SWF_LAUNCH), enabled);
+		Button_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_LOCAL), enabled);
+		Button_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_NETWORK), enabled);
+		Static_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_STATIC1), enabled);
+		Static_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_STATIC2), enabled);
+		return true;
+	}
+
+	return false;
 }
 
 
