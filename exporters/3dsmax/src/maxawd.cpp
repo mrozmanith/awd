@@ -451,6 +451,9 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 	AWDMaterial *awdMtl = NULL;
 	AWDTriGeom *awdGeom = NULL;
 
+	// Default at no bind transform.
+	bindMtx.IdentityMatrix();
+
 	if (opts->ExportGeometry()) {
 		awdGeom = ExportTriGeom(obj, node, skin, &bindMtx);
 	}
