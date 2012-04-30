@@ -296,7 +296,11 @@ void MaxAWDExporter::CopyViewerHTML(char *templatePath, char *outPath, char *nam
 	memset((void *)(buf + bufLen), 0, 1);
     fclose(in);
 
+	char bgcolor[8];
+	snprintf(bgcolor, 8, "%x", opts->PreviewBackgroundColor());
+
     ReplaceString(buf, &bufLen, "%NAME%", name);
+	ReplaceString(buf, &bufLen, "%COLOR%", bgcolor);
 
     FILE *out = fopen(outPath, "w");
     fwrite(buf, sizeof(char), bufLen, out);

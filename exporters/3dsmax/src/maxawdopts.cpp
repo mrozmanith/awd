@@ -31,6 +31,7 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	createPreview = true;
 	launchPreview = true;
 	networkPreview = false;
+	previewBackgroundColor = 0;
 
 	// Override defaults using config file, if any exists
 	ReadConfigFile();
@@ -135,6 +136,9 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 		else if (ATTREQ(key, "deploy")) {
 			networkPreview = (strtol(val, NULL, 10) == 1);
 		}
+		else if (ATTREQ(key, "bgcolor")) {
+			previewBackgroundColor = strtol(val, NULL, 16);
+		}
 	}
 
 	fclose(cfg);
@@ -169,6 +173,7 @@ void MaxAWDExporterOpts::WriteConfigFile(void)
 	fprintf(cfg, "preview=%d\n", createPreview);
 	fprintf(cfg, "launch=%d\n", launchPreview);
 	fprintf(cfg, "deploy=%d\n", networkPreview);
+	fprintf(cfg, "bgcolor=%06x\n", previewBackgroundColor);
 
 	fclose(cfg);
 }
@@ -270,6 +275,14 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
 	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !imp->networkPreview);
 
+	// Flip color channels
+	AColor col;
+	col.r = GetBValue(imp->previewBackgroundColor) / 255.0;
+	col.g = GetGValue(imp->previewBackgroundColor) / 255.0;
+	col.b = GetRValue(imp->previewBackgroundColor) / 255.0;
+	GetIColorSwatch(GetDlgItem(viewerOpts, IDC_SWF_COLOR))->SetAColor(col, FALSE);
+		
+
 	// Force redraw all panels
 	RedrawGeneralOpts(0);
 	RedrawSceneOpts(0);
@@ -319,6 +332,9 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
 	imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
 	imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+
+	int col = GetIColorSwatch(GetDlgItem(viewerOpts, IDC_SWF_COLOR))->GetColor();
+	imp->previewBackgroundColor = (GetRValue(col)<<16) | (GetGValue(col)<<8) | GetBValue(col);
 
 	imp->WriteConfigFile();
 }
@@ -493,6 +509,8 @@ bool MaxAWDExporterOpts::RedrawViewerOpts(LPARAM lParam)
 		Button_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_NETWORK), enabled);
 		Static_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_STATIC1), enabled);
 		Static_Enable(GetDlgItem(viewerOpts,IDC_SWFSB_STATIC2), enabled);
+		Static_Enable(GetDlgItem(viewerOpts,IDC_SWF_COL_STATIC), enabled);
+		GetIColorSwatch(GetDlgItem(viewerOpts,IDC_SWF_COLOR))->Enable(enabled);
 		return true;
 	}
 
@@ -594,4 +612,9 @@ bool MaxAWDExporterOpts::LaunchPreview(void)
 bool MaxAWDExporterOpts::PreviewForDeployment(void)
 {
 	return networkPreview;
+}
+
+int MaxAWDExporterOpts::PreviewBackgroundColor(void)
+{
+	return previewBackgroundColor;
 }

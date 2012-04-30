@@ -36,6 +36,7 @@ private:
 	bool createPreview;
 	bool launchPreview;
 	bool networkPreview;
+	int previewBackgroundColor;
 
 	static MaxAWDExporterOpts *imp;
 
@@ -97,5 +98,6 @@ public:
 	bool CreatePreview(void);
 	bool LaunchPreview(void);
 	bool PreviewForDeployment(void);
+	int PreviewBackgroundColor(void);
 };
 
