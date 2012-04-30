@@ -64,6 +64,7 @@ package
 			_view = new View3D();
 			_view.antiAlias = 4;
 			_view.camera.lens.far = 5000;
+			_view.backgroundColor = loaderInfo.parameters['bgcolor'] || 0;
 			addChild(_view);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
