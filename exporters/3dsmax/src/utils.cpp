@@ -185,6 +185,7 @@ int ReplaceString(char *buf, int *size, char *find, char *rep)
 
     // Append trailing string
     memcpy(p, tmp, endLen);
+	memset(p+endLen, 0, 1);
 
     free(tmp);
 
