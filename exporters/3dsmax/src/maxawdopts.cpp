@@ -245,7 +245,12 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 		ViewerOptsDialogProc, "Flash viewer", 0, APPENDROLL_CLOSED);
 	viewerOpts = rollup->GetPanelDlg(index);
 
-	// Set defaults
+	// Find the correct option for textures
+	int texOption = IDC_TEX_FULLPATH;
+	if (imp->forceBasenameTextures) texOption = IDC_TEX_BASENAME;
+	else if (imp->embedTextures) texOption = IDC_TEX_EMBED;
+
+	// Set default (or loaded if cfg file existed) options
 	ComboBox_SetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO), imp->compression);
 	SetCheckBox(generalOpts, IDC_INC_ATTR, imp->exportAttributes);
 	Edit_SetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace);
@@ -255,10 +260,8 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 	SetCheckBox(sceneOpts, IDC_INC_NORMALS, imp->exportNormals);
 	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
 	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
-	SetCheckBox(mtlOpts, IDC_TEX_BASENAME, imp->forceBasenameTextures);
-	SetCheckBox(mtlOpts, IDC_TEX_FULLPATH, !imp->forceBasenameTextures);
+	SetCheckBox(mtlOpts, texOption, true);
 	SetCheckBox(mtlOpts, IDC_TEX_COPY, imp->copyTextures);
-	SetCheckBox(mtlOpts, IDC_EMBED_TEX, imp->embedTextures);
 	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
 	SetCheckBox(animOpts, IDC_INC_SKELANIM, imp->exportSkelAnim);
 	Edit_SetText(GetDlgItem(animOpts, IDC_SEQ_TXT), imp->sequencesTxtPath);
