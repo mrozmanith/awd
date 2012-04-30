@@ -37,7 +37,7 @@ def printl(str=''):
 
 def print_header(data):
     compressions = ('uncompressed', 'deflate (file-level)', 'lzma (file-level)')
-    header = struct.unpack_from('>BBHBI', data, 3)
+    header = struct.unpack_from('<BBHBI', data, 3)
 
     if header[3] < len(compressions):
         compression = compressions[header[3]]
@@ -52,7 +52,7 @@ def print_header(data):
     return (header[3], header[2] & 2, header[2] & 4)
 
 def read_var_str(data, offs=0):
-    len = struct.unpack_from('>H', data, offs)
+    len = struct.unpack_from('<H', data, offs)
     str = struct.unpack_from('%ds' % len[0], data, offs+2)
 
     return str[0]
@@ -63,7 +63,7 @@ def print_properties(data):
     offs = 0
 
     printl()
-    props_len = struct.unpack_from('>I', data, offs)[0]
+    props_len = struct.unpack_from('<I', data, offs)[0]
     offs += 4
     if props_len > 0:
         printl('PROPERTIES: (%db)' % props_len)
@@ -71,12 +71,12 @@ def print_properties(data):
 
         indent_level += 1
         while (offs < props_end):
-            prop_key, prop_len = struct.unpack_from('>HH', data, offs)
+            prop_key, prop_len = struct.unpack_from('<HH', data, offs)
             offs += 4
             prop_end = offs + prop_len
             val_str = ''
             while (offs < prop_end):
-                val_str += '%02x ' % struct.unpack_from('>B', data, offs)[0]
+                val_str += '%02x ' % struct.unpack_from('<B', data, offs)[0]
                 offs += 1
 
             printl('%d: %s' % (prop_key, val_str))
@@ -89,7 +89,7 @@ def print_user_attributes(data):
     global indent_level
 
     offs = 0
-    attr_len = struct.unpack_from('>I', data, offs)[0]
+    attr_len = struct.unpack_from('<I', data, offs)[0]
     offs += 4
 
     if attr_len > 0:
@@ -105,7 +105,7 @@ def print_skeleton(data):
     name = read_var_str(data)
     offs = 2+len(name)
 
-    num_joints = struct.unpack_from('>H', data, offs)[0]
+    num_joints = struct.unpack_from('<H', data, offs)[0]
     offs += 2
 
     printl('NAME: %s' % name)
@@ -116,7 +116,7 @@ def print_skeleton(data):
     indent_level += 1
     joints_printed = 0
     while offs < len(data) and joints_printed < num_joints:
-        joint_id, parent_id = struct.unpack_from('>HH', data, offs)
+        joint_id, parent_id = struct.unpack_from('<HH', data, offs)
         offs += 4
 
         joint_name = read_var_str(data, offs)
@@ -149,7 +149,7 @@ def print_skelpose(data):
     pose_name = read_var_str(data, offs)
     offs += (2 + len(pose_name))
 
-    num_joints = struct.unpack_from('>H', data, offs)[0]
+    num_joints = struct.unpack_from('<H', data, offs)[0]
     offs += 2
 
     printl('NAME: %s' % pose_name)
@@ -179,7 +179,7 @@ def print_skelpose(data):
     offs += print_user_attributes(data[offs:])
 
 def read_scene_data(data):
-    parent = struct.unpack_from('>I', data)[0]
+    parent = struct.unpack_from('<I', data)[0]
     matrix = read_mtx(data, 4)
     name = read_var_str(data, 52)
 
@@ -199,7 +199,7 @@ def print_mesh_instance(data):
     global indent_level
 
     parent, matrix, name, offs = read_scene_data(data)
-    data_id = struct.unpack_from('>I', data, offs)[0]
+    data_id = struct.unpack_from('<I', data, offs)[0]
 
     printl('NAME: %s' % name)
     printl('DATA ID: %d' % data_id)
@@ -210,9 +210,9 @@ def print_mesh_instance(data):
 
 def read_mtx(data, offset):
     if wide_mtx:
-        matrix = struct.unpack_from('>12d', data, offset) 
+        matrix = struct.unpack_from('<12d', data, offset) 
     else:
-        matrix = struct.unpack_from('>12f', data, offset) 
+        matrix = struct.unpack_from('<12f', data, offset) 
 
     return matrix
 
@@ -226,7 +226,7 @@ def print_mesh_data(data):
 
     name = read_var_str(data)
     offs = (2 + len(name)) # var str 
-    num_subs = struct.unpack_from('>H', data, offs)[0]
+    num_subs = struct.unpack_from('<H', data, offs)[0]
     offs += 2
 
     printl('NAME: %s' % name)
@@ -239,7 +239,7 @@ def print_mesh_data(data):
     subs_printed = 0
     indent_level += 1
     while offs < len(data) and subs_printed < num_subs:
-        length = struct.unpack_from('>I', data, offs)[0]
+        length = struct.unpack_from('<I', data, offs)[0]
         offs += 4
 
         printl('SUB-MESH')
@@ -253,7 +253,7 @@ def print_mesh_data(data):
         indent_level += 1
         while offs < sub_end:
             stream_types = ('', 'VERTEX', 'TRIANGLE', 'UV', 'VERTEX_NORMALS', 'VERTEX_TANGENTS', 'JOINT_INDICES', 'VERTEX_WEIGHTS')
-            type, data_type, str_len = struct.unpack_from('>BBI', data, offs)
+            type, data_type, str_len = struct.unpack_from('<BBI', data, offs)
             offs += 6
 
             if type < len(stream_types):
@@ -280,7 +280,7 @@ def print_mesh_data(data):
 
             str_end = offs + str_len
             while offs < str_end:
-                element = struct.unpack_from('>%s' % elem_data_format, data, offs)
+                element = struct.unpack_from('<%s' % elem_data_format, data, offs)
                 printl(elem_print_format % element[0])
                 offs += struct.calcsize(elem_data_format)
 
@@ -306,7 +306,7 @@ def print_next_block(data):
     block_types[BT_SKELPOSE] =  'SkeletonPose'
     block_types[BT_SKELANIM] =  'SkeletonAnimation'
 
-    block_header = struct.unpack_from('>IBBBI', data, offset)
+    block_header = struct.unpack_from('<IBBBI', data, offset)
 
     type = block_header[2]
     flags = block_header[3]
@@ -381,7 +381,7 @@ if __name__ == '__main__':
             import pylzma
 
             offset = 0
-            uncompressed_len = struct.unpack_from('>I', data, 12)[0]
+            uncompressed_len = struct.unpack_from('<I', data, 12)[0]
             data = data[16:]
             uncompressed_data = pylzma.decompress(data, uncompressed_len, uncompressed_len)
         else:
