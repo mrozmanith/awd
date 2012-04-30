@@ -17,11 +17,15 @@ package
 	import away3d.library.AssetLibrary;
 	import away3d.library.assets.AssetType;
 	import away3d.library.utils.AssetLibraryIterator;
+	import away3d.lights.DirectionalLight;
+	import away3d.lights.PointLight;
 	import away3d.loaders.Loader3D;
 	import away3d.loaders.misc.AssetLoaderContext;
 	import away3d.loaders.parsers.AWD2Parser;
 	import away3d.materials.ColorMaterial;
+	import away3d.materials.DefaultMaterialBase;
 	import away3d.materials.TextureMaterial;
+	import away3d.materials.lightpickers.StaticLightPicker;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -44,6 +48,10 @@ package
 		private var _skeleton : Skeleton;
 		private var _animator : SkeletonAnimator;
 		
+		private var _defDirLight : DirectionalLight;
+		private var _defCamLight : PointLight;
+		private var _defLightPicker : StaticLightPicker;
+		
 		public function AWDViewer()
 		{
 			init();
@@ -64,6 +72,10 @@ package
 			_hoverCtrl.panAngle = 180;
 			_hoverCtrl.minTiltAngle = -60;
 			_hoverCtrl.maxTiltAngle = 60;
+			
+			_defDirLight = new DirectionalLight(1, -3, 1);
+			_defCamLight = new PointLight();
+			_defLightPicker = new StaticLightPicker([_defDirLight,_defCamLight]);
 			
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove);
@@ -90,8 +102,11 @@ package
 				mesh = Mesh(ev.asset);
 				texMat = mesh.material as TextureMaterial;
 				
-				if (mesh.material == null || (texMat && texMat.texture == null))
+				if (mesh.material == null || (texMat && texMat.texture == null)) {
 					mesh.material = new ColorMaterial(Math.random() * 0xffffff);
+				}
+				
+				mesh.material.lightPicker = _defLightPicker;
 			}
 			else if (ev.asset.assetType == AssetType.SKELETON) {
 				_skeleton = Skeleton(ev.asset);
@@ -189,6 +204,11 @@ package
 		private function onEnterFrame(ev : Event) : void
 		{
 			_hoverCtrl.update();
+			
+			_defCamLight.x = _view.camera.x;
+			_defCamLight.y = _view.camera.y;
+			_defCamLight.z = _view.camera.z;
+			
 			_view.render();
 		}
 	}
