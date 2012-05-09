@@ -22,7 +22,7 @@
 #include "iparamm2.h"
 //SIMPLE TYPE
 
-#include "awd/awd.h"
+#include "awd.h"
 #include "cache.h"
 #include "maxawdopts.h"
 
