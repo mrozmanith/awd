@@ -28,6 +28,8 @@ package
 	import away3d.materials.lightpickers.StaticLightPicker;
 	
 	import flash.display.Sprite;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
@@ -75,12 +77,18 @@ package
 			_hoverCtrl.maxTiltAngle = 60;
 			
 			_defDirLight = new DirectionalLight(1, -3, 1);
+			_defDirLight.specular = 0.1;
 			_defCamLight = new PointLight();
+			_defCamLight.specular = 0.1;
 			_defLightPicker = new StaticLightPicker([_defDirLight,_defCamLight]);
 			
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheel);
+			
+			stage.align = StageAlign.TOP_LEFT;
+			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.addEventListener(Event.RESIZE, onStageResize);
 		}
 		
 		
@@ -199,6 +207,13 @@ package
 				_hoverCtrl.distance = 100;
 			else if (_hoverCtrl.distance > 2000)
 				_hoverCtrl.distance = 2000;
+		}
+		
+		
+		private function onStageResize(ev : Event) : void
+		{
+			_view.width = stage.stageWidth;
+			_view.height = stage.stageHeight;
 		}
 		
 		
