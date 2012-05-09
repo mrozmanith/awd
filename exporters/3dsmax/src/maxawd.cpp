@@ -18,10 +18,10 @@
 #include <iparamb2.h>
 #include <MeshNormalSpec.h>
 
-#include "awd/awd.h"
-#include "awd/util.h"
-#include "awd/platform.h"
-#include "awd/geomutil.h"
+#include "awd.h"
+#include "util.h"
+#include "platform.h"
+#include "geomutil.h"
 #include "maxawd.h"
 #include "utils.h"
 

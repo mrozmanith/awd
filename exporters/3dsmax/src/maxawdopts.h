@@ -4,7 +4,7 @@
 #include "max.h"
 #include "resource.h"
 
-#include "awd/awd.h"
+#include "awd.h"
 
 // Config attribute macros
 #define ATTR_BUF_LEN 1024

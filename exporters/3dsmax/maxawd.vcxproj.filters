@@ -72,9 +72,6 @@
     <ClInclude Include="..\..\sdks\cpp-libawd\lib\lzma\Bra.h">
       <Filter>Header Files\libawd</Filter>
     </ClInclude>
-    <ClInclude Include="src\cache.h">
-      <Filter>Header Files\libawd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\sdks\cpp-libawd\include\camera.h">
       <Filter>Header Files\libawd</Filter>
     </ClInclude>
@@ -176,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sdks\cpp-libawd\lib\zlib\zlib.h">
       <Filter>Header Files\libawd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cache.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

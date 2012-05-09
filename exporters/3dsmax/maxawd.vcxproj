@@ -109,16 +109,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">./bin</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">./bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">bin</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">.\Release\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">.\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">./bin</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">./bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">bin</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">x64\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">x64\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">false</LinkIncremental>
@@ -157,10 +157,14 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='2013 Debug|x64'">maxawd_2013_64</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='2012 Debug|x64'">.dle</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='2013 Debug|x64'">.dle</TargetExt>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Debug|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Debug|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Debug|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Debug|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Debug|Win32'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2013 Release|Win32'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Debug|Win32'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)include;</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)include;</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\zlib;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\lib\lzma;C:\Users\richardolsson\Projects\AWD\Dev\sdks\cpp-libawd\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)include;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='2012 Release|Win32'">
     <Midl>
@@ -179,8 +183,8 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\sdks\cpp-libawd\lib\zlib;..\..\sdks\cpp-libawd\lib\lzma;..\..\sdks\cpp-libawd\include;.\midl\Win32;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\midl\Win32;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -190,7 +194,6 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -239,7 +242,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\..\sdks\cpp-libawd\lib\zlib;..\..\sdks\cpp-libawd\lib\lzma;..\..\sdks\cpp-libawd\include;.\midl\Win32;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -310,8 +313,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <UseFullPaths>true</UseFullPaths>
-      <AdditionalIncludeDirectories>src;..\..\sdks\cpp-libawd\build;.\midl\x64;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <AdditionalIncludeDirectories>src;.\midl\x64;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -356,7 +358,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SECURE_SCL=0;WIN32;NDEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST;_7ZIP_ST</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -411,7 +413,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>src;..\..\sdks\cpp-libawd\build;.\midl\Win32;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -460,7 +462,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>src;..\..\sdks\cpp-libawd\build;.\midl\Win32;C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -508,7 +510,7 @@
       <AdditionalOptions>/LD %40"C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\ProjectSettings\AdditionalCompilerOptions64.txt" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST;_7ZIP_ST</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -557,7 +559,7 @@
       <AdditionalOptions>/LD %40"C:\Program Files (x86)\Autodesk\3ds Max 2012 SDK\maxsdk\ProjectSettings\AdditionalCompilerOptions64.txt" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;ISOLATION_AWARE_ENABLED=1;MODULE_NAME=$(TargetFileName);%(PreprocessorDefinitions);_7ZIP_ST;_7ZIP_ST</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>

@@ -2,7 +2,7 @@
 
 #include <iskin.h>
 #include "Max.h"
-#include "awd/awd.h"
+#include "awd.h"
 
 /**
  * BlockCache
