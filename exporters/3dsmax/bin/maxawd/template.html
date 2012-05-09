@@ -32,7 +32,8 @@
         <script type="text/javascript">
             var swfVersionStr = "11.0.0";
             var flashvars = {
-                // TODO: Add settings
+		awd: "%NAME%.awd",
+		bgcolor: "%COLOR%"
             };
             var params = {
                 quality: 'high',
@@ -41,12 +42,12 @@
             };
             attributes = {
                 id: 'AWDViewer',
-                name: 'AWDViewer',
+                name: 'AWDViewer'
             };
 
             swfobject.embedSWF(
-                "AWDViewer.swf", "flashContent", 
-                "100%", "100%", 
+		"viewer.swf", "flashContent", 
+                "800", "600", 
                 swfVersionStr, null, 
                 flashvars, params, attributes);
 
