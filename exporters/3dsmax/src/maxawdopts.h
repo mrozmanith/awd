@@ -38,7 +38,7 @@ private:
 	bool networkPreview;
 	int previewBackgroundColor;
 
-	static MaxAWDExporterOpts *imp;
+	static MaxAWDExporterOpts *INSTANCE;
 
 	static HWND generalOpts;
 	static HWND sceneOpts;
@@ -53,20 +53,20 @@ private:
 
 	// Main proc function and helpers
 	static INT_PTR CALLBACK DialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static void InitDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	static void SaveOptions(void);
+	void InitDialog(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void SaveOptions(void);
 
 	// Tab panel proc functions
 	static INT_PTR CALLBACK GeneralOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static bool RedrawGeneralOpts(LPARAM lParam);
+	bool RedrawGeneralOpts(LPARAM lParam);
 	static INT_PTR CALLBACK SceneOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static bool RedrawSceneOpts(LPARAM lParam);
+	bool RedrawSceneOpts(LPARAM lParam);
 	static INT_PTR CALLBACK MtlOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static bool RedrawMtlOpts(LPARAM lParam);
+	bool RedrawMtlOpts(LPARAM lParam);
 	static INT_PTR CALLBACK AnimOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static bool RedrawAnimOpts(LPARAM lParam);
+	bool RedrawAnimOpts(LPARAM lParam);
 	static INT_PTR CALLBACK ViewerOptsDialogProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
-	static bool RedrawViewerOpts(LPARAM lParam);
+	bool RedrawViewerOpts(LPARAM lParam);
 
 public:
 	MaxAWDExporterOpts(void);
