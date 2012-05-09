@@ -3,6 +3,10 @@
 
 MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 {
+	// Store pointer to single instance
+	INSTANCE = this;
+
+
 	// Default values
 	compression = (int)DEFLATE;
 	exportAttributes = true;
@@ -25,7 +29,7 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	exportSkeletons = true;
 	exportSkelAnim = true;
 
-	sequencesTxtPath = (char*)malloc(14);
+	sequencesTxtPath = (char*)malloc(15);
 	strcpy(sequencesTxtPath, "sequences.txt");
 
 	createPreview = true;
@@ -39,7 +43,7 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 
 
 // Static members
-MaxAWDExporterOpts *MaxAWDExporterOpts::imp = NULL;
+MaxAWDExporterOpts *MaxAWDExporterOpts::INSTANCE;// = NULL;
 HWND MaxAWDExporterOpts::generalOpts = NULL;
 HWND MaxAWDExporterOpts::sceneOpts = NULL;
 HWND MaxAWDExporterOpts::mtlOpts = NULL;
@@ -184,7 +188,8 @@ bool MaxAWDExporterOpts::ShowDialog(void)
 	int ret = DialogBoxParam(hInstance, 
 				MAKEINTRESOURCE(IDD_AWD_OPTIONS), 
 				GetActiveWindow(), 
-				DialogProc, (LPARAM)this);
+				DialogProc, 
+				0);
 
 	return (ret == IDOK);
 }
@@ -195,15 +200,14 @@ INT_PTR CALLBACK MaxAWDExporterOpts::DialogProc(HWND hWnd,UINT message,WPARAM wP
 {
 	switch(message) {
 		case WM_INITDIALOG:
-			imp = (MaxAWDExporterOpts *)lParam;
-			InitDialog(hWnd, message, wParam, lParam);
+			INSTANCE->InitDialog(hWnd, message, wParam, lParam);
 			CenterWindow(hWnd,GetParent(hWnd));
 			return TRUE;
 
 		case WM_COMMAND:
 			switch (wParam) {
 				case IDC_OK:
-					SaveOptions();
+					INSTANCE->SaveOptions();
 					EndDialog(hWnd, IDOK);
 					break;
 
@@ -252,34 +256,34 @@ void MaxAWDExporterOpts::InitDialog(HWND hWnd,UINT message,WPARAM wParam,LPARAM 
 
 	// Find the correct option for textures
 	int texOption = IDC_TEX_FULLPATH;
-	if (imp->forceBasenameTextures) texOption = IDC_TEX_BASENAME;
-	else if (imp->embedTextures) texOption = IDC_TEX_EMBED;
+	if (forceBasenameTextures) texOption = IDC_TEX_BASENAME;
+	else if (embedTextures) texOption = IDC_TEX_EMBED;
 
 	// Set default (or loaded if cfg file existed) options
-	ComboBox_SetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO), imp->compression);
-	SetCheckBox(generalOpts, IDC_INC_ATTR, imp->exportAttributes);
-	Edit_SetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace);
-	SetCheckBox(sceneOpts, IDC_INC_SCENE, imp->exportScene);
-	SetCheckBox(sceneOpts, IDC_INC_GEOM, imp->exportGeometry);
-	SetCheckBox(sceneOpts, IDC_INC_UVS, imp->exportUVs);
-	SetCheckBox(sceneOpts, IDC_INC_NORMALS, imp->exportNormals);
-	SetCheckBox(sceneOpts, IDC_INC_SKIN, imp->exportSkin);
-	SetCheckBox(mtlOpts, IDC_INC_MTL, imp->exportMaterials);
+	ComboBox_SetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO), compression);
+	SetCheckBox(generalOpts, IDC_INC_ATTR, exportAttributes);
+	Edit_SetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), attributeNamespace);
+	SetCheckBox(sceneOpts, IDC_INC_SCENE, exportScene);
+	SetCheckBox(sceneOpts, IDC_INC_GEOM, exportGeometry);
+	SetCheckBox(sceneOpts, IDC_INC_UVS, exportUVs);
+	SetCheckBox(sceneOpts, IDC_INC_NORMALS, exportNormals);
+	SetCheckBox(sceneOpts, IDC_INC_SKIN, exportSkin);
+	SetCheckBox(mtlOpts, IDC_INC_MTL, exportMaterials);
 	SetCheckBox(mtlOpts, texOption, true);
-	SetCheckBox(mtlOpts, IDC_TEX_COPY, imp->copyTextures);
-	SetCheckBox(animOpts, IDC_INC_SKEL, imp->exportSkeletons);
-	SetCheckBox(animOpts, IDC_INC_SKELANIM, imp->exportSkelAnim);
-	Edit_SetText(GetDlgItem(animOpts, IDC_SEQ_TXT), imp->sequencesTxtPath);
-	SetCheckBox(viewerOpts, IDC_SWF_ENABLE, imp->createPreview);
-	SetCheckBox(viewerOpts, IDC_SWF_LAUNCH, imp->launchPreview);
-	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, imp->networkPreview);
-	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !imp->networkPreview);
+	SetCheckBox(mtlOpts, IDC_TEX_COPY, copyTextures);
+	SetCheckBox(animOpts, IDC_INC_SKEL, exportSkeletons);
+	SetCheckBox(animOpts, IDC_INC_SKELANIM, exportSkelAnim);
+	Edit_SetText(GetDlgItem(animOpts, IDC_SEQ_TXT), sequencesTxtPath);
+	SetCheckBox(viewerOpts, IDC_SWF_ENABLE, createPreview);
+	SetCheckBox(viewerOpts, IDC_SWF_LAUNCH, launchPreview);
+	SetCheckBox(viewerOpts, IDC_SWFSB_NETWORK, networkPreview);
+	SetCheckBox(viewerOpts, IDC_SWFSB_LOCAL, !networkPreview);
 
 	// Flip color channels
 	AColor col;
-	col.r = GetBValue(imp->previewBackgroundColor) / 255.0;
-	col.g = GetGValue(imp->previewBackgroundColor) / 255.0;
-	col.b = GetRValue(imp->previewBackgroundColor) / 255.0;
+	col.r = GetBValue(previewBackgroundColor) / 255.0;
+	col.g = GetGValue(previewBackgroundColor) / 255.0;
+	col.b = GetRValue(previewBackgroundColor) / 255.0;
 	GetIColorSwatch(GetDlgItem(viewerOpts, IDC_SWF_COLOR))->SetAColor(col, FALSE);
 		
 
@@ -299,44 +303,44 @@ void MaxAWDExporterOpts::SaveOptions(void)
 	int len;
 
 	// General options
-	imp->compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
-	imp->exportAttributes = (IsDlgButtonChecked(generalOpts, IDC_INC_ATTR) == BST_CHECKED);
+	compression = ComboBox_GetCurSel(GetDlgItem(generalOpts, IDC_COMP_COMBO));
+	exportAttributes = (IsDlgButtonChecked(generalOpts, IDC_INC_ATTR) == BST_CHECKED);
 	
 	len = Edit_GetTextLength(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT));
-	imp->attributeNamespace = (char*)realloc(imp->attributeNamespace, len+1);
-	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), imp->attributeNamespace, len+1);
+	attributeNamespace = (char*)realloc(attributeNamespace, len+1);
+	Edit_GetText(GetDlgItem(generalOpts, IDC_ATTRNS_TEXT), attributeNamespace, len+1);
 
 	// Scene & geometry options
-	imp->exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
-	imp->exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
-	imp->exportUVs = (IsDlgButtonChecked(sceneOpts, IDC_INC_UVS) == BST_CHECKED);
-	imp->exportNormals = (IsDlgButtonChecked(sceneOpts, IDC_INC_NORMALS) == BST_CHECKED);
-	imp->exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
-	imp->jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
+	exportScene = (IsDlgButtonChecked(sceneOpts, IDC_INC_SCENE) == BST_CHECKED);
+	exportGeometry = (IsDlgButtonChecked(sceneOpts, IDC_INC_GEOM) == BST_CHECKED);
+	exportUVs = (IsDlgButtonChecked(sceneOpts, IDC_INC_UVS) == BST_CHECKED);
+	exportNormals = (IsDlgButtonChecked(sceneOpts, IDC_INC_NORMALS) == BST_CHECKED);
+	exportSkin = (IsDlgButtonChecked(sceneOpts, IDC_INC_SKIN) == BST_CHECKED);
+	jointsPerVertex = GetISpinner(GetDlgItem(sceneOpts,IDC_JPV_SPINNER))->GetIVal();
 					
 	// Material options
-	imp->exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
-	imp->forceBasenameTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_BASENAME) == BST_CHECKED);
-	imp->copyTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_COPY) == BST_CHECKED);
-	imp->embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_EMBED) == BST_CHECKED);
+	exportMaterials = (IsDlgButtonChecked(mtlOpts, IDC_INC_MTL) == BST_CHECKED);
+	forceBasenameTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_BASENAME) == BST_CHECKED);
+	copyTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_COPY) == BST_CHECKED);
+	embedTextures = (IsDlgButtonChecked(mtlOpts, IDC_TEX_EMBED) == BST_CHECKED);
 
 	// Animation options
-	imp->exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
-	imp->exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
+	exportSkeletons = (IsDlgButtonChecked(animOpts, IDC_INC_SKEL) == BST_CHECKED);
+	exportSkelAnim = (IsDlgButtonChecked(animOpts, IDC_INC_SKELANIM) == BST_CHECKED);
 	
 	len = Edit_GetTextLength(GetDlgItem(animOpts, IDC_SEQ_TXT));
-	imp->sequencesTxtPath = (char*)realloc(imp->sequencesTxtPath, len+1);
-	Edit_GetText(GetDlgItem(animOpts, IDC_SEQ_TXT), imp->sequencesTxtPath, len+1);
+	sequencesTxtPath = (char*)realloc(sequencesTxtPath, len+1);
+	Edit_GetText(GetDlgItem(animOpts, IDC_SEQ_TXT), sequencesTxtPath, len+1);
 
 	// Preview options
-	imp->createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
-	imp->launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
-	imp->networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
+	createPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_ENABLE) == BST_CHECKED);
+	launchPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWF_LAUNCH) == BST_CHECKED);
+	networkPreview = (IsDlgButtonChecked(viewerOpts, IDC_SWFSB_NETWORK) == BST_CHECKED);
 
 	int col = GetIColorSwatch(GetDlgItem(viewerOpts, IDC_SWF_COLOR))->GetColor();
-	imp->previewBackgroundColor = (GetRValue(col)<<16) | (GetGValue(col)<<8) | GetBValue(col);
+	previewBackgroundColor = (GetRValue(col)<<16) | (GetGValue(col)<<8) | GetBValue(col);
 
-	imp->WriteConfigFile();
+	WriteConfigFile();
 }
 
 
@@ -354,7 +358,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::GeneralOptsDialogProc(HWND hWnd,UINT messag
 			return TRUE;
 
 		case WM_COMMAND:
-			return RedrawGeneralOpts(lParam);
+			return INSTANCE->RedrawGeneralOpts(lParam);
 			break;
 	}
 
@@ -383,12 +387,12 @@ INT_PTR CALLBACK MaxAWDExporterOpts::SceneOptsDialogProc(HWND hWnd,UINT message,
 		case WM_INITDIALOG:
 			spinner = GetISpinner(GetDlgItem(hWnd,IDC_JPV_SPINNER));
 			spinner->SetLimits(1, 5, FALSE);
-			spinner->SetValue(imp->jointsPerVertex, TRUE);
+			spinner->SetValue(INSTANCE->jointsPerVertex, TRUE);
 			spinner->LinkToEdit(GetDlgItem(hWnd,IDC_JPV_EDIT),EDITTYPE_INT);
 			return TRUE;
 
 		case WM_COMMAND:
-			return RedrawSceneOpts(lParam);
+			return INSTANCE->RedrawSceneOpts(lParam);
 			break;
 	}
 
@@ -429,7 +433,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::MtlOptsDialogProc(HWND hWnd,UINT message,WP
 {
 	switch (message) {
 		case WM_COMMAND:
-			return RedrawMtlOpts(lParam);
+			return INSTANCE->RedrawMtlOpts(lParam);
 			break;
 	}
 
@@ -462,7 +466,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::AnimOptsDialogProc(HWND hWnd,UINT message,W
 {
 	switch (message) {
 		case WM_COMMAND:
-			return RedrawAnimOpts(lParam);
+			return INSTANCE->RedrawAnimOpts(lParam);
 			break;
 	}
 
@@ -491,7 +495,7 @@ INT_PTR CALLBACK MaxAWDExporterOpts::ViewerOptsDialogProc(HWND hWnd,UINT message
 
 	switch (message) {
 		case WM_COMMAND:
-			return RedrawViewerOpts(lParam);
+			return INSTANCE->RedrawViewerOpts(lParam);
 			break;
 	}
 
