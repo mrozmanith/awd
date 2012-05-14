@@ -29,7 +29,7 @@ MaxAWDExporterOpts::MaxAWDExporterOpts(void)
 	exportSkeletons = true;
 	exportSkelAnim = true;
 
-	sequencesTxtPath = (char*)malloc(15);
+	sequencesTxtPath = (char*)malloc(14);
 	strcpy(sequencesTxtPath, "sequences.txt");
 
 	createPreview = true;
@@ -88,7 +88,7 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 			exportAttributes = (strtol(val, NULL, 10) == 1);
 		}
 		else if (ATTREQ(key,"namespace")) {
-			attributeNamespace = (char*)realloc(attributeNamespace, strlen(val));
+			attributeNamespace = (char*)realloc(attributeNamespace, strlen(val)+1);
 			strcpy(attributeNamespace, val);
 		}
 		else if (ATTREQ(key, "scene")) {
@@ -128,7 +128,7 @@ void MaxAWDExporterOpts::ReadConfigFile(void)
 			exportSkelAnim = (strtol(val, NULL, 10) == 1);
 		}
 		else if (ATTREQ(key, "sequences")) {
-			sequencesTxtPath = (char*)realloc(sequencesTxtPath, strlen(val));
+			sequencesTxtPath = (char*)realloc(sequencesTxtPath, strlen(val)+1);
 			strcpy(sequencesTxtPath, val);
 		}
 		else if (ATTREQ(key, "preview")) {
