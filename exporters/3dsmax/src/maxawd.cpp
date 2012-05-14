@@ -228,6 +228,10 @@ void MaxAWDExporter::CleanUp()
 	delete cache;
 	delete colMtlCache;
 	delete skeletonCache;
+
+	if (ns) {
+		delete ns;
+	}
 }
 
 
