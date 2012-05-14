@@ -730,7 +730,7 @@ AWDBitmapTexture * MaxAWDExporter::ExportBitmapTexture(BitmapTex *tex)
 
 			// Split path to retrieve name and concatenate to form base name
 			_splitpath_s(fullPath, NULL, 0, NULL, 0, fileName, 240, fileExt, 16);
-			url = (char*)malloc(strlen(fileName)+strlen(fileExt));
+			url = (char*)malloc(strlen(fileName)+strlen(fileExt)+1);
 			strcpy(url, fileName);
 			strcat(url, fileExt);
 			awdTex->set_url(url, strlen(fileName)+strlen(fileExt));
