@@ -405,7 +405,7 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 				}
 
 				awdMesh = ExportTriObject(obj, node, skin);
-				RETURN_IF_ERROR();
+				RETURN_IF_ERROR;
 
 				// Add generated mesh instance to AWD scene graph.
 				// This can be null, if exporter was configured not
@@ -437,7 +437,7 @@ void MaxAWDExporter::ExportNode(INode *node, AWDSceneBlock *parent)
 
 		for (i=0; i<numChildren; i++) {
 			ExportNode(node->GetChildNode(i), awdParent);
-			RETURN_IF_ERROR();
+			RETURN_IF_ERROR;
 		}
 	}
 	else {
@@ -465,7 +465,7 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 	// Export material
 	if (opts->ExportMaterials()) {
 		awdMtl = ExportNodeMaterial(node);
-		RETURN_IF_ERROR(NULL);
+		RETURN_VALUE_IF_ERROR(NULL);
 	}
 
 	// Export instance

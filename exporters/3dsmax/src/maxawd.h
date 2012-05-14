@@ -36,7 +36,8 @@
 #define MAXAWD_PHASE_FLUSH 4
 
 // Error handling helper macros
-#define RETURN_IF_ERROR(retval) if (error) return retval;
+#define RETURN_IF_ERROR if (error) return
+#define RETURN_VALUE_IF_ERROR(retval) if (error) return retval
 #define DIE_IF_ERROR() if (error) { maxInterface->ProgressEnd(); CleanUp(); return FALSE; }
 
 extern TCHAR *GetString(int id);
