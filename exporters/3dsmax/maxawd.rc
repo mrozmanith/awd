@@ -186,6 +186,7 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_LIBDESCRIPTION      "Away3D AWD exporter. http://awd.googlecode.com"
     IDS_CLASS_NAME          "MaxAWDExporter"
     IDS_PARAMS              "Parameters"
     IDS_SPIN                "Spin"
