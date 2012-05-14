@@ -662,7 +662,7 @@ AWDMaterial *MaxAWDExporter::ExportNodeMaterial(INode *node)
 
 						// Stop if an error occurred during texture
 						// export (e.g. that a file was missing.)
-						RETURN_IF_ERROR(NULL);
+						RETURN_VALUE_IF_ERROR(NULL);
 
 						awdMtl = new AWDMaterial(AWD_MATTYPE_TEXTURE, name.data(), name.length());
 						awdMtl->set_texture(awdDiffTex);
