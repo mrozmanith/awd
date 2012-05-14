@@ -98,7 +98,7 @@ const TCHAR *MaxAWDExporter::ShortDesc()
 
 const TCHAR *MaxAWDExporter::AuthorName()
 {			
-	return _T("Away3D");
+	return _T("The Away3D Team");
 }
 
 const TCHAR *MaxAWDExporter::CopyrightMessage() 
@@ -118,7 +118,7 @@ const TCHAR *MaxAWDExporter::OtherMessage2()
 
 unsigned int MaxAWDExporter::Version()
 {				
-	return 100;
+	return 101;
 }
 
 void MaxAWDExporter::ShowAbout(HWND hWnd)
