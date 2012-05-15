@@ -26,12 +26,17 @@ package
 	import away3d.materials.DefaultMaterialBase;
 	import away3d.materials.TextureMaterial;
 	import away3d.materials.lightpickers.StaticLightPicker;
+	import away3d.textures.BitmapTexture;
+	import away3d.textures.BitmapTextureCache;
+	import away3d.tools.utils.TextureUtils;
 	
+	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
 	import flash.geom.Vector3D;
 	import flash.net.URLRequest;
 	
@@ -58,6 +63,9 @@ package
 		{
 			init();
 			load(loaderInfo.parameters['awd'] || 'default.awd');
+			
+			// Force resize
+			stage.dispatchEvent(new Event(Event.RESIZE));
 		}
 		
 		
@@ -179,6 +187,9 @@ package
 			_loader.scale(scale);
 			
 			_view.scene.addChild(_loader);
+			
+			// Force resize
+			stage.dispatchEvent(new Event(Event.RESIZE));
 		}
 		
 		
