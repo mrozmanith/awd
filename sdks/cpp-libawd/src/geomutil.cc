@@ -5,25 +5,21 @@
 #include "platform.h"
 #include "geomutil.h"
 
-AWDGeomUtil::AWDGeomUtil()
+VertexDataList::VertexDataList()
 {
-    this->num_exp_vd = 0;
-    this->col_first_vd = NULL;
-    this->col_last_vd = NULL;
-    this->exp_first_vd = NULL;
-    this->exp_last_vd = NULL;
-    this->normal_threshold = 0;
-    this->joints_per_vertex = 0;
-    this->include_uv = true;
-    this->include_normals = true;
+	this->num_items = 0;
+	this->cur = NULL;
+	this->first = NULL;
+	this->last = NULL;
 }
 
-AWDGeomUtil::~AWDGeomUtil()
+VertexDataList::~VertexDataList()
 {
-    vdata *cur_v = this->exp_first_vd;
-    while (cur_v) {
+	vdata_list_item *cur_item = this->first;
+    while (cur_item) {
         ninfluence *cur_n;
-        vdata *next_v = cur_v->next_exp;
+		vdata *cur_v = cur_item->vd;
+        vdata_list_item *next_item = cur_item->next;
 
         // Free skinning data if any
         if (cur_v->num_bindings) {
@@ -40,8 +36,78 @@ AWDGeomUtil::~AWDGeomUtil()
         }
 
         free(cur_v);
-        cur_v = next_v;
+        cur_item = next_item;
     }
+
+	this->clear();
+}
+
+void
+VertexDataList::append_vdata(vdata *vd)
+{
+	vdata_list_item *item = (vdata_list_item*)malloc(sizeof(vdata_list_item));
+	item->vd = vd;
+
+	if (!this->first) {
+		this->first = item;
+	}
+	else {
+		this->last->next = item;
+	}
+
+	this->last = item;
+	this->last->next = NULL;
+	this->num_items++;
+}
+
+void
+VertexDataList::clear()
+{
+	this->num_items = 0;
+	this->first = NULL;
+	this->last = NULL;
+}
+
+int
+VertexDataList::get_num_items()
+{
+	return this->num_items;
+}
+
+void
+VertexDataList::iter_reset()
+{
+	this->cur = this->first;
+}
+
+vdata *
+VertexDataList::iter_next()
+{
+	if (this->cur) {
+		vdata *vd = this->cur->vd;
+		this->cur = this->cur->next;
+		return vd;
+	}
+	else {
+		return NULL;
+	}
+}
+
+AWDGeomUtil::AWDGeomUtil()
+{
+	this->expanded = new VertexDataList();
+	this->collapsed = new VertexDataList();
+    this->normal_threshold = 0;
+    this->joints_per_vertex = 0;
+    this->include_uv = true;
+    this->include_normals = true;
+}
+
+AWDGeomUtil::~AWDGeomUtil()
+{
+	collapsed->clear();
+	delete collapsed;
+	delete expanded;
 }
 
 
@@ -75,18 +141,10 @@ AWDGeomUtil::append_vert_data(unsigned int idx, double x, double y, double z,
 void
 AWDGeomUtil::append_vdata_struct(vdata *vd)
 {
-    if (!this->exp_first_vd)
-        this->exp_first_vd = vd;
-    else
-        this->exp_last_vd->next_exp = vd;
-
-    this->exp_last_vd = vd;
-    this->exp_last_vd->first_normal_influence = NULL;
-    this->exp_last_vd->last_normal_influence = NULL;
-    this->exp_last_vd->next_col = NULL;
-    this->exp_last_vd->next_exp = NULL;
-    this->exp_last_vd->out_idx = 0;
-    this->num_exp_vd++;
+	vd->first_normal_influence = NULL;
+	vd->last_normal_influence = NULL;
+	vd->out_idx = 0;
+	expanded->append_vdata(vd);
 }
 
 
@@ -136,8 +194,9 @@ AWDGeomUtil::has_vert(vdata *vd)
     // and found vertices.
 
     idx = 0;
-    cur = this->col_first_vd;
-    while (cur) {
+	collapsed->iter_reset();
+	cur = collapsed->iter_next();
+	while (cur) {
 
         // If any of vertices have force_hard set, their normals must
         // not be averaged. Hence, they must be returned by this 
@@ -195,7 +254,7 @@ AWDGeomUtil::has_vert(vdata *vd)
 
 next:
         idx++;
-        cur = cur->next_col;
+		cur = collapsed->iter_next();
     }
 
     // This is the first time that this vertex is encountered,
@@ -221,18 +280,20 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
     AWD_str_ptr w_str;
     AWD_str_ptr j_str;
 
+	int num_exp = expanded->get_num_items();
+
     sub = new AWDSubGeom();
-    v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
-    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * this->num_exp_vd);
+    v_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * num_exp);
+    i_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * num_exp);
 
     if (this->include_normals) 
-        n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * this->num_exp_vd);
+        n_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 3 * num_exp);
 
     if (this->include_uv)
-        u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * this->num_exp_vd);
+        u_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * 2 * num_exp);
 
     if (this->joints_per_vertex > 0) {
-        int max_num_vals = this->num_exp_vd * this->joints_per_vertex;
+        int max_num_vals = num_exp * this->joints_per_vertex;
         w_str.f64 = (awd_float64*) malloc(sizeof(awd_float64) * max_num_vals);
         j_str.ui32 = (awd_uint32*) malloc(sizeof(awd_uint32) * max_num_vals);
 
@@ -242,8 +303,9 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
 
     v_idx = i_idx = 0;
 
-    vd = this->exp_first_vd;
-    while (vd) {
+	expanded->iter_reset();
+	vd = expanded->iter_next();
+	while (vd) {
         int idx = this->has_vert(vd);
         if (idx >= 0) {
             i_str.ui32[i_idx++] = idx;
@@ -277,21 +339,17 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
 
             i_str.ui32[i_idx++] = v_idx++;
 
-            if (!col_first_vd)
-                col_first_vd = vd;
-            else
-                col_last_vd->next_col = vd;
-
-            col_last_vd = vd;
+			collapsed->append_vdata(vd);
         }
 
-        vd = vd->next_exp;
+		vd = expanded->iter_next();
     }
 
     // Smoothing (averaging of normals) required?
     if (this->normal_threshold > 0) {
-        vd = this->col_first_vd;
-        while (vd) {
+		collapsed->iter_reset();
+		vd = collapsed->iter_next();
+		while (vd) {
             int num_influences;
             double nx, ny, nz;
             ninfluence *inf;
@@ -311,7 +369,7 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
             n_str.f64[vd->out_idx*3+1] = ny / num_influences;
             n_str.f64[vd->out_idx*3+2] = nz / num_influences;
 
-            vd = vd->next_col;
+			vd = collapsed->iter_next();
         }
     }
 

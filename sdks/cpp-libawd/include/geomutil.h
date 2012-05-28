@@ -37,21 +37,41 @@ typedef struct _vdata {
     int mtlid;
 
     bool force_hard;
-    struct _vdata *next_exp;
-    struct _vdata *next_col;
 
     ninfluence *first_normal_influence;
     ninfluence *last_normal_influence;
 } vdata;
 
+typedef struct _vdata_list_item {
+	vdata *vd;
+	struct _vdata_list_item *next;
+} vdata_list_item;
+
+class VertexDataList
+{
+private:
+	int num_items;
+	vdata_list_item *cur;
+	vdata_list_item *first;
+	vdata_list_item *last;
+
+public:
+	VertexDataList();
+	~VertexDataList();
+
+	void append_vdata(vdata *);
+	void clear();
+	int get_num_items();
+
+	void iter_reset();
+	vdata *iter_next();
+};
+
 class AWDGeomUtil
 {
 private:
-    int num_exp_vd;
-    vdata *exp_first_vd;
-    vdata *exp_last_vd;
-    vdata *col_first_vd;
-    vdata *col_last_vd;
+	VertexDataList *expanded;
+	VertexDataList *collapsed;
 
     int has_vert(vdata *);
 
