@@ -575,7 +575,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin,
 					Point3 tvtx = mesh.getTVert(tvIdx);
 
 					vd->u = tvtx.x;
-					vd->v = tvtx.y;
+					vd->v = 1.0-tvtx.y;
 				}
 
 				if (geomUtil.include_normals) {
