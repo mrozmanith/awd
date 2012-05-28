@@ -97,6 +97,8 @@ AWDGeomUtil::AWDGeomUtil()
 {
 	this->expanded = new VertexDataList();
 	this->collapsed = new VertexDataList();
+	this->per_idx_lists = NULL;
+	this->max_orig_idx = 0;
     this->normal_threshold = 0;
     this->joints_per_vertex = 0;
     this->include_uv = true;
@@ -105,8 +107,22 @@ AWDGeomUtil::AWDGeomUtil()
 
 AWDGeomUtil::~AWDGeomUtil()
 {
+	int i;
+	for (i=0; i<num_idx_lists; i++) {
+		// Empty list to not delete items, which are
+		// duplicated in the expanded list.
+		per_idx_lists[i]->clear();
+		delete per_idx_lists[i];
+	}
+
+	free(per_idx_lists);
+
+	// Empty list to not delete items, which are
+	// duplicated in the expanded list.
 	collapsed->clear();
 	delete collapsed;
+
+	// Delete entire list, including items.
 	delete expanded;
 }
 
@@ -145,6 +161,9 @@ AWDGeomUtil::append_vdata_struct(vdata *vd)
 	vd->last_normal_influence = NULL;
 	vd->out_idx = 0;
 	expanded->append_vdata(vd);
+
+	if (vd->orig_idx > max_orig_idx)
+		max_orig_idx = vd->orig_idx;
 }
 
 
@@ -189,13 +208,17 @@ AWDGeomUtil::has_vert(vdata *vd)
 {
     int idx;
     vdata *cur;
+	VertexDataList *list;
 
-    // TODO: Optimize by caching relationship between original vertex index
-    // and found vertices.
+    // The list that is used for look-up is a list that only contains
+	// vertex data structs that originate from the same client vertex.
+	// Vertices that weren't the same in the client app should never
+	// be joined together, and this optimization stems from that fact.
+	list = per_idx_lists[vd->orig_idx];
 
     idx = 0;
-	collapsed->iter_reset();
-	cur = collapsed->iter_next();
+	list->iter_reset();
+	cur = list->iter_next();
 	while (cur) {
 
         // If any of vertices have force_hard set, their normals must
@@ -211,7 +234,7 @@ AWDGeomUtil::has_vert(vdata *vd)
         // If UV coordinates do not match, move on to next vertex
         if (this->include_uv) {
             if (cur->u != vd->u || cur->v != vd->v)
-            goto next;
+				goto next;
         }
 
         // Check if normals match (possibly with fuzzy matching using a
@@ -249,12 +272,11 @@ AWDGeomUtil::has_vert(vdata *vd)
         // not be included unless the vertex matches.
 
         // Made it here? Then vertices match!
-        cur->out_idx = idx;
-        return idx;
+        return cur->out_idx;
 
 next:
         idx++;
-		cur = collapsed->iter_next();
+		cur = list->iter_next();
     }
 
     // This is the first time that this vertex is encountered,
@@ -262,6 +284,20 @@ next:
     add_unique_influence(vd, vd->nx, vd->ny, vd->nz);
 
     return -1;
+}
+
+
+void
+AWDGeomUtil::prepare_build()
+{
+	int i;
+	
+	num_idx_lists = this->max_orig_idx + 1;
+
+	per_idx_lists = (VertexDataList**)malloc(num_idx_lists * sizeof(VertexDataList *));
+	for (i=0; i<num_idx_lists; i++) {
+		per_idx_lists[i] = new VertexDataList();
+	}
 }
 
 
@@ -301,6 +337,11 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
         memset(j_str.v, 0, max_num_vals * sizeof(awd_uint32));
     }
 
+	// Prebuild a lookup list of vertices by their original index, so that
+	// has_vert() can check only those vertices that used to be the same
+	// client vertex, instead of looping over them all.
+	prepare_build();
+
     v_idx = i_idx = 0;
 
 	expanded->iter_reset();
@@ -337,9 +378,11 @@ AWDGeomUtil::build_geom(AWDTriGeom *md)
                 }
             }
 
+			vd->out_idx = v_idx;
             i_str.ui32[i_idx++] = v_idx++;
 
 			collapsed->append_vdata(vd);
+			per_idx_lists[vd->orig_idx]->append_vdata(vd);
         }
 
 		vd = expanded->iter_next();

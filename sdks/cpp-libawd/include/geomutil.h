@@ -72,7 +72,12 @@ class AWDGeomUtil
 private:
 	VertexDataList *expanded;
 	VertexDataList *collapsed;
+	
+	int max_orig_idx;
+	int num_idx_lists;
+	VertexDataList **per_idx_lists;
 
+	void prepare_build();
     int has_vert(vdata *);
 
 public:
