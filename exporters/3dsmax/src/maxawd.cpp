@@ -559,13 +559,13 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin,
 			if (geomUtil.include_uv)
 				tvface = mesh.tvFace[t];
 
-			for (v=0; v<3; v++) {
+			for (v=2; v>=0; v--) {
 				int vIdx = face.getVert(v);
 				Point3 vtx = offsMtx * mesh.getVert(vIdx);
 
 				vdata *vd = (vdata *)malloc(sizeof(vdata));
 				vd->orig_idx = vIdx;
-				vd->x = -vtx.x;
+				vd->x = vtx.x;
 				vd->y = vtx.z;
 				vd->z = vtx.y;
 				
@@ -580,7 +580,7 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin,
 
 				if (geomUtil.include_normals) {
 					Point3 normal = normals->GetNormal(t, v);
-					vd->nx = -normal.x;
+					vd->nx = normal.x;
 					vd->ny = normal.z;
 					vd->nz = normal.y;
 				}

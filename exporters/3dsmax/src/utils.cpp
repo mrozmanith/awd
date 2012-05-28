@@ -6,21 +6,21 @@ void SerializeMatrix3(Matrix3 &mtx, double *output)
 	
 	row = mtx.GetRow(0);
 	output[0] = row.x;
-	output[1] = -row.z;
-	output[2] = -row.y;
+	output[1] = row.z;
+	output[2] = row.y;
 
 	row = mtx.GetRow(2);
-	output[3] = -row.x;
+	output[3] = row.x;
 	output[4] = row.z;
 	output[5] = row.y;
 
 	row = mtx.GetRow(1);
-	output[6] = -row.x;
+	output[6] = row.x;
 	output[7] = row.z;
 	output[8] = row.y;
 
 	row = mtx.GetRow(3);
-	output[9] = -row.x;
+	output[9] = row.x;
 	output[10] = row.z;
 	output[11] = row.y;
 }
