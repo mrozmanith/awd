@@ -464,6 +464,10 @@ AWDMeshInst * MaxAWDExporter::ExportTriObject(Object *obj, INode *node, ISkin *s
 
 	if (opts->ExportGeometry()) {
 		awdGeom = ExportTriGeom(obj, node, skin, &bindMtx);
+
+		// No geometry could be exported
+		if (awdGeom == NULL)
+			return NULL;
 	}
 
 	// Export material
@@ -541,6 +545,10 @@ AWDTriGeom *MaxAWDExporter::ExportTriGeom(Object *obj, INode *node, ISkin *skin,
 		geomUtil.include_normals = (opts->ExportNormals() && normals && normals->GetNumNormals()>0);
 
 		int numTris = mesh.getNumFaces();
+
+		// This could happen for example with splines
+		if (numTris==0)
+			return NULL;
 
 		for (t=0; t<numTris; t++) {
 			int v;
