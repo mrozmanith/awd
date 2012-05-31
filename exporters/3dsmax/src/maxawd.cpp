@@ -60,7 +60,7 @@ ClassDesc2* GetMaxAWDExporterDesc() {
  * argument is specified by MaxAWDExporter::DoExport() as the
  * instance of the exporter.
 */
-static DWORD ExecuteExportCallback(void *arg)
+static DWORD WINAPI ExecuteExportCallback(LPVOID arg)
 {
 	MaxAWDExporter *exporter = (MaxAWDExporter*)arg;
 	return exporter->ExecuteExport();
@@ -154,7 +154,7 @@ int	MaxAWDExporter::DoExport(const TCHAR *path,ExpInterface *ei,Interface *i, BO
 	
 	// Execute export while showing a progress bar. Send this as argument
 	// to the execute callback, which will invoke MaxAWDExporter::ExecuteExport();
-	maxInterface->ProgressStart("Exporting AWD file", TRUE, (LPTHREAD_START_ROUTINE)&ExecuteExportCallback, this);
+	maxInterface->ProgressStart("Exporting AWD file", TRUE, ExecuteExportCallback, this);
 
 	// Export worked
 	return TRUE;
