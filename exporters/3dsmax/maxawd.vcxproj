@@ -125,7 +125,7 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='2012 Release|x64'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='2013 Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Debug|Win32'">C:\Program Files\Autodesk\3ds Max 2012\plugins\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='2012 Debug|Win32'">C:\Program Files %28x86%29\Autodesk\3ds Max 2012\plugins</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='2013 Debug|Win32'">C:\Program Files\Autodesk\3ds Max 2012\plugins\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2012 Debug|Win32'">.\Debug\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='2013 Debug|Win32'">.\Debug\</IntDir>
