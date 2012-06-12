@@ -13,16 +13,16 @@ class AWDAttr
     protected:
         AWD_field_type type;
         AWD_field_ptr value;
-        awd_uint16 value_len;
+        awd_uint32 value_len;
 
         virtual void write_metadata(int)=0;
 
     public:
         void write_attr(int, bool);
 
-        void set_val(AWD_field_ptr, awd_uint16, AWD_field_type);
-        AWD_field_ptr get_val(awd_uint16 *, AWD_field_type *);
-        awd_uint16 get_val_len();
+        void set_val(AWD_field_ptr, awd_uint32, AWD_field_type);
+        AWD_field_ptr get_val(awd_uint32 *, AWD_field_type *);
+        awd_uint32 get_val_len();
 };
 
 
@@ -67,8 +67,8 @@ class AWDUserAttrList {
         void write_attributes(int, bool);
 
         AWD_field_ptr get_val_ptr(AWDNamespace *ns, const char *, awd_uint16);
-        bool get(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
-        void set(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint16, AWD_field_type);
+        bool get(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint32 *, AWD_field_type *);
+        void set(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint32, AWD_field_type);
 
         //void add_namespaces(AWD *);
 };
@@ -107,8 +107,8 @@ class AWDNumAttrList {
         void write_attributes(int, bool);
 
         AWD_field_ptr get_val_ptr(awd_propkey);
-        bool get(awd_propkey, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
-        void set(awd_propkey, AWD_field_ptr, awd_uint16, AWD_field_type);
+        bool get(awd_propkey, AWD_field_ptr *, awd_uint32 *, AWD_field_type *);
+        void set(awd_propkey, AWD_field_ptr, awd_uint32, AWD_field_type);
 };
 
 
@@ -130,8 +130,8 @@ class AWDAttrElement
         awd_uint32 calc_attr_length(bool, bool, bool);
 
     public:
-        bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint16 *, AWD_field_type *);
-        void set_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint16, AWD_field_type);
+        bool get_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr *, awd_uint32 *, AWD_field_type *);
+        void set_attr(AWDNamespace *, const char *, awd_uint16, AWD_field_ptr, awd_uint32, AWD_field_type);
 };
 
 #endif
