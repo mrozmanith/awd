@@ -118,7 +118,7 @@ const TCHAR *MaxAWDExporter::OtherMessage2()
 
 unsigned int MaxAWDExporter::Version()
 {				
-	return 101;
+	return 102;
 }
 
 void MaxAWDExporter::ShowAbout(HWND hWnd)
