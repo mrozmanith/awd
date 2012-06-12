@@ -14,7 +14,7 @@ void
 AWDAttr::write_attr(int fd, bool wide_mtx)
 {
     AWD_field_ptr val;
-    awd_uint16 bytes_written;
+    awd_uint32 bytes_written;
     awd_int16 i16_be;
     awd_int32 i32_be;
     awd_float32 f32_be;
@@ -91,7 +91,7 @@ AWDAttr::write_attr(int fd, bool wide_mtx)
 
 
 void
-AWDAttr::set_val(AWD_field_ptr val, awd_uint16 val_len, AWD_field_type val_type)
+AWDAttr::set_val(AWD_field_ptr val, awd_uint32 val_len, AWD_field_type val_type)
 {
     this->value = val;
     this->value_len = val_len;
@@ -100,7 +100,7 @@ AWDAttr::set_val(AWD_field_ptr val, awd_uint16 val_len, AWD_field_type val_type)
 
 
 AWD_field_ptr 
-AWDAttr::get_val(awd_uint16 *val_len, AWD_field_type *val_type)
+AWDAttr::get_val(awd_uint32 *val_len, AWD_field_type *val_type)
 {
     *val_len = this->value_len;
     *val_type = this->type;
@@ -108,7 +108,7 @@ AWDAttr::get_val(awd_uint16 *val_len, AWD_field_type *val_type)
 }
 
 
-awd_uint16
+awd_uint32
 AWDAttr::get_val_len()
 {
     return this->value_len;
@@ -157,17 +157,17 @@ void
 AWDUserAttr::write_metadata(int fd)
 {
     awd_uint8 type;
-    awd_uint16 len_be;
+    awd_uint32 len_be;
     awd_nsid ns_handle;
 
-    len_be = UI16(this->value_len);
+    len_be = UI32(this->value_len);
     type = (awd_uint8)this->type;
     ns_handle = this->ns->get_handle();
 
     write(fd, &ns_handle, sizeof(awd_uint8));
     awdutil_write_varstr(fd, this->key, this->key_len);
     write(fd, &type, sizeof(awd_uint8));
-    write(fd, &len_be, sizeof(awd_uint16));
+    write(fd, &len_be, sizeof(awd_uint32));
 }
 
 
@@ -209,8 +209,8 @@ AWDUserAttrList::calc_length(bool wide_mtx)
     // Accumulate size of individual attributes
     cur = this->first_attr;
     while (cur) {
-        // Meta-data takes up 6 bytes
-        len += (6 + (awd_uint32)cur->get_key_len() + (awd_uint32)cur->get_val_len());
+        // Meta-data takes up 8 bytes
+        len += (8 + (awd_uint32)cur->get_key_len() + (awd_uint32)cur->get_val_len());
         cur = cur->next;
     }
 
@@ -261,7 +261,7 @@ AWDUserAttrList::find(AWDNamespace *ns, const char *key, awd_uint16 key_len)
 
 bool
 AWDUserAttrList::get(AWDNamespace *ns, const char *key, awd_uint16 key_len,
-    AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
+    AWD_field_ptr *val, awd_uint32 *val_len, AWD_field_type *val_type)
 {
     AWDUserAttr *attr;
 
@@ -277,7 +277,7 @@ AWDUserAttrList::get(AWDNamespace *ns, const char *key, awd_uint16 key_len,
 
 void
 AWDUserAttrList::set(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_field_ptr value, awd_uint16 value_length, AWD_field_type type)
+    AWD_field_ptr value, awd_uint32 value_length, AWD_field_type type)
 {
     bool created;
     AWDUserAttr *attr;
@@ -336,13 +336,13 @@ void
 AWDNumAttr::write_metadata(int fd)
 {
     awd_uint16 key_be;
-    awd_uint16 len_be;
+    awd_uint32 len_be;
 
     key_be = UI16(this->key);
-    len_be = UI16(this->value_len);
+    len_be = UI32(this->value_len);
 
     write(fd, &key_be, sizeof(awd_uint16));
-    write(fd, &len_be, sizeof(awd_uint16));
+    write(fd, &len_be, sizeof(awd_uint32));
 }
 
 
@@ -384,8 +384,8 @@ AWDNumAttrList::calc_length(bool wide_mtx)
 
     cur = this->first_attr;
     while (cur) {
-        // Meta-data is always four bytes
-        len += (4 + cur->get_val_len());
+        // Meta-data is always six bytes
+        len += (6 + cur->get_val_len());
         cur = cur->next;
     }
 
@@ -431,7 +431,7 @@ AWDNumAttrList::find(awd_propkey key)
 
 
 bool
-AWDNumAttrList::get(awd_propkey key, AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
+AWDNumAttrList::get(awd_propkey key, AWD_field_ptr *val, awd_uint32 *val_len, AWD_field_type *val_type)
 {
     AWDNumAttr *attr;
 
@@ -447,7 +447,7 @@ AWDNumAttrList::get(awd_propkey key, AWD_field_ptr *val, awd_uint16 *val_len, AW
 
 
 void
-AWDNumAttrList::set(awd_propkey key, AWD_field_ptr value, awd_uint16 value_length, AWD_field_type type)
+AWDNumAttrList::set(awd_propkey key, AWD_field_ptr value, awd_uint32 value_length, AWD_field_type type)
 {
     bool created;
     AWDNumAttr *attr;    
@@ -520,7 +520,7 @@ AWDAttrElement::calc_attr_length(bool with_props, bool with_user_attr, bool wide
 
 bool
 AWDAttrElement::get_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_field_ptr *val, awd_uint16 *val_len, AWD_field_type *val_type)
+    AWD_field_ptr *val, awd_uint32 *val_len, AWD_field_type *val_type)
 {
     return this->user_attributes->get(ns, key, key_len, val, val_len, val_type);
 }
@@ -528,7 +528,7 @@ AWDAttrElement::get_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len,
 
 void
 AWDAttrElement::set_attr(AWDNamespace *ns, const char *key, awd_uint16 key_len, 
-    AWD_field_ptr val, awd_uint16 val_len, AWD_field_type val_type)
+    AWD_field_ptr val, awd_uint32 val_len, AWD_field_type val_type)
 {
     this->user_attributes->set(ns, key, key_len, val, val_len, val_type);
 }
