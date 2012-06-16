@@ -90,6 +90,42 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
 
             exporter.export(None)
 
+            #TODO: Check whether to copy viewer
+            if True:
+                import shutil
+                import subprocess
+
+                pyawd_path = pyawd.__path__[0]
+                viewer_path = os.path.normpath(os.path.join(pyawd_path, '..', 'mayaawd'))
+                out_path = os.path.dirname(file_path)
+                out_name = os.path.basename(os.path.splitext(file_path)[0])
+
+                #TODO: Check local/network
+                viewer_name = 'viewer_l.swf'
+
+                shutil.copyfile(os.path.join(viewer_path, viewer_name), os.path.join(out_path, 'viewer.swf'))
+                shutil.copyfile(os.path.join(viewer_path, 'swfobject.js'), os.path.join(out_path, 'swfobject.js'))
+
+                html_template = os.path.join(viewer_path, 'template.html')
+                html_output = os.path.splitext(file_path)[0] + '.html'
+
+                # TODO: Fetch color from options
+                bg_color = '000000'
+
+                with open(html_template, 'r') as html_in:
+                    with open(html_output, 'w') as html_out:
+                        for line in html_in:
+                            line = line.replace('%NAME%', out_name)
+                            line = line.replace('%COLOR%', bg_color) 
+                            html_out.write(line)
+                
+                try:
+                    # Windows?
+                    os.startfile(html_output)
+                except AttributeError:
+                    # Mac OS X
+                    subprocess.call(['open', html_output])
+
 
     def defaultExtension(self):
         return 'awd'
