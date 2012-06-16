@@ -128,7 +128,7 @@ cpyawd_AWDWriter_write(cpyawd_AWDWriter *self, PyObject *args)
         __prepare_blocks(awd_obj, "skeleton_blocks", lawd_awd, bcache, __prepare_skeleton);
         __prepare_blocks(awd_obj, "skelpose_blocks", lawd_awd, bcache, __prepare_skelpose);
         __prepare_blocks(awd_obj, "skelanim_blocks", lawd_awd, bcache, __prepare_skelanim);
-        __prepare_blocks(awd_obj, "mesh_data_blocks", lawd_awd, bcache, __prepare_mesh_data);
+        __prepare_blocks(awd_obj, "tri_geom_blocks", lawd_awd, bcache, __prepare_mesh_data);
         __prepare_blocks(awd_obj, "scene_blocks", lawd_awd, bcache, __prepare_scene_block);
 
         // Write buffer

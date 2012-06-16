@@ -13,9 +13,9 @@ cpyawd_util_build_geom(PyObject *self, PyObject *args, PyObject *kwds)
     double normal_threshold;
     PyObject *verts_list;
     PyObject *py_md;
-    AWDMeshData *lawd_md;
+    AWDTriGeom *lawd_md;
     AWDGeomUtil *lawd_util;
-    AWDSubMesh *lawd_sub;
+    AWDSubGeom *lawd_sub;
     PyObject *geom_mod;
     PyObject *sub_class;
 
@@ -53,7 +53,7 @@ cpyawd_util_build_geom(PyObject *self, PyObject *args, PyObject *kwds)
         }
     }
 
-    lawd_md = new AWDMeshData("dummy", 5);
+    lawd_md = new AWDTriGeom("dummy", 5);
     ret = lawd_util->build_geom(lawd_md);
 
     // Import pyawd.geom module and get the AWDSubMesh classobj, which
@@ -97,7 +97,7 @@ cpyawd_util_build_geom(PyObject *self, PyObject *args, PyObject *kwds)
                     break;
             }
 
-            PyObject_CallMethod(py_sub, (char *)"add_stream", "iO", (int)str_type, py_list);
+            PyObject_CallMethod(py_sub, (char *)"add_stream", (char *)"iO", (int)str_type, py_list);
         }
     }
 

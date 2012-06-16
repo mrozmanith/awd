@@ -73,7 +73,7 @@ class AWD(object):
         self.metadata = None
         self.texture_blocks = []
         self.material_blocks = []
-        self.mesh_data_blocks = []
+        self.tri_geom_blocks = []
         self.uvanim_blocks = []
         self.skelanim_blocks = []
         self.skelpose_blocks = []
@@ -97,8 +97,8 @@ class AWD(object):
     def add_material(self, block):
         self.material_blocks.append(block)
 
-    def add_mesh_data(self, block):
-        self.mesh_data_blocks.append(block)
+    def add_tri_geom(self, block):
+        self.tri_geom_blocks.append(block)
 
     def add_scene_block(self, block):
         self.scene_blocks.append(block)
