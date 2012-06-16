@@ -92,6 +92,7 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
 
             exporter.export(None)
 
+
     def defaultExtension(self):
         return 'awd'
 
@@ -498,10 +499,10 @@ class MayaAWDExporter:
             md = self.block_cache.get(sh_name)
             if md is None:
                 print('Creating mesh data %s' % sh_name)
-                md = AWDMeshData(sh_name)
+                md = AWDTriGeom(sh_name)
                 md.bind_matrix = AWDMatrix4x4(mtx)
                 self.export_mesh_data(md, shape)
-                self.awd.add_mesh_data(md)
+                self.awd.add_tri_geom(md)
                 self.block_cache.add(sh_name, md)
  
             inst = AWDMeshInst(md, tf_name, self.mtx_list2awd(mtx))
@@ -572,11 +573,11 @@ class MayaAWDExporter:
                             if tex is None:
                                 tex_abs_path = str(mc.getAttr(state+'.fileTextureName'))
                                 if self.embed_textures:
-                                    tex = AWDTexture(TEX_EMBED_JPG, name=self.get_name(state))
+                                    tex = AWDBitmapTexture(AWDBitmapTexture.EMBED, name=self.get_name(state))
                                     tex.embed_file(tex_abs_path)
                                     print('embedding %s' % tex_abs_path)
                                 else:
-                                    tex = AWDTexture(TEX_EXTERNAL, name=self.get_name(state))
+                                    tex = AWDBitmapTexture(AWDBitmapTexture.EXTERNAL, name=self.get_name(state))
                                     tex.url = mc.workspace(pp=tex_abs_path)
                                 self.awd.add_texture(tex)
                                 self.block_cache.add(state, tex)
@@ -813,7 +814,7 @@ class MayaAWDExporter:
     
             benchmark_print()
             print('- Creating sub-mesh')
-            sub = AWDSubMesh()
+            sub = AWDSubGeom()
             sub.add_stream(pyawd.geom.STR_VERTICES, vertices)
             sub.add_stream(pyawd.geom.STR_TRIANGLES, indices)
             sub.add_stream(pyawd.geom.STR_UVS, uvs)
@@ -821,7 +822,7 @@ class MayaAWDExporter:
     
             print('- Adding sub-mesh')
     
-            md.add_sub_mesh(sub)
+            md.add_sub_geom(sub)
     
             # Store mesh data block to block cache
 
