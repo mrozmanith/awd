@@ -300,7 +300,7 @@ class MayaAWDExporter:
 
     def export_camera(self, transform, awd_parent):
         mtx = mc.xform(transform, q=True, m=True)
-        cam = AWDCamera(self.get_name(transform), AWDMatrix4x4(mtx))
+        cam = AWDCamera(self.get_name(transform), AWDMatrix3x4(mtx))
         cam.type = CAM_FREE
         cam.lens = LENS_PERSPECTIVE
         cam.fov = mc.camera(transform, q=True, vfv=True)
@@ -485,7 +485,7 @@ class MayaAWDExporter:
         if (tf_is_ref or sh_is_ref) and self.replace_exrefs:
             # This is an external reference, and it should be
             # replaced with an empty container in the AWD file
-            ctr = AWDContainer(name=tf_name, transform=AWDMatrix4x4(mtx))
+            ctr = AWDContainer(name=tf_name, transform=AWDMatrix3x4(mtx))
             self.set_attributes(transform, ctr)
             self.block_cache.add(transform, ctr)
             if awd_ctr is not None:
@@ -498,7 +498,7 @@ class MayaAWDExporter:
             if md is None:
                 print('Creating mesh data %s' % sh_name)
                 md = AWDTriGeom(sh_name)
-                md.bind_matrix = AWDMatrix4x4(mtx)
+                md.bind_matrix = AWDMatrix3x4(mtx)
                 self.export_mesh_data(md, shape)
                 self.awd.add_tri_geom(md)
                 self.block_cache.add(sh_name, md)
@@ -837,31 +837,24 @@ class MayaAWDExporter:
         return str(dag_path.split('|')[-1])
         
     def mtx_list2awd(self, mtx):
-        mtx_list = [v for v in mtx]
-        mtx_list[2] *= -1
-        mtx_list[6] *= -1
-        mtx_list[8] *= -1
-        mtx_list[9] *= -1
-        mtx_list[11] *= -1
-        mtx_list[14] *= -1
-        #mtx_list[0] = mtx[0]
-        #mtx_list[1] = mtx[2]
-        #mtx_list[2] = mtx[1]
-        #mtx_list[3] = mtx[3]
-        #mtx_list[4] = mtx[8]
-        #mtx_list[5] = mtx[10]
-        #mtx_list[6] = mtx[9]
-        #mtx_list[7] = mtx[11]
-        #mtx_list[8] = mtx[4]
-        #mtx_list[9] = mtx[6]
-        #mtx_list[10] = mtx[5]
-        #mtx_list[11] = mtx[7]
-        #mtx_list[12] = mtx[12]
-        #mtx_list[13] = mtx[14]
-        #mtx_list[14] = mtx[13]
-        #mtx_list[15] = mtx[15]
+        mtx_list = [1,0,0,0,1,0,0,0,1,0,0,0]
+        mtx_list[0] = mtx[0]
+        mtx_list[1] = mtx[1]
+        mtx_list[2] = -mtx[2]
+
+        mtx_list[3] = mtx[4]
+        mtx_list[4] = mtx[5]
+        mtx_list[5] = -mtx[6]
+
+        mtx_list[6] = -mtx[8]
+        mtx_list[7] = -mtx[9]
+        mtx_list[8] = mtx[10]
+
+        mtx_list[9] = mtx[12]
+        mtx_list[10] = mtx[13]
+        mtx_list[11] = -mtx[14]
  
-        return AWDMatrix4x4(mtx_list)
+        return AWDMatrix3x4(mtx_list)
         
     def mtx_maya2awd(self, mtx):
         mtx_list = []
