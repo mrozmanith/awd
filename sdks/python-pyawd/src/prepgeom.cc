@@ -16,32 +16,33 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
     int sub_i;
     int num_subs;
-    AWDMeshData *lawd_md;
+    AWDTriGeom *lawd_md;
     const char *name;
     int name_len;
     PyObject *subs_list;
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
 
-    lawd_md = new AWDMeshData(name, name_len);
+    lawd_md = new AWDTriGeom(name, name_len);
 
     // Get list of sub-meshes from python-space attribute __sub_meshes
-    subs_list = PyObject_GetAttrString(block, "_AWDMeshData__sub_meshes");
+    subs_list = PyObject_GetAttrString(block, "_AWDTriGeom__sub_geoms");
     num_subs = PyList_Size(subs_list);
     for (sub_i=0; sub_i<num_subs; sub_i++) {
-        AWDSubMesh *lawd_sub;
+        AWDSubGeom *lawd_sub;
         int str_i;
         int num_streams;
         PyObject *streams_list;
         PyObject *sub = PyList_GetItem(subs_list, sub_i);
 
-        lawd_sub = new AWDSubMesh();
+        lawd_sub = new AWDSubGeom();
 
         // Get list of data streams from python-space attribute __data_streams
-        streams_list = PyObject_GetAttrString(sub, "_AWDSubMesh__data_streams");
+        streams_list = PyObject_GetAttrString(sub, "_AWDSubGeom__data_streams");
         num_streams = PyList_Size(streams_list);
         for (str_i=0; str_i<num_streams; str_i++) {
             int data_len;
+			AWD_field_type elem_type;
             AWD_mesh_str_type str_type;
             AWD_str_ptr lawd_data;
             PyObject *type;
@@ -60,13 +61,17 @@ __prepare_mesh_data(PyObject *block, AWD *awd, pyawd_bcache *bcache)
             str_type = (AWD_mesh_str_type)PyLong_AsLong(type);
             if (str_type == TRIANGLES || str_type == JOINT_INDICES) {
                 lawd_data.ui32 = pyawdutil_pylist_to_uint32(data, NULL, data_len);
+				elem_type = AWD_FIELD_UINT16;
             }
             else {
                 lawd_data.f64 = pyawdutil_pylist_to_float64(data, NULL, data_len);
+				elem_type = AWD_FIELD_FLOAT32;
             }
 
+			// TODO: Make elem_type configurable
+
             // Add stream to libawd sub-mesh
-            lawd_sub->add_stream(str_type, lawd_data, data_len);
+            lawd_sub->add_stream(str_type, elem_type, lawd_data, data_len);
         }
 
         // Add sub-mesh to libawd mesh data

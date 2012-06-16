@@ -8,7 +8,7 @@ STR_VERTEX_TANGENTS = 5
 STR_JOINT_INDICES = 6
 STR_JOINT_WEIGHTS = 7
 
-class AWDSubMesh:
+class AWDSubGeom:
     def __init__(self):
         self.__data_streams = []
 
@@ -22,19 +22,19 @@ class AWDSubMesh:
         return self.__data_streams[index]
 
 
-class AWDMeshData(core.AWDAttrElement, core.AWDBlockBase):
+class AWDTriGeom(core.AWDAttrElement, core.AWDBlockBase):
     def __init__(self, name=''):
-        super(AWDMeshData, self).__init__()
+        super(AWDTriGeom, self).__init__()
 
         self.name = name
-        self.__sub_meshes = []
+        self.__sub_geoms = []
 
-    def add_sub_mesh(self, sub):
-        self.__sub_meshes.append(sub)
+    def add_sub_geom(self, sub):
+        self.__sub_geoms.append(sub)
 
     def __len__(self):
-        return len(self.__sub_meshes)
+        return len(self.__sub_geoms)
 
     def __getitem__(self, index):
-        return self.__sub_meshes[index]
+        return self.__sub_geoms[index]
 

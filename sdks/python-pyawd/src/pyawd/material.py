@@ -1,13 +1,12 @@
 from pyawd import core
 
 
-class AWDTexture(core.AWDAttrElement, core.AWDBlockBase):
+class AWDBitmapTexture(core.AWDAttrElement, core.AWDBlockBase):
     EXTERNAL = 0
-    EMBED_JPG = 1
-    EMBED_PNG = 2
+    EMBED = 1
 
     def __init__(self, type=0, name='', url=None):
-        super(AWDTexture, self).__init__()
+        super(AWDBitmapTexture, self).__init__()
         self.type = type
         self.name = name
         self.url = url
@@ -29,5 +28,6 @@ class AWDMaterial(core.AWDAttrElement, core.AWDBlockBase):
         self.alpha_blending = False
         self.alpha_threshold = 0.0
         self.color = 0
+        self.alpha = 1.0
 
 

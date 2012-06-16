@@ -21,12 +21,12 @@ __prepare_mesh_inst(PyObject *block, pyawd_bcache *bcache)
     PyObject *mat_attr;
 
     AWDMeshInst *lawd_inst;
-    AWDMeshData *lawd_md;
+    AWDTriGeom *lawd_md;
     
     lawd_md = NULL;
-    md_attr = PyObject_GetAttrString(block, "mesh_data");
+    md_attr = PyObject_GetAttrString(block, "geometry");
     if (md_attr != Py_None) {
-        lawd_md = (AWDMeshData *)pyawd_bcache_get(bcache, md_attr);
+        lawd_md = (AWDTriGeom *)pyawd_bcache_get(bcache, md_attr);
     }
     
     lawd_inst = new AWDMeshInst(NULL, 0, lawd_md);
@@ -108,33 +108,6 @@ __prepare_light(PyObject *block)
 }
 
 
-static AWDSceneBlock *
-__prepare_primitive(PyObject *block, bool subtype)
-{
-    AWD_primitive_type type;
-    AWDPrimitive *lawd_prim;
-
-    if (subtype) {
-        if (strcmp(block->ob_type->tp_name, "AWDCubePrimitive")==0) {
-            type = AWD_PRIMITIVE_CUBE;
-        }
-        else {
-            //TODO: Handle error, unknown sub-type
-            return NULL;
-        }
-    }
-    else {
-        PyObject *type_attr;
-        type_attr = PyObject_GetAttrString(block, "type");
-        type = (AWD_primitive_type)PyLong_AsLong(type_attr);
-    }
-
-    lawd_prim = new AWDPrimitive(NULL, 0, type);
-
-    return lawd_prim;
-}
-
-
 void
 __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 {
@@ -165,18 +138,9 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     else if (strcmp(type, "AWDLight")==0) {
         scene_block = __prepare_light(block);
     }
-    else if (strcmp(type, "AWDPrimitive")==0) {
-        scene_block = __prepare_primitive(block, false);
-    }
     else {
-        PyTypeObject *base = block->ob_type->tp_base;
-        if (base && strcmp(base->tp_name, "AWDPrimitive")==0) {
-            scene_block = __prepare_primitive(block, true);
-        }
-        else {
-            // Unknown type
-            return;
-        }
+		// Unknown type
+		return;
     }
 
     mtx = NULL;

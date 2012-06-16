@@ -48,8 +48,8 @@ __prepare_material(PyObject *block, AWD *awd, pyawd_bcache *bcache)
 
         tex_attr = PyObject_GetAttrString(block, "texture");
         if (tex_attr != Py_None) {
-            AWDTexture *tex;
-            tex = (AWDTexture *)pyawd_bcache_get(bcache, tex_attr);
+            AWDBitmapTexture *tex;
+            tex = (AWDBitmapTexture *)pyawd_bcache_get(bcache, tex_attr);
             if (tex)
                 lawd_mat->set_texture(tex);
         }
@@ -78,14 +78,14 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     AWD_tex_type type;
     PyObject *type_attr;
 
-    AWDTexture *lawd_tex;
+    AWDBitmapTexture *lawd_tex;
 
     type_attr = PyObject_GetAttrString(block, "type");
     type = (AWD_tex_type)PyLong_AsLong(type_attr);
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
 
-    lawd_tex = new AWDTexture(type, name, name_len);
+    lawd_tex = new AWDBitmapTexture(type, name, name_len);
 
     if (type == EXTERNAL) {
         const char *url;
@@ -102,7 +102,7 @@ __prepare_texture(PyObject *block, AWD *awd, pyawd_bcache *bcache)
         const char *buf;
         int buf_len;
 
-        tex_bytes = PyObject_GetAttrString(block, "_AWDTexture__data");
+        tex_bytes = PyObject_GetAttrString(block, "_AWDBitmapTexture__data");
         buf = PyBytes_AsString(tex_bytes);
         buf_len = PyBytes_Size(tex_bytes);
 
