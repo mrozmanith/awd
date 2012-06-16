@@ -1,4 +1,4 @@
-class AWDMatrix4x4(object):
+class AWDMatrix3x4(object):
     def __init__(self, raw_data=None):
         self.raw_data = raw_data
 

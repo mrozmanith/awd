@@ -148,7 +148,7 @@ __prepare_scene_block(PyObject *block, AWD *awd, pyawd_bcache *bcache)
     if (mtx_attr != Py_None) {
         PyObject *mtx_list;
         mtx_list = PyObject_GetAttrString(mtx_attr, "raw_data");
-        mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 16);
+        mtx = pyawdutil_pylist_to_float64(mtx_list, NULL, 12);
     }
 
     pyawdutil_get_strattr(block, "name", &name, &name_len);
