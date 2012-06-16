@@ -517,18 +517,19 @@ class MayaAWDExporter:
             else:
                 self.awd.add_scene_block(inst)
  
-            history = mc.listHistory(transform)
-            clusters = mc.ls(history, type='skinCluster')
-            if len(clusters) > 0:
-                #TODO: Deal with multiple clusters?
-                sc = clusters[0]
+            if self.include_skeletons:
+                history = mc.listHistory(transform)
+                clusters = mc.ls(history, type='skinCluster')
+                if len(clusters) > 0:
+                    #TODO: Deal with multiple clusters?
+                    sc = clusters[0]
  
-                influences = mc.skinCluster(sc, q=True, inf=True)
-                if len(influences) > 0:
-                    skel_path = self.get_skeleton_root(influences[0])
+                    influences = mc.skinCluster(sc, q=True, inf=True)
+                    if len(influences) > 0:
+                        skel_path = self.get_skeleton_root(influences[0])
  
-                    if self.block_cache.get(skel_path) is None:
-                        self.export_skeleton(skel_path)
+                        if self.block_cache.get(skel_path) is None:
+                            self.export_skeleton(skel_path)
  
     def export_materials(self, transform, awd_inst):
         sets = mc.listSets(object=transform, t=1, ets=True)
