@@ -2,6 +2,7 @@ syntax: glob
 *.o
 *.pyc
 *.swp
+*.DS_Store
 sdks/python-pyawd/build
 sdks/cpp-libawd/build
 tools/viewers/flash/away3d
