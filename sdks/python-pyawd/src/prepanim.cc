@@ -33,7 +33,7 @@ __prepare_skeljoint(PyObject *py_joint, AWD *awd, AWDSkeletonJoint *lawd_parent)
 
         raw_data_attr = PyObject_GetAttrString(bind_mtx_attr, "raw_data");
         if (raw_data_attr)
-            mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 16);
+            mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 12);
     }
 
     lawd_joint = new AWDSkeletonJoint(name, name_len, mtx);
@@ -152,7 +152,7 @@ __prepare_skelpose(PyObject *block, AWD *awd, pyawd_bcache *bcache)
             awd_float64 *mtx;
 
             raw_data_attr = PyObject_GetAttrString(joint_tf, "raw_data");
-            mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 16);
+            mtx = pyawdutil_pylist_to_float64(raw_data_attr, NULL, 12);
             lawd_pose->set_next_transform(mtx);
         }
         else {
