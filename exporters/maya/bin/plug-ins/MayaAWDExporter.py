@@ -16,7 +16,6 @@ from pyawd.anim import *
 from pyawd.scene import *
 from pyawd.geom import *
 from pyawd.material import *
-from pyawd.utils import *
 from pyawd.utils.math import *
 
 
@@ -89,6 +88,42 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
                 exporter.joints_per_vert = int(o('jointspervert', 3))
 
             exporter.export(None)
+
+            #TODO: Check whether to copy viewer
+            if False:
+                import shutil
+                import subprocess
+
+                pyawd_path = pyawd.__path__[0]
+                viewer_path = os.path.normpath(os.path.join(pyawd_path, '..', 'mayaawd'))
+                out_path = os.path.dirname(file_path)
+                out_name = os.path.basename(os.path.splitext(file_path)[0])
+
+                #TODO: Check local/network
+                viewer_name = 'viewer_l.swf'
+
+                shutil.copyfile(os.path.join(viewer_path, viewer_name), os.path.join(out_path, 'viewer.swf'))
+                shutil.copyfile(os.path.join(viewer_path, 'swfobject.js'), os.path.join(out_path, 'swfobject.js'))
+
+                html_template = os.path.join(viewer_path, 'template.html')
+                html_output = os.path.splitext(file_path)[0] + '.html'
+
+                # TODO: Fetch color from options
+                bg_color = '000000'
+
+                with open(html_template, 'r') as html_in:
+                    with open(html_output, 'w') as html_out:
+                        for line in html_in:
+                            line = line.replace('%NAME%', out_name)
+                            line = line.replace('%COLOR%', bg_color) 
+                            html_out.write(line)
+                
+                try:
+                    # Windows?
+                    os.startfile(html_output)
+                except AttributeError:
+                    # Mac OS X
+                    subprocess.call(['open', html_output])
 
 
     def defaultExtension(self):
@@ -300,7 +335,7 @@ class MayaAWDExporter:
 
     def export_camera(self, transform, awd_parent):
         mtx = mc.xform(transform, q=True, m=True)
-        cam = AWDCamera(self.get_name(transform), AWDMatrix4x4(mtx))
+        cam = AWDCamera(self.get_name(transform), AWDMatrix3x4(mtx))
         cam.type = CAM_FREE
         cam.lens = LENS_PERSPECTIVE
         cam.fov = mc.camera(transform, q=True, vfv=True)
@@ -485,7 +520,7 @@ class MayaAWDExporter:
         if (tf_is_ref or sh_is_ref) and self.replace_exrefs:
             # This is an external reference, and it should be
             # replaced with an empty container in the AWD file
-            ctr = AWDContainer(name=tf_name, transform=AWDMatrix4x4(mtx))
+            ctr = AWDContainer(name=tf_name, transform=AWDMatrix3x4(mtx))
             self.set_attributes(transform, ctr)
             self.block_cache.add(transform, ctr)
             if awd_ctr is not None:
@@ -498,7 +533,7 @@ class MayaAWDExporter:
             if md is None:
                 print('Creating mesh data %s' % sh_name)
                 md = AWDTriGeom(sh_name)
-                md.bind_matrix = AWDMatrix4x4(mtx)
+                md.bind_matrix = AWDMatrix3x4(mtx)
                 self.export_mesh_data(md, shape)
                 self.awd.add_tri_geom(md)
                 self.block_cache.add(sh_name, md)
@@ -517,18 +552,19 @@ class MayaAWDExporter:
             else:
                 self.awd.add_scene_block(inst)
  
-            history = mc.listHistory(transform)
-            clusters = mc.ls(history, type='skinCluster')
-            if len(clusters) > 0:
-                #TODO: Deal with multiple clusters?
-                sc = clusters[0]
+            if self.include_skeletons:
+                history = mc.listHistory(transform)
+                clusters = mc.ls(history, type='skinCluster')
+                if len(clusters) > 0:
+                    #TODO: Deal with multiple clusters?
+                    sc = clusters[0]
  
-                influences = mc.skinCluster(sc, q=True, inf=True)
-                if len(influences) > 0:
-                    skel_path = self.get_skeleton_root(influences[0])
+                    influences = mc.skinCluster(sc, q=True, inf=True)
+                    if len(influences) > 0:
+                        skel_path = self.get_skeleton_root(influences[0])
  
-                    if self.block_cache.get(skel_path) is None:
-                        self.export_skeleton(skel_path)
+                        if self.block_cache.get(skel_path) is None:
+                            self.export_skeleton(skel_path)
  
     def export_materials(self, transform, awd_inst):
         sets = mc.listSets(object=transform, t=1, ets=True)
@@ -837,31 +873,24 @@ class MayaAWDExporter:
         return str(dag_path.split('|')[-1])
         
     def mtx_list2awd(self, mtx):
-        mtx_list = [v for v in mtx]
-        mtx_list[2] *= -1
-        mtx_list[6] *= -1
-        mtx_list[8] *= -1
-        mtx_list[9] *= -1
-        mtx_list[11] *= -1
-        mtx_list[14] *= -1
-        #mtx_list[0] = mtx[0]
-        #mtx_list[1] = mtx[2]
-        #mtx_list[2] = mtx[1]
-        #mtx_list[3] = mtx[3]
-        #mtx_list[4] = mtx[8]
-        #mtx_list[5] = mtx[10]
-        #mtx_list[6] = mtx[9]
-        #mtx_list[7] = mtx[11]
-        #mtx_list[8] = mtx[4]
-        #mtx_list[9] = mtx[6]
-        #mtx_list[10] = mtx[5]
-        #mtx_list[11] = mtx[7]
-        #mtx_list[12] = mtx[12]
-        #mtx_list[13] = mtx[14]
-        #mtx_list[14] = mtx[13]
-        #mtx_list[15] = mtx[15]
+        mtx_list = [1,0,0,0,1,0,0,0,1,0,0,0]
+        mtx_list[0] = mtx[0]
+        mtx_list[1] = mtx[1]
+        mtx_list[2] = -mtx[2]
+
+        mtx_list[3] = mtx[4]
+        mtx_list[4] = mtx[5]
+        mtx_list[5] = -mtx[6]
+
+        mtx_list[6] = -mtx[8]
+        mtx_list[7] = -mtx[9]
+        mtx_list[8] = mtx[10]
+
+        mtx_list[9] = mtx[12]
+        mtx_list[10] = mtx[13]
+        mtx_list[11] = -mtx[14]
  
-        return AWDMatrix4x4(mtx_list)
+        return AWDMatrix3x4(mtx_list)
         
     def mtx_maya2awd(self, mtx):
         mtx_list = []

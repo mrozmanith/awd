@@ -99,12 +99,131 @@ global proc int MayaAWDExporterUI(string $parent,
             text -label "Sequence file path:" -align "left";
             textField -tx "sequences.txt" tfSequences;
 
+        /*
         setParent $parent;
         frameLayout -l "Cameras and lights"
             -mw 20 -mh 20
             -bs "etchedIn";
             checkBox -label "Include cameras" chkIncludeCameras;
             checkBox -label "Include lights" chkIncludeLights;
+            */
+
+        // Use $settings to set initial state
+        // Split stored settings
+        string $options[];
+        int $len=`tokenize $settings "&" $options`;
+
+        for ($i=0; $i<$len; $i++) {
+            string $option[];
+            tokenize $options[$i] "=" $option;
+            string $key = $option[0];
+
+            switch ($key) {
+                case "wide_mtx":
+                    int $ival = $option[1];
+                    radioButtonGrp -e -sl $ival radWideMtx;
+                    break;
+
+                case "wide_geom":
+                    int $ival = $option[1];
+                    radioButtonGrp -e -sl $ival radWideGeom;
+                    break;
+
+                case "compression":
+                    int $ival;
+                    switch ($option[1]) {
+                        case "none": $ival = 1; break;
+                        case "deflate": $ival = 2; break;
+                        case "lzma": $ival = 3; break;
+                    }
+
+                    optionMenu -e -sl $ival optCompression;
+                    break;
+
+                case "inc_attr":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeAttributes;
+                    // Enable namespace text field if checked
+                    textField -e -en ($ival==1) tfUserNamespace;
+                    break;
+
+                case "attrns":
+                    string $sval = $option[1];
+                    textField -e -tx $sval tfUserNamespace;
+                    break;
+
+                case "inc_geom":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeGeom;
+                    break;
+
+                case "inc_scene":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeScene;
+                    break;
+
+                case "flatten_untransformed":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkFlatten;
+                    break;
+
+                case "replace_exrefs":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkReplaceExRefs;
+                    break;
+
+                case "inc_materials":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeMat;
+                    break;
+
+                case "embed_textures":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkEmbedTex;
+                    break;
+
+                case "alpha_blending":
+                    radioButtonGrp -e -sl 2 radAlphaMethod;
+                    floatSliderGrp -e -en false inpAlphaThreshold;
+                    break;
+
+                case "alpha_threshold":
+                    float $fval = $option[1];
+                    radioButtonGrp -e -sl 3 radAlphaMethod;
+                    floatSliderGrp -e -v $fval inpAlphaThreshold;
+                    floatSliderGrp -e -en true inpAlphaThreshold;
+                    break;
+
+                case "inc_skeletons":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeSkel;
+                    break;
+
+                case "inc_uvanim":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkIncludeUVAnim;
+                    break;
+
+                case "inc_skelanim":
+                    int $ival = $option[1];
+                    print "inc_skelanim\n";
+                    print $ival;
+                    print "\n\n\n";
+                    checkBox -e -v $ival chkIncludeSkelAnim;
+                    intSliderGrp -e -en ($ival==1) inpJointsPerVert;
+                    break;
+
+                case "jointspervert":
+                    int $ival = $option[1];
+                    intSliderGrp -e -v $ival inpJointsPerVert;
+                    break;
+
+                case "seqsrc":
+                    string $sval = $option[1];
+                    textField -e -tx $sval tfSequences;
+                    break;
+            }
+        }
     }
     else if ($action == "query") { 
         int $oi=0;
@@ -197,6 +316,7 @@ global proc int MayaAWDExporterUI(string $parent,
         $options[$oi] = "seqsrc="+`textField -q -tx tfSequences`;
         $oi++;
 
+        /*
         if (`checkBox -q -v chkIncludeCameras`) {
             $oitions[$oi] = "inc_cams=1";
             $oi++;
@@ -206,6 +326,7 @@ global proc int MayaAWDExporterUI(string $parent,
             $oitions[$oi] = "inc_lights=1";
             $oi++;
         }
+        */
 
 
         // Join option string (equivalent of '&'.join(options) in Python)
