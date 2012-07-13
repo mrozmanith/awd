@@ -89,8 +89,9 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
 
             exporter.export(None)
 
-            #TODO: Check whether to copy viewer
-            if True:
+            # Copy viewer if preview should be created
+            create_preview = int(o('create_preview', 0)) 
+            if create_preview:
                 import shutil
                 import subprocess
 
@@ -99,8 +100,12 @@ class MayaAWDFileTranslator(OpenMayaMPx.MPxFileTranslator):
                 out_path = os.path.dirname(file_path)
                 out_name = os.path.basename(os.path.splitext(file_path)[0])
 
-                #TODO: Check local/network
-                viewer_name = 'viewer_l.swf'
+                # Pick the right SWF file depending on desired sandbox model
+                prev_sandbox = int(o('preview_sandbox', 1))
+                if prev_sandbox == 1:
+                    viewer_name = 'viewer_l.swf'
+                else:
+                    viewer_name = 'viewer_n.swf'
 
                 shutil.copyfile(os.path.join(viewer_path, viewer_name), os.path.join(out_path, 'viewer.swf'))
                 shutil.copyfile(os.path.join(viewer_path, 'swfobject.js'), os.path.join(out_path, 'swfobject.js'))
