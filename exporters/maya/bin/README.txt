@@ -1,3 +1,5 @@
+Maya AWD v1.0.0
+
 This is an AWD2 exporter for Autodesk Maya. To install, copy the contents of
 the enclosed scripts folder to your Maya scripts folder, and the contents of
 the enclosed plug-ins folder to your Maya plug-ins folder. 
