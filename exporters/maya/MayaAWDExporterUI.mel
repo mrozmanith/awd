@@ -99,6 +99,24 @@ global proc int MayaAWDExporterUI(string $parent,
             text -label "Sequence file path:" -align "left";
             textField -tx "sequences.txt" tfSequences;
 
+        setParent $parent;
+        frameLayout -l "Preview"
+            -mw 20 -mh 20
+            -bs "etchedIn";
+            checkBox -label "Create Flash preview"
+                -onc "radioButtonGrp -e -en true radPreviewSandbox"
+                -ofc "radioButtonGrp -e -en false radPreviewSandbox"
+                -v 1 -align "left"
+                chkCreatePreview;
+
+            text -align "left" -l"Deployment type:";
+            columnLayout -co "left" 20;
+                radioButtonGrp -nrb 2 -vr -cl2 "left" "left" -sl 1
+                    -labelArray2 "Preview on local machine" "Deploy online" 
+                    radPreviewSandbox;
+
+
+
         /*
         setParent $parent;
         frameLayout -l "Cameras and lights"
@@ -219,6 +237,17 @@ global proc int MayaAWDExporterUI(string $parent,
                     string $sval = $option[1];
                     textField -e -tx $sval tfSequences;
                     break;
+
+                case "create_preview":
+                    int $ival = $option[1];
+                    checkBox -e -v $ival chkCreatePreview;
+                    radioButtonGrp -e -en $ival radPreviewSandbox;
+                    break;
+
+                case "preview_sandbox":
+                    int $ival = $option[1];
+                    radioButtonGrp -e -sl $ival radPreviewSandbox;
+                    break;
             }
         }
     }
@@ -258,6 +287,9 @@ global proc int MayaAWDExporterUI(string $parent,
         $options[$oi++] = "inc_skelanim="+`checkBox -q -v chkIncludeSkelAnim`;
         $options[$oi++] = "jointspervert="+`intSliderGrp -q -v inpJointsPerVert`;
         $options[$oi++] = "seqsrc="+`textField -q -tx tfSequences`;
+
+        $options[$oi++] = "create_preview="+`checkBox -q -v chkCreatePreview`;
+        $options[$oi++] = "preview_sandbox="+`radioButtonGrp -q -sl radPreviewSandbox`;
 
 
         // Join option string (equivalent of '&'.join(options) in Python)
